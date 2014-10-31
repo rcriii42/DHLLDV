@@ -6,6 +6,9 @@ Created on Oct 8, 2014
 '''
 from DHLLDV_Utils import interpDict
 
+steel_roughness = 4.5e-05 #new steel pipe absolute roughness in m
+gravity =  9.80665 #m/s2
+
 water_density = interpDict({00:0.99984, #deg C, density in ton/m**3 per wikipedia
                             04:0.99997,
                             05:0.99996,
@@ -57,9 +60,6 @@ water_dynamic_viscosity = interpDict({00:1.7921E-03,   #Dynamic Viscosity (mu or
 #Water kinematic viscosity in m2/sec
 water_viscosity = interpDict(dict((t,water_dynamic_viscosity[t]/(1000*water_density[t])) for t in water_density.keys()))
 
-steel_roughness = 4.5e-05 #new steel pipe absolute roughness in m
-gravity =  9.80665 #m/s2
-
 Arel_to_beta = interpDict({0.00000:0.0000000,  #lookup table for calculating the angle beta for a given proportion of a pipe filled
                            0.00007:0.0698132,  #Arel = Adesired/Atotal
                            0.00058:0.1396263,  #beta in radians
@@ -70,6 +70,7 @@ Arel_to_beta = interpDict({0.00000:0.0000000,  #lookup table for calculating the
                            0.10838:0.8377580,
                            0.16355:0.9773844,
                            0.23014:1.1170107,
+                           0.25000:1.1549420,
                            0.28659:1.2217305,
                            0.33709:1.3089969,
                            0.39001:1.3962634,
