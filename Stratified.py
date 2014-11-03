@@ -7,7 +7,7 @@ Created on Oct 22, 2014
 '''
 
 from DHLLDV_constants import gravity, Arel_to_beta
-from math import pi, sin
+from math import pi, sin, log
 
 def beta(Cvs, Cvb=0.6):
     """Return the angle beta based on the Cvs and Cvb"""
@@ -38,6 +38,29 @@ def perimeters(Dp, Cvs, Cvb=0.6):
     O12 = Dp * sin(B)
     O2 = Op - O1
     return Op, O1, O12, O2
+
+def lambda1(Dp_H, v1, epsilon, nu_l):
+    """Return the friction factor for the pipewall above the bed (eqn 8.3-12)
+       Dp_H = Hydraulic radius of the pipe above the bed (m)
+       v1 = velocity of the fluid above the bed (m/sec)
+       epsilon = absolute pipe roughness (m)
+       nu_l = fluid kinematic viscosity in m2/sec
+    """
+    Re = v1 * Dp_H/nu_l
+    c1 = 0.27*epsilon/Dp_H
+    c2 = 5.75/Re**0.9
+    bottom = log(c1+c2)**2
+    return 1.325/bottom
+
+def lambda12(Dp, vls, v2, rho_s, rho_l):
+    """Return the bed friction factor lambda12 (eqn 8.3-12, no sheet flow) 
+       Dp = Pipe diameter (m)
+       vls = overall average line speed (m/sec)
+       v2 = velocity of the bed (m/sec)
+       rho_s = density of solids (ton/m3)
+       rho_l = density of the fluid (ton/m3)
+    """
+    pass
     
 if __name__ == '__main__':
     pass
