@@ -35,6 +35,31 @@ class Test(unittest.TestCase):
         epsilon = DHLLDV_constants.steel_roughness
         nu_l = DHLLDV_constants.water_viscosity[20]
         self.assertAlmostEqual(stratified.lambda1(Dp_H, v1, epsilon, nu_l), 1.336871e-02, places=3)
+        
+    def test_lambda12(self):
+        Ap, A1, A2 = stratified.areas(0.5, 0.1)
+        Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
+        Dp_H = 4*A1/(O1+O12)
+        v1 = 2*Ap/A1
+        epsilon = DHLLDV_constants.steel_roughness
+        nu_l = DHLLDV_constants.water_viscosity[20]
+        rho_l = DHLLDV_constants.water_density[20]
+        d=.0075
+        v2 = 0
+        self.assertAlmostEqual(stratified.lambda12(Dp_H, d, v1, v2, rho_l, nu_l), 4.59257238e-02)#, places=3)
+        
+    def test_lambda12_sf(self):
+        Ap, A1, A2 = stratified.areas(0.5, 0.1)
+        Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
+        Dp_H = 4*A1/(O1+O12)
+        v1 = 2*Ap/A1
+        epsilon = DHLLDV_constants.steel_roughness
+        nu_l = DHLLDV_constants.water_viscosity[20]
+        rho_l = DHLLDV_constants.water_density[20]
+        rho_s = 2.65
+        d=.0075
+        v2 = 0
+        self.assertAlmostEqual(stratified.lambda12_sf(Dp_H, d, v1, v2, epsilon, rho_s, rho_l, nu_l), 3.9094578e-02, places=3)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
