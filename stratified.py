@@ -9,6 +9,7 @@ Created on Oct 22, 2014
 from DHLLDV_constants import gravity, Arel_to_beta
 from math import pi, sin, log
 
+
 def beta(Cvs, Cvb=0.6):
     """Return the angle beta based on the Cvs and Cvb"""
     return Arel_to_beta[Cvs/Cvb]
@@ -25,19 +26,21 @@ def areas(Dp, Cvs, Cvb=0.6):
     A1 = Ap - A2
     return Ap, A1, A2
 
+
 def perimeters(Dp, Cvs, Cvb=0.6):
     """Return the four perimeters:
        Op  = The perimeter of the pipe
        O1  = The length of pipewall above the bed
        O12 = The width of the top of the bed
        O2  = The length of pipewall/bed contact
-    """ 
+    """
     B = beta(Cvs, Cvb)
     Op = pi * Dp
     O1 = (pi - B) * Dp
     O12 = Dp * sin(B)
     O2 = Op - O1
     return Op, O1, O12, O2
+
 
 def lambda1(Dp_H, v1, epsilon, nu_l):
     """Return the friction factor for the pipewall above the bed (eqn 8.3-12)
@@ -52,15 +55,37 @@ def lambda1(Dp_H, v1, epsilon, nu_l):
     bottom = log(c1+c2)**2
     return 1.325/bottom
 
-def lambda12(Dp, vls, v2, rho_s, rho_l):
-    """Return the bed friction factor lambda12 (eqn 8.3-12, no sheet flow) 
+
+def lambda12(Dp_H, d, v1, v2, rho_l, nu_l):
+    """Return the bed friction factor lambda12 (eqn 8.3-13, no sheet flow)
        Dp = Pipe diameter (m)
-       vls = overall average line speed (m/sec)
+       d = Particle diameter (m)
+       v1 = velocity of the fluid above the bed (m/sec)
        v2 = velocity of the bed (m/sec)
-       rho_s = density of solids (ton/m3)
+       nu_l = fluid kinematic viscosity in m2/sec
        rho_l = density of the fluid (ton/m3)
     """
-    pass
-    
+    Re = (v1 - v2) * Dp_H/nu_l
+    c1 = 0.27 * d/Dp_H
+    c2 = 5.75/Re**0.9
+    bottom = log(c1+c2)**2
+    return 1.325/bottom
+
+
+def lambda12_sf(Dp_H, d, v1, v2, epsilon, rho_s, rho_l, nu_l):
+    """Return the bed friction factor lambda12 (eqn 8.3-14, with sheet flow)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       v1 = velocity of the fluid above the bed (m/sec)
+       v2 = velocity of the bed (m/sec)
+       nu_l = fluid kinematic viscosity in m2/sec
+       rho_l = density of the fluid (ton/m3)
+    """
+    Rsd = (rho_s - rho_l)/rho_l
+    first = ((v1-v2)/(2*gravity*Dp_H*Rsd)**0.5)**2.73
+    second = ((rho_s*(pi/6)*d**3)/rho_l)**0.094
+    return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second
+
+
 if __name__ == '__main__':
     pass
