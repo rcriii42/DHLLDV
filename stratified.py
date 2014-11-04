@@ -86,6 +86,24 @@ def lambda12_sf(Dp_H, d, v1, v2, epsilon, rho_s, rho_l, nu_l):
     second = ((rho_s*(pi/6)*d**3)/rho_l)**0.094
     return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second
 
+def stratified_pressure_loss(Dp, epsilon, d, rho_s, rho_l, nu_l, Cvs, vls, v2=0):
+    """Return the pressure loss for stratified flow with a given bed velocity.
+    """
+    Ap, A1, A2 = areas(Dp, Cvs)
+    Op, O1, O12, O2 = perimeters(Dp, Cvs)
+    Dp_H = 4*A1/(O1+O12)
+    v1 = 2*Ap/A1
+    tau1 = lambda1(Dp_H, v1, epsilon, nu_l)*rho_l*v1^2/8
+    tau12_nsf = lambda12(Dp_H, d, v1, v2, rho_l, nu_l)*rho_l*(v1-v2)^2/8
+    tau12_sf = lambda12_sf(Dp_H, d, v1, v2, epsilon, rho_s, rho_l, nu_l)*rho_l*(v1-v2)^2/8
+    tau12 = max(tau12_nsf, tau12_sf)
+    return (tau1*O1 + tau12*O12)/A1  #Equation 8.3-19
+
+def stratified_head_loss(Dp, epsilon, d, rho_s, rho_l, nu_l, Cvs, vls, v2=0):
+    """Return the head loss for stratified flow with a given bed velocity.
+    """
+    return  stratified_pressure_loss(Dp, epsilon, d, rho_s, rho_l, nu_l, Cvs, vls, v2)/(rho_l*gravity)
+
 
 if __name__ == '__main__':
     pass
