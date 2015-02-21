@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         nu_l = DHLLDV_constants.water_viscosity[20]
         self.assertAlmostEqual(stratified.lambda1(Dp_H, v1, epsilon, nu_l), 
                                0.01349789)
-    
+
     def test_lambda12(self):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
@@ -47,7 +47,7 @@ class Test(unittest.TestCase):
         nu_l = DHLLDV_constants.water_viscosity[20]
         self.assertAlmostEqual(stratified.lambda12(Dp_H, d, v1, v2, nu_l), 
                                0.46554005, places=5)
-    
+
     def test_lambda12_sf(self):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
         rho_l = DHLLDV_constants.water_density[20]
         self.assertAlmostEqual(stratified.lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s),
                                0.09045342, places=6)
-    
+
     def test_fb_pressure_loss(self):
         vls = 2.0
         Dp = 0.5
