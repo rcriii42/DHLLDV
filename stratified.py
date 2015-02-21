@@ -7,6 +7,7 @@ Created on Oct 22, 2014
 '''
 
 from DHLLDV_constants import gravity, Arel_to_beta
+from homogeneous import fluid_head_loss
 from math import pi, sin, log
 
 
@@ -128,6 +129,38 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
     """
     delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb)
     return delta_p * rhol/gravity
+
+
+def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
+    """Return the pressure loss for a sliding bed.
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+    """
+    im = sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb)
+    return im*gravity/rhol
+
+
+def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
+    """Return the head loss for sliding bed.
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+    """
+    Erhg = 0.415
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    Rsd = (rhos-rhol)/rhol
+    return Erhg*Rsd*Cvs+il
 
 if __name__ == '__main__':
     pass

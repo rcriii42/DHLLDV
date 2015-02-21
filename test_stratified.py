@@ -75,6 +75,20 @@ class Test(unittest.TestCase):
                                0.22937437, places=5)
         self.assertAlmostEqual(stratified.fb_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
                                0.02334757, places=6)
+        
+    def test_sliding_bed_pressure_loss(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.3
+        epsilon = DHLLDV_constants.steel_roughness
+        nu_l = DHLLDV_constants.water_viscosity[20]
+        rho_s = 2.65
+        rho_l = DHLLDV_constants.water_density[20]
+        Cvs = 0.1
+        self.assertAlmostEqual(stratified.sliding_bed_pressure_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
+                               0.79134558773497)#, places=5)
+        self.assertAlmostEqual(stratified.sliding_bed_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
+                               0.08054954196153)#, places=6)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
