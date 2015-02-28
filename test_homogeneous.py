@@ -34,28 +34,26 @@ class Test(unittest.TestCase):
         lmbda = homogeneous.swamee_jain_ff(Re, 0.5, DHLLDV_constants.steel_roughness)
         self.assertAlmostEqual(lmbda, 2.75862069e-02)
 
-    def test_pressure_losses(self):
-        nu = DHLLDV_constants.water_viscosity[20]
-        rhol = DHLLDV_constants.water_density[20]
+    def test_Erhg(self):
+        vls = 3.0
+        Dp =0.5
         epsilon = DHLLDV_constants.steel_roughness
-        delta_p = homogeneous.fluid_pressure_loss(3.0, 0.5, epsilon, nu, rhol)
-        self.assertAlmostEqual(delta_p, 0.1162564)
-        il = homogeneous.fluid_head_loss(3.0, 0.5, epsilon, nu, rhol)
-        self.assertAlmostEqual(il, 0.01187623)
-
-    def test_relative_viscosity(self):
-        Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.relative_viscosity(Cvs), 2.4262998)
-
-    def test_homogeneous_pressure_losses(self):
-        Cvs = 0.25
-        nu = DHLLDV_constants.water_viscosity[20]
         rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.00843819592638)
+        
+    def test_head_loss(self):
+        vls = 3.0
+        Dp = 0.5
         epsilon = DHLLDV_constants.steel_roughness
-        delta_pm = homogeneous.homogeneous_pressure_loss(3.0, 0.5, epsilon, nu, rhol, Cvs)
-        self.assertAlmostEqual(delta_pm, 1.258881141e-01)
-        im = homogeneous.homogeneous_head_loss(3.0, 0.5, epsilon, nu, rhol, Cvs)
-        self.assertAlmostEqual(im, 1.286016339e-02)
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.01536706804371)
+        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.15097120600165)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

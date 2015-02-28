@@ -9,6 +9,9 @@ Created on Oct 7, 2014
 from math import log, exp
 from DHLLDV_constants import gravity
 
+Acv = 1.3   #coefficient homogeneous regime
+kvK = 0.4 #von Karman constant
+
 def pipe_reynolds_number(vls, Dp, nu):
     """
     Return the reynolds number for the given velocity, fluid & pipe
@@ -68,7 +71,27 @@ def relative_viscosity(Cvs):
     """
     return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)
 
-def homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, Cvs):
+def Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
+    """Return the Ergh value for homogeneous flow.
+    Use the Thomas correction for slurry density.
+    vls: line speed in m/sec
+    Dp: Pipe diameter in m
+    epsilon: pipe absolute roughness in m
+    nu: fluid kinematic viscosity in m2/sec
+    rhol: fluid density in ton/m3
+    Cvs - in situ volume concentration of solids
+    """
+    Re = pipe_reynolds_number(vls, Dp, nu)
+    lambda1 = swamee_jain_ff(Re, Dp, epsilon)
+    Rsd = (rhos-rhol)/rhol
+    rhom = rhol+Cvs*(rhos-rhol)
+    sb = ((Acv/kvK)*log(rhom/rhol)*(lambda1/8)**0.5+1)**2
+    top = 1+Rsd*Cvs - sb
+    bottom = Rsd*Cvs*sb
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    return il*top/bottom
+
+def homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
     """
     Return the pressure loss (delta_pm in kPa per m) for (pseudo) homogeneous flow incorporating viscosity correction.
     vls: line speed in m/sec
@@ -78,10 +101,9 @@ def homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, Cvs):
     rhol: fluid density in ton/m3
     Cvs - in situ volume concentration of solids
     """
-    nu_m = relative_viscosity(Cvs)*nu
-    return fluid_pressure_loss(vls, Dp, epsilon, nu_m, rhol)
+    return homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
 
-def homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, Cvs):
+def homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
     """
     Return the head loss (m.w.c per m) for (pseudo) homogeneous flow incorporating viscosity correction.
     vls: line speed in m/sec
@@ -91,5 +113,6 @@ def homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, Cvs):
     rhol: fluid density in ton/m3
     Cvs - in situ volume concentration of solids
     """
-    nu_m = relative_viscosity(Cvs)*nu
-    return fluid_head_loss(vls, Dp, epsilon, nu_m, rhol)
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    Rsd = (rhos-rhol)/rhol
+    return Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il

@@ -54,6 +54,33 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     
     return Shr + Srs
 
+def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
+    """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+    """
+    return heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
+
+def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
+    """Return the head loss (m.w.c per m) for (pseudo) heterogeneous flow.
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+    """
+    il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    Rsd = (rhos-rhol)/rhol
+    return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il
 
 if __name__ == '__main__':
     pass
