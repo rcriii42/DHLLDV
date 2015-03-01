@@ -7,16 +7,18 @@ Created on Oct 22, 2014
 '''
 
 from DHLLDV_constants import gravity, Arel_to_beta
-from homogeneous import fluid_head_loss
+import homogeneous
 from math import pi, sin, log
 
+musf = 0.415    #Sliding friction coefficient
+Cvb = 0.6       #The bed concentration
 
-def beta(Cvs, Cvb=0.6):
+def beta(Cvs):
     """Return the angle beta based on the Cvs and Cvb"""
     return Arel_to_beta[Cvs/Cvb]
 
 
-def areas(Dp, Cvs, Cvb=0.6):
+def areas(Dp, Cvs):
     """Return the three areas in the pipe:
        Ap = pipe area
        A1 = Area of clear fluid above the bed
@@ -29,14 +31,14 @@ def areas(Dp, Cvs, Cvb=0.6):
     return Ap, A1, A2
 
 
-def perimeters(Dp, Cvs, Cvb=0.6):
+def perimeters(Dp, Cvs):
     """Return the four perimeters:
        Op  = The perimeter of the pipe
        O1  = The length of pipewall above the bed
        O12 = The width of the top of the bed
        O2  = The length of pipewall/bed contact
     """
-    B = beta(Cvs, Cvb)
+    B = beta(Cvs)
     Op = pi * Dp
     O1 = (pi - B) * Dp
     O12 = Dp * sin(B)
@@ -90,7 +92,7 @@ def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s):
     return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second
 
 
-def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
+def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the pressure loss for fluid above a fixed bed.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -101,8 +103,8 @@ def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    Ap, A1, A2 = areas(Dp, Cvs, Cvb)
-    Op, O1, O12, O2 = perimeters(Dp, Cvs, Cvb)
+    Ap, A1, A2 = areas(Dp, Cvs)
+    Op, O1, O12, O2 = perimeters(Dp, Cvs)
     Dp_H = 4*A1/(O1 + O12)
     v1 = vls*Ap/A1
     v2 = 0.0
@@ -116,7 +118,7 @@ def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
     return (F1_l + F12_l)/A1
 
 
-def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
+def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the head loss for fluid above a fixed bed.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -127,11 +129,24 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb)
+    delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
     return delta_p * rhol/gravity
 
+def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
+    """Return the relative excess hydraulic gradient
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+    """
+    return musf  #Eq 8.4-2
 
-def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
+
+def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the pressure loss for a sliding bed.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -142,8 +157,7 @@ def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    im = sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb)
-    return im*gravity/rhol
+    return sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
 
 
 def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
@@ -157,10 +171,9 @@ def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    Erhg = 0.415
-    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos-rhol)/rhol
-    return Erhg*Rsd*Cvs+il
+    return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il
 
 if __name__ == '__main__':
     pass
