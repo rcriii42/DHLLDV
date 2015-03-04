@@ -71,11 +71,12 @@ def relative_viscosity(Cvs):
     """
     return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)
 
-def Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
+def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """Return the Ergh value for homogeneous flow.
     Use the Thomas correction for slurry density.
     vls: line speed in m/sec
     Dp: Pipe diameter in m
+    d: Particle diameter in m (not used, here for consitency)
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
@@ -91,7 +92,7 @@ def Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     return il*top/bottom
 
-def homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
+def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """
     Return the pressure loss (delta_pm in kPa per m) for (pseudo) homogeneous flow incorporating viscosity correction.
     vls: line speed in m/sec
@@ -101,9 +102,9 @@ def homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
     rhol: fluid density in ton/m3
     Cvs - in situ volume concentration of solids
     """
-    return homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
+    return homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
 
-def homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
+def homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """
     Return the head loss (m.w.c per m) for (pseudo) homogeneous flow incorporating viscosity correction.
     vls: line speed in m/sec
@@ -115,4 +116,4 @@ def homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs):
     """
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos-rhol)/rhol
-    return Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il
+    return Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il

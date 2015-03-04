@@ -37,23 +37,25 @@ class Test(unittest.TestCase):
     def test_Erhg(self):
         vls = 3.0
         Dp =0.5
+        d=0.5/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.00843819592638)
+        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.00843819592638)
         
     def test_head_loss(self):
         vls = 3.0
         Dp = 0.5
+        d=0.5/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.01536706804371)
-        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, epsilon, nu, rhol, rhos, Cvs), 0.15097120600165)
+        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.01536706804371)
+        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.15097120600165)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
