@@ -132,6 +132,15 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
     return delta_p * rhol/gravity
 
+def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
+    """Return the ERHG for the fixed-bed case.
+    """
+    Rsd = (rhos-rhol)/rhol
+    il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    im = fb_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
+    return (im - il)/(Rsd * Cvs)
+    
+
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the relative excess hydraulic gradient
        vls = average line speed (velocity, m/sec)

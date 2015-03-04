@@ -31,39 +31,42 @@ class Test(unittest.TestCase):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
         Dp_H = 4*A1/(O1+O12)
-        v1 = 2*Ap/A1
+        vls = 3.0
+        v1 = vls*Ap/A1
         epsilon = DHLLDV_constants.steel_roughness
         nu_l = DHLLDV_constants.water_viscosity[20]
         self.assertAlmostEqual(stratified.lambda1(Dp_H, v1, epsilon, nu_l), 
-                               0.01349789)
+                               0.01311036)
 
     def test_lambda12(self):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
         Dp_H = 4*A1/(O1+O12)
-        v1 = 2*Ap/A1
+        vls = 3.0
+        v1 = vls*Ap/A1
         v2 = 0.0
         d = 0.3
         nu_l = DHLLDV_constants.water_viscosity[20]
         self.assertAlmostEqual(stratified.lambda12(Dp_H, d, v1, v2, nu_l), 
-                               0.46554005, places=5)
+                               0.46551996, places=5)
 
     def test_lambda12_sf(self):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
         Dp_H = 4*A1/(O1+O12)
         d=0.3
-        v1 = 2*Ap/A1
+        vls = 3.0
+        v1 = vls*Ap/A1
         v2 = 0.0
         epsilon = DHLLDV_constants.steel_roughness
         nu_l = DHLLDV_constants.water_viscosity[20]
         rho_s = 2.65
         rho_l = DHLLDV_constants.water_density[20]
         self.assertAlmostEqual(stratified.lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s),
-                               0.09045342, places=6)
+                               0.25061545, places=5)
 
     def test_fb_pressure_loss(self):
-        vls = 2.0
+        vls = 3.0
         Dp = 0.5
         d = 0.3
         epsilon = DHLLDV_constants.steel_roughness
@@ -72,9 +75,11 @@ class Test(unittest.TestCase):
         rho_l = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         self.assertAlmostEqual(stratified.fb_pressure_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.22937437, places=5)
+                               1.17095691, places=4)
         self.assertAlmostEqual(stratified.fb_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.02334757, places=6)
+                               0.11918945, places=4)
+        self.assertAlmostEqual(stratified.fb_Erhg(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
+                               0.64850498, places=5)
         
     def test_sliding_bed_pressure_loss(self):
         vls = 3.0
@@ -89,6 +94,8 @@ class Test(unittest.TestCase):
                                0.79134558773497)#, places=5)
         self.assertAlmostEqual(stratified.sliding_bed_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
                                0.08054954196153)#, places=6)
+        self.assertAlmostEqual(stratified.Erhg(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
+                               0.415)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
