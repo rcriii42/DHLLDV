@@ -25,14 +25,21 @@ def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
               'He':heterogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
               'Ho':  homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
               }
+    
+    
     if Erhg_obj['FB'] < Erhg_obj['SB']:
-        Erhg_obj['regime'] = 'FB'
-    elif Erhg_obj['SB'] < Erhg_obj['He']:
-        Erhg_obj['regime'] = 'SB'
-    elif Erhg_obj['He'] > Erhg_obj['Ho']:
-        Erhg_obj['regime'] = 'He'
+        regime = 'FB'
     else:
-        Erhg_obj['regime'] = 'Ho'
+        regime = 'SB'
+    
+    if Erhg_obj[regime] > Erhg_obj['He']:
+        regime = 'He'
+    
+    if Erhg_obj[regime] < Erhg_obj['Ho']:
+        regime = 'Ho'
+    
+    Erhg_obj['regime'] = regime
+    
     if get_dict:
         return Erhg_obj
     else:

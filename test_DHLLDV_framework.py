@@ -36,8 +36,8 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         Erhg2 = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(Erhg2, 0.06351955, places=6)
-        self.assertAlmostEqual(Erhg, 0.06351955, places=6)
+        self.assertAlmostEqual(Erhg2, 0.0528735)
+        self.assertAlmostEqual(Erhg, 0.0528735)
         
     def testCvs_Erhg_regime(self):
         vls = 3.0
@@ -50,8 +50,8 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Erhg_regime = DHLLDV_framework.Cvs_regime(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(Erhg, 0.06351955, places=6)
-        self.assertAlmostEqual(Erhg_regime,'fixed bed')
+        self.assertAlmostEqual(Erhg, 0.0528735)
+        self.assertAlmostEqual(Erhg_regime,'heterogeneous')
 
 
 if __name__ == "__main__":
