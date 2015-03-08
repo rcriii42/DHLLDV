@@ -84,26 +84,38 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     Rsd = (rhos-rhol)/rhol
     fbot = (2*gravity*Rsd*Dp)**0.5
     
+    vls = 1.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    FL_vs = 1.4*(nu*Rsd*gravity)**0.333*(8/lambdal)**0.5/fbot #eqn 8.11-1
+    FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot #eqn 8.11-1
+    #print "VLS - lambdal_vs = %0.6f"%lambdal
+    #print "VLS - FL_vs = %0.6f"%FL_vs
     
-    alphap = 3.5 * (1.65/Rsd)**0.9
+    vls = 4.5
+    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+    lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+    alphap = 3.5 * (1.65/Rsd)**(1./9)
     vt = heterogeneous.vt_grace(d, Rsd, nu)
     Rep = vt*d/nu  #eqn 4.2-6
     top = 4.7 + 0.41*Rep**0.75
     bottom = 1. + 0.175*Rep**0.75
     beta = top/bottom  #eqn 4.6-4
     KC = 0.175*(1+beta)
-    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**0.333 #eqn 8.11-3
+    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) #eqn 8.11-3
+#     print "VLS - vt = %0.6f"%vt
+#     print "VLS - beta = %0.6f"%beta
+#     print "VLS - lambdal_ss = %0.6f"%lambdal
+#    print "VLS - FL_ss = %0.6f"%FL_ss
     
     FL_s = max(FL_vs, FL_ss)
+    #print "VLS - FL_s = %0.6f"%FL_s
     
     if d <= 0.015*Dp:
         Cvr_ldv = 0.0039/(2*gravity*Rsd*Dp) #Eqn 8.11-7
     else:
         Cvr_ldv = 0.0318*(d/Dp)**0.5/(2*gravity*Rsd*Dp) #Eqn 8.11-7
-    FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**0.333 #Eqn 8.11-6
+    FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) #Eqn 8.11-6
+    #print "VLS - FL_r = %0.6f"%FL_r
     
     d0 = 0.00042*(1.65/Rsd)**0.5
     drough = 2./1000 #note: only valid for sand with Rsd=1.65
@@ -113,14 +125,22 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
         FL_ul = FL_s
     else:
         FL_ul = FL_s*exp(-1*d/d0) + FL_r*(1-exp(-1*d/d0))   #Eqn 8.11-8
+    #print "VLS - FL_ul = %0.6f"%FL_ul
     
     A = -1
-    B = vt*(1-Cvs/KC)**beta
-    C = ((7.5**2/lambdal)*(vt/(gravity*d)**0.5)**(8/3)*(nu*gravity)**(2/3))/stratified.musf
-    vlsldv = (-1*B * (B**2-4*A*C)**0.5)/(2*A)   #Eqn 8.11-11
+    B = vt*(1-Cvs/KC)**beta/stratified.musf
+    C = ((7.5**2/lambdal)*(vt/(gravity*d)**0.5)**(8./3)*(nu*gravity)**(2./3))/stratified.musf
+    vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   #Eqn 8.11-11
     FL_ll = vlsldv/fbot #Eqn 8.11-12
+#     print "VLS - vt = %0.6f"%vt
+#     print "VLS - A = %0.6f"%A
+#     print "VLS - B = %0.6f"%B
+#     print "VLS - C = %0.6f"%C
+#     print "VLS - vlsldv = %0.6f"%vlsldv
+#     print "VLS - FL_ll = %0.6f"%FL_ll
     
     FL = max(FL_ul, FL_ll)  #Eqn 8.11-13
+#     print "VLS - FL = %0.6f"%FL
     return FL*fbot
     
 
