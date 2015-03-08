@@ -6,6 +6,7 @@ Created on Mar 4, 2015
 import unittest
 import DHLLDV_constants
 import DHLLDV_framework
+import stratified
 
 class Test(unittest.TestCase):
 
@@ -52,6 +53,21 @@ class Test(unittest.TestCase):
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(Erhg, 0.0528735)
         self.assertAlmostEqual(Erhg_regime,'heterogeneous')
+        
+    def testLDV(self):
+        #stratified.musf = 0.52
+        vls = 0.7
+        Dp = 0.1524
+        d=0.5/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 1.59*rhol+rhol
+        Cvs = 0.2
+        Rsd = (rhos-rhol)/rhol
+        fbot = (2*DHLLDV_constants.gravity*Rsd*Dp)**0.5
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
+        self.assertAlmostEqual(LDV, 1.6/fbot)#, places, msg, delta)
 
 
 if __name__ == "__main__":
