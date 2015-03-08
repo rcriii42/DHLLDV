@@ -88,6 +88,16 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
     FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot #eqn 8.11-1
+    vlsldv = FL_vs*fbot
+    steps = 0
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+        vls = (vls + vlsldv)/2
+        Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+        lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+        FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot #eqn 8.11-1
+        vlsldv = FL_vs*fbot
+        steps += 1
+    
     #print "VLS - lambdal_vs = %0.6f"%lambdal
     #print "VLS - FL_vs = %0.6f"%FL_vs
     
@@ -102,6 +112,15 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     beta = top/bottom  #eqn 4.6-4
     KC = 0.175*(1+beta)
     FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) #eqn 8.11-3
+    vlsldv = FL_ss*fbot
+    steps = 0
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+        vls = (vls + vlsldv)/2
+        Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+        lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+        FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) #eqn 8.11-3
+        vlsldv = FL_ss*fbot
+        steps += 1
 #     print "VLS - vt = %0.6f"%vt
 #     print "VLS - beta = %0.6f"%beta
 #     print "VLS - lambdal_ss = %0.6f"%lambdal
@@ -110,11 +129,21 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     FL_s = max(FL_vs, FL_ss)
     #print "VLS - FL_s = %0.6f"%FL_s
     
+    vls=4.5
     if d <= 0.015*Dp:
         Cvr_ldv = 0.0039/(2*gravity*Rsd*Dp) #Eqn 8.11-7
     else:
         Cvr_ldv = 0.0318*(d/Dp)**0.5/(2*gravity*Rsd*Dp) #Eqn 8.11-7
     FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) #Eqn 8.11-6
+    vlsldv = FL_r*fbot
+    steps = 0
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+        vls = (vls + vlsldv)/2
+        Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+        lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+        FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) #Eqn 8.11-6
+        vlsldv = FL_r*fbot
+        steps += 1
     #print "VLS - FL_r = %0.6f"%FL_r
     
     d0 = 0.00042*(1.65/Rsd)**0.5
@@ -127,10 +156,25 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
         FL_ul = FL_s*exp(-1*d/d0) + FL_r*(1-exp(-1*d/d0))   #Eqn 8.11-8
     #print "VLS - FL_ul = %0.6f"%FL_ul
     
+    vls = 2.0
+    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+    lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
     A = -1
     B = vt*(1-Cvs/KC)**beta/stratified.musf
     C = ((7.5**2/lambdal)*(vt/(gravity*d)**0.5)**(8./3)*(nu*gravity)**(2./3))/stratified.musf
     vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   #Eqn 8.11-11
+    steps = 0
+    print "d=%0.2f step: %d vls=%0.6f vlsldv=%0.6f VLS/VLSLDV=%0.6f"%(d, steps, vls, vlsldv, vls/vlsldv)
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+        print "step: %d vls=%0.6f vlsldv=%0.6f VLS/VLSLDV=%0.6f"%(steps, vls, vlsldv, vls/vlsldv)
+        vls = (vls + vlsldv)/2
+        Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+        lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+        A = -1
+        B = vt*(1-Cvs/KC)**beta/stratified.musf
+        C = ((7.5**2/lambdal)*(vt/(gravity*d)**0.5)**(8./3)*(nu*gravity)**(2./3))/stratified.musf
+        vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   #Eqn 8.11-11
+        steps += 1
     FL_ll = vlsldv/fbot #Eqn 8.11-12
 #     print "VLS - vt = %0.6f"%vt
 #     print "VLS - A = %0.6f"%A
