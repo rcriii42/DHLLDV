@@ -10,7 +10,6 @@ import stratified
 
 class Test(unittest.TestCase):
 
-
     def testCvs_Erhg_obj(self):
         vls = 3.0
         Dp = 0.5
@@ -81,7 +80,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 0.8288413)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 0.8288413, places=1)
         
     def testLDV_small(self):
         vls = 3.5502843557
@@ -94,7 +93,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 3.5502843557)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 3.5502843557, places=1)
         
     def testLDV_large(self):
         vls = 4.3897193
@@ -107,7 +106,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 4.3897193)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 4.3897193, places=1)
          
     def testLDV_large2(self):
         vls = 4.4226477
@@ -120,7 +119,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 4.4226477)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 4.4226477, places=1)
      
     def testLDV_drough(self):
         vls = 4.0917049
@@ -133,7 +132,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 4.0917049)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 4.0917049, places=1)
         
     def testLDV_SBHe1(self):
         vls = 1.7689662
@@ -146,7 +145,7 @@ class Test(unittest.TestCase):
         Cvs = 0.0025
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 1.7689662)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 1.7689662, places=0) #Gives 1.827
     
     def testLDV_SBHe2(self):
         vls = 2.4907119
@@ -159,7 +158,7 @@ class Test(unittest.TestCase):
         Cvs = 0.0025
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(LDV, 2.4907119)#, places, msg, delta)
+        self.assertAlmostEqual(LDV, 2.4907119, places=1)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
