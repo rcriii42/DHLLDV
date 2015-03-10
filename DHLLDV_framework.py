@@ -70,7 +70,7 @@ def Cvs_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
             }[Erhg_obj['regime']]
             
             
-def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
+def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     """
     Return the LDV for the given slurry.
     Dp = Pipe diameter (m)
@@ -90,7 +90,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot #eqn 8.11-1
     vlsldv = FL_vs*fbot
     steps = 0
-    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
@@ -114,7 +114,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) #eqn 8.11-3
     vlsldv = FL_ss*fbot
     steps = 0
-    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
@@ -137,7 +137,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) #Eqn 8.11-6
     vlsldv = FL_r*fbot
     steps = 0
-    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
@@ -164,9 +164,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     C = ((7.5**2/lambdal)*(vt/(gravity*d)**0.5)**(8./3)*(nu*gravity)**(2./3))/stratified.musf
     vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   #Eqn 8.11-11
     steps = 0
-    print "d=%0.2f step: %d vls=%0.6f vlsldv=%0.6f VLS/VLSLDV=%0.6f"%(d, steps, vls, vlsldv, vls/vlsldv)
-    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < 20:
-        print "step: %d vls=%0.6f vlsldv=%0.6f VLS/VLSLDV=%0.6f"%(steps, vls, vlsldv, vls/vlsldv)
+    while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
