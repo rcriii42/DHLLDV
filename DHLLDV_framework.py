@@ -184,8 +184,63 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     FL = max(FL_ul, FL_ll)  #Eqn 8.11-13
 #     print "VLS - FL = %0.6f"%FL
     return FL*fbot
-    
 
+
+def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, alpha=0):
+    """
+    Return the slip ratio (Xi) for the given slurry.
+    Dp = Pipe diameter (m)
+    d = Particle diameter (m)
+    epsilon = absolute pipe roughness (m)
+    nu = fluid kinematic viscosity in m2/sec
+    rhol = density of the fluid (ton/m3)
+    rhos = particle density (ton/m3)
+    Cvt = transport volume concentration
+    """
+    Rsd = (rhos-rhol)/rhol
+    vt = heterogeneous.vt_grace(d, Rsd, nu) #particle shape factor assumed for sand for now
+    CD = (4/3.)*((gravity*Rsd*d)/vt**2)      #eqn 4.4-6 without the shape factor
+    Rep = vt*d/nu  #eqn 4.2-6
+    top = 4.7 + 0.41*Rep**0.75
+    bottom = 1. + 0.175*Rep**0.75
+    beta = top/bottom  #eqn 4.6-4
+    KC = 0.175*(1+beta)
+    vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    Xi_ldv = (1/(2*CD)) * (1-Cvt/KC)**beta * (vls_ldv/vls)  #eqn 8.12-1
+    
+    Kldv = 1/(1 - Xi_ldv)   #eqn 7.9-14
+    Xi_fb = 1-((Cvt*vls_ldv)/(stratified.Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv)  #eqn 8.12-2
+    Xi_th = min(Xi_fb, Xi_ldv)  #eqn 8.12-3
+    
+    vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1/4) #eqn8.12-4
+    Xi_t = (1-Cvt/stratified.Cvb) * (1-(4./5)*(vls/vls_t))  #8.12-5
+    
+    
+    Xi = Xi_th*(1-(vls/vls_t)**alpha) + Xi_t *(vls/vls_t)**alpha    #eqn 8.12-7
+    return Xi 
+
+def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, max_steps = 10):
+    """
+    Return the Cvs for a given Cvt.
+    Dp = Pipe diameter (m)
+    d = Particle diameter (m)
+    epsilon = absolute pipe roughness (m)
+    nu = fluid kinematic viscosity in m2/sec
+    rhol = density of the fluid (ton/m3)
+    rhos = particle density (ton/m3)
+    Cvt = transport volume concentration
+    max_steps = max steps for the iterations
+    """
+    Xi0 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    Cvs0 = Cvt * (1/(1-Xi0))
+    Xi1 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs0)
+    steps = 0
+    while not (1.00001 >= Xi0/Xi1 > 0.99999) and steps < max_steps:
+        steps += 1
+        Xi0 = Xi1
+        Cvs0 = Cvt * (1/(1-Xi0))
+        Xi1 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs0)
+    return Cvt * (1/(1-Xi0))
 
 if __name__ == '__main__':
     pass
