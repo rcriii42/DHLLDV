@@ -215,14 +215,27 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     Xi_fb = 1-((Cvt*vs_ldv)/(stratified.Cvb-Kldv*Cvt)*(vs_ldv-vls)+Kldv*Cvt*vs_ldv)  #eqn 8.12-2
     Xi_th = min(Xi_fb, Xi_ldv)  #eqn 8.12-3
     
-    
-    
     vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1./4) #eqn8.12-4
     Xi_t = (1-Cvt/stratified.Cvb) * (1-(4./5)*(vls/vls_t))  #8.12-5
-    print "dia: %0.1f Vls_ldv: %0.3f vls_t: %0.3f Xi_t: %0.4f"%(d*1000, vls_ldv, vls_t, Xi_t)
     
     Xi = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t *(vls/vls_t)**alpha_xi    #eqn 8.12-7
-    return Xi 
+    return min(max(Xi, 0.0),1.0)
+
+def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
+    """
+    Cvs_from_Cvt - Calculate the Cvs for the given Cvt
+    vls = average line speed (velocity, m/sec)
+    Dp = Pipe diameter (m)
+    d = Particle diameter (m)
+    epsilon = absolute pipe roughness (m)
+    nu = fluid kinematic viscosity in m2/sec
+    rhol = density of the fluid (ton/m3)
+    rhos = particle density (ton/m3)
+    Cvt = transported volume concentration
+    get_dict: if true return the dict with all models.
+    """
+    Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    return (1/(1-Xi)) * Cvt
 
 def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     """
@@ -237,8 +250,7 @@ def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     Cvt = transported volume concentration
     get_dict: if true return the dict with all models.
     """
-    Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    Cvs = (1/(1-Xi)) * Cvt
+    Cvs = Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     return Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict)
 
 if __name__ == '__main__':

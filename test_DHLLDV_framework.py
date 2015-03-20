@@ -183,6 +183,48 @@ class Test(unittest.TestCase):
         Cvt = 0.1
         Xi = DHLLDV_framework.slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
         self.assertAlmostEqual(Xi, 0.31788144, places=6)
+        
+    def test_fig8_16_4(self):
+#         Dp = 0.762
+#         d = 1.0/1000
+#         epsilon = DHLLDV_constants.steel_roughness
+#         nu = 0.001005/(0.9982*1000)
+#         Rsd = 1.59
+#         rhol = DHLLDV_constants.water_density[20]
+#         rhos = Rsd*rhol+rhol
+#         Cvt = 0.2
+#         print "%4s  %0.5s  %5s"%("vls", "ldv", "Xi")
+#         for vls in [0.5, 1.0, 2.0, 3.0, 4.0, 5.0, 5.5, 6.0]:
+#             ldv = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+#             Xi = DHLLDV_framework.slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+#             print "%0.3f  %0.3f  %0.4f"%(vls, ldv, Xi)
+#         assert False
+        pass
+    
+    def test_Cvs_from_Cvt_p4(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.4/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvt = 0.1
+        Cvs = DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+        self.assertAlmostEqual(Cvs, 0.12414368)#, places=6)
+        
+    def test_Cvs_from_Cvt_p4(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.8/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvt = 0.1
+        Cvs = DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+        self.assertAlmostEqual(Cvs, 0.14660208, places=6)
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
