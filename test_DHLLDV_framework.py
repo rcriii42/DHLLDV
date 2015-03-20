@@ -159,6 +159,30 @@ class Test(unittest.TestCase):
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
         self.assertAlmostEqual(LDV, 2.4907119, places=5)
+        
+    def test_Xi_p4(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.4/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvt = 0.1
+        Xi = DHLLDV_framework.slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+        self.assertAlmostEqual(Xi, 0.19448177, places=6)
+        
+    def test_Xi_p8(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.8/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvt = 0.1
+        Xi = DHLLDV_framework.slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+        self.assertAlmostEqual(Xi, 0.31788144, places=6)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

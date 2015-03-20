@@ -10,6 +10,8 @@ import homogeneous
 from DHLLDV_constants import gravity
 from math import pi, exp
 
+alpha_xi = 0    #alpha in equation 8.12-6
+
 
 def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     """
@@ -186,7 +188,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     return FL*fbot
 
 
-def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, alpha=0):
+def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
     Return the slip ratio (Xi) for the given slurry.
     Dp = Pipe diameter (m)
@@ -208,39 +210,36 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, alpha=0):
     vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     Xi_ldv = (1/(2*CD)) * (1-Cvt/KC)**beta * (vls_ldv/vls)  #eqn 8.12-1
     
+    vs_ldv = vls_ldv * Xi_ldv
     Kldv = 1/(1 - Xi_ldv)   #eqn 7.9-14
-    Xi_fb = 1-((Cvt*vls_ldv)/(stratified.Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv)  #eqn 8.12-2
+    Xi_fb = 1-((Cvt*vs_ldv)/(stratified.Cvb-Kldv*Cvt)*(vs_ldv-vls)+Kldv*Cvt*vs_ldv)  #eqn 8.12-2
     Xi_th = min(Xi_fb, Xi_ldv)  #eqn 8.12-3
     
-    vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1/4) #eqn8.12-4
+    
+    
+    vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1./4) #eqn8.12-4
     Xi_t = (1-Cvt/stratified.Cvb) * (1-(4./5)*(vls/vls_t))  #8.12-5
+    print "dia: %0.1f Vls_ldv: %0.3f vls_t: %0.3f Xi_t: %0.4f"%(d*1000, vls_ldv, vls_t, Xi_t)
     
-    
-    Xi = Xi_th*(1-(vls/vls_t)**alpha) + Xi_t *(vls/vls_t)**alpha    #eqn 8.12-7
+    Xi = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t *(vls/vls_t)**alpha_xi    #eqn 8.12-7
     return Xi 
 
-def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, max_steps = 10):
+def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     """
-    Return the Cvs for a given Cvt.
+    Cvt_Erhg - Calculate the Erhg for the given Cvt, using the appropriate model
+    vls = average line speed (velocity, m/sec)
     Dp = Pipe diameter (m)
     d = Particle diameter (m)
     epsilon = absolute pipe roughness (m)
     nu = fluid kinematic viscosity in m2/sec
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
-    Cvt = transport volume concentration
-    max_steps = max steps for the iterations
+    Cvt = transported volume concentration
+    get_dict: if true return the dict with all models.
     """
-    Xi0 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    Cvs0 = Cvt * (1/(1-Xi0))
-    Xi1 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs0)
-    steps = 0
-    while not (1.00001 >= Xi0/Xi1 > 0.99999) and steps < max_steps:
-        steps += 1
-        Xi0 = Xi1
-        Cvs0 = Cvt * (1/(1-Xi0))
-        Xi1 = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs0)
-    return Cvt * (1/(1-Xi0))
+    Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    Cvs = (1/(1-Xi)) * Cvt
+    return Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict)
 
 if __name__ == '__main__':
     pass
