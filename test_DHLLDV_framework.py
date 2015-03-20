@@ -211,9 +211,9 @@ class Test(unittest.TestCase):
         rhos = 2.65
         Cvt = 0.1
         Cvs = DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-        self.assertAlmostEqual(Cvs, 0.12414368)#, places=6)
+        self.assertAlmostEqual(Cvs, 0.12414368, places=6)
         
-    def test_Cvs_from_Cvt_p4(self):
+    def test_Cvs_from_Cvt_p8(self):
         vls = 3.0
         Dp = 0.5
         d = 0.8/1000
