@@ -235,7 +235,7 @@ def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     get_dict: if true return the dict with all models.
     """
     Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    return (1/(1-Xi)) * Cvt
+    return (1/(1-Xi)) * Cvt #eqn8.12-8
 
 def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     """
