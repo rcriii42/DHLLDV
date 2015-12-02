@@ -8,9 +8,10 @@ import stratified
 import heterogeneous
 import homogeneous
 from DHLLDV_constants import gravity
-from math import pi, exp
+from math import pi, exp, log10
 
 alpha_xi = 0    #alpha in equation 8.12-6
+d_uf = 0.057    #particle size that affects viscosity
 
 
 def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
@@ -281,6 +282,29 @@ def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
             'He': 'heterogeneous',
             'Ho': 'homogeneous',
             }[Erhg_obj['regime']]
+
+def calc_GSD_fractions(GSD, n=0):
+    """
+    Return the Cvs_f, the concentration of fines d<0.057
+    GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
+    Cvs = Spatial volume cioncentration
+    n: number of fractions (including d=0.057)
+    """
+    if len(GSD) < 2:
+        return GSD
+    fracs = sorted(GSD.keys())
+    lowslope = (fracs[1] - fracs[0])/(log10(GSD[fracs[1]])-log10(GSD[fracs[0]]))
+    f_uf = fracs[0] - (log10(GSD[fracs[0]])-log10(d_uf))*lowslope/2
+    GSD[f_uf] = d_uf
+    if n <= len(GSD):
+        return GSD
+    fracs = sorted(GSD.keys())
+    newfracs = [fracs[0]]+[x*(1-fracs[0])/(n-1) for x in range(1, n)]
+    i0 = 0
+    inf = 1
+    for i in range(1, len(fracs)):
+        pass
+    return GSD
 
 if __name__ == '__main__':
     pass

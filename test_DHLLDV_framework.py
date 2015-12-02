@@ -224,7 +224,14 @@ class Test(unittest.TestCase):
         Cvt = 0.1
         Cvs = DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
         self.assertAlmostEqual(Cvs, 0.14660208, places=6)
-
+        
+    def test_calc_GSD_fractions(self):
+        GSD = {0.85:0.85, 0.5:0.30, 0.15:0.1}
+        DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
+        fracs = sorted(GSD.keys())
+        self.assertAlmostEqual(fracs[0], .060459029, places=6)
+        self.assertAlmostEqual(GSD[fracs[0]], 0.057, places=6)
+        self.assertAlmostEqual(fracs[-1], 0.9395000000000001)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
