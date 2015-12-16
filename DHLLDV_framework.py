@@ -283,27 +283,45 @@ def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
             'Ho': 'homogeneous',
             }[Erhg_obj['regime']]
 
-def calc_GSD_fractions(GSD, n=0):
+def calc_GSD_fractions(GSD, n=10):
     """
-    Return the Cvs_f, the concentration of fines d<0.057
+    Break the given Grain Size Distribution into n fractions, and add % passing d_uf.
     GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
     Cvs = Spatial volume cioncentration
     n: number of fractions (including d=0.057)
+    Scheme:
+    Find fraction <.057
+    separate GSD into n even pieces, _add_ these to the GSD dict
+    Interpolate between the given fractions, assuming log scale on the x-axis
+    Note that at the top and bottom the slope is halved
     """
     if len(GSD) < 2:
         return GSD
     fracs = sorted(GSD.keys())
-    lowslope = (fracs[1] - fracs[0])/(log10(GSD[fracs[1]])-log10(GSD[fracs[0]]))
-    f_uf = fracs[0] - (log10(GSD[fracs[0]])-log10(d_uf))*lowslope/2
+    sizes = [GSD[p] for p in fracs]
+    #First the .057 fraction
+    lowslope = (fracs[1] - fracs[0])/(log10(sizes[1])-log10(sizes[0]))
+    if sizes[0]>=.057:
+        lowslope = lowslope/2.
+    f_uf = fracs[0] - (log10(sizes[0])-log10(d_uf))*lowslope
     GSD[f_uf] = d_uf
-    if n <= len(GSD):
+    if len(GSD) <= n:
         return GSD
+    
+    #The n fractions - note you could end up with n + len(GSD) + 1
     fracs = sorted(GSD.keys())
-    newfracs = [fracs[0]]+[x*(1-fracs[0])/(n-1) for x in range(1, n)]
-    i0 = 0
-    inf = 1
-    for i in range(1, len(fracs)):
-        pass
+    sizes = [GSD[p] for p in fracs]
+    f_index = 1
+    for i in range(n-1):
+        this_frac = (i+1)/n
+        if this_frac > fracs[f_index]:
+            f_index = min(f_index+1, len(fracs)-1)
+        slope = (fracs[f_index] - fracs[f_index-1])/(log10(sizes[f_index])-log10(sizes[f_index-1]))
+        if this_frac>fracs[-1]:
+            slope = slope/2 #halve the slope above the largest given size
+        log_size = (this_frac - fracs[f_index-1])/slope + log10(sizes[f_index-1])
+        this_size = 10**log_size
+        GSD[this_frac] = this_size
     return GSD
 
 if __name__ == '__main__':
