@@ -226,20 +226,29 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(Cvs, 0.14660208, places=6)
         
     def test_calc_GSD_fractions_057(self):
-        GSD = {0.85:1.20, 0.5:0.35, 0.11:0.075}
+        GSD = {0.85:1.20/1000, 0.5:0.35/1000, 0.11:0.075/1000}
         GSD = DHLLDV_framework.calc_GSD_fractions(GSD, n=1)
         fracs = sorted(GSD.keys())
         self.assertAlmostEqual(fracs[0], 0.0752599, places=6)
-        self.assertAlmostEqual(GSD[fracs[0]], 0.057, places=6)
+        self.assertAlmostEqual(GSD[fracs[0]]*1000, 0.057, places=6)
+        
+    def test_calc_GSD_fractions_057_already_there(self):
+        GSD = {0.85:1.20/1000, 0.5:0.35/1000, 0.11:0.075/1000, .08:.057/1000}
+        GSD = DHLLDV_framework.calc_GSD_fractions(GSD, n=1)
+        fracs = sorted(GSD.keys())
+        self.assertEqual(len(GSD), 4)
+        self.assertAlmostEqual(fracs[0], 0.08, places=6)
+        self.assertAlmostEqual(GSD[fracs[0]]*1000, 0.057, places=6)
+        self.assertAlmostEqual(GSD[.08]*1000, 0.057, places=6)
     
     def test_calc_GSD_fractions_others(self):
-        GSD = {0.85:1.20, 0.5:0.35, 0.11:0.075}
+        GSD = {0.85:1.20/1000, 0.5:0.35/1000, 0.11:0.075/1000}
         GSD1 = DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
         fracs = sorted(GSD1.keys())
-        self.assertAlmostEqual(GSD1[0.5], 0.35, places=6)
-        self.assertAlmostEqual(GSD1[0.9], 1.7063602762, places=6)
-        self.assertAlmostEqual(GSD1[0.7], 0.70769644947624, places=6)
-        self.assertAlmostEqual(GSD1[0.1], 0.0693032, places=6)
+        self.assertAlmostEqual(GSD1[0.5]*1000, 0.35, places=6)
+        self.assertAlmostEqual(GSD1[0.9]*1000, 1.7063602762, places=6)
+        self.assertAlmostEqual(GSD1[0.7]*1000, 0.70769644947624, places=6)
+        self.assertAlmostEqual(GSD1[0.1]*1000, 0.0693032, places=6)
         
 
 if __name__ == "__main__":

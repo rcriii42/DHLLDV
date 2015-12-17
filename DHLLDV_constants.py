@@ -57,7 +57,7 @@ water_dynamic_viscosity = interpDict({00: 1.7921E-03,   ##Dynamic Viscosity (mu 
                                       100: 2.8380E-04,
                                       })
 
-#Water kinematic viscosity in m2/sec
+#Water kinematic viscosity (nu) in m2/sec
 water_viscosity = interpDict(dict((t,water_dynamic_viscosity[t]/(1000*water_density[t])) for t in water_density.keys()))
 
 Arel_to_beta = interpDict({0.00000: 0.0000000,  ##lookup table for calculating the angle beta for a given proportion of a pipe filled
