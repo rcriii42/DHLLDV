@@ -250,6 +250,32 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(GSD1[0.7]*1000, 0.70769644947624, places=6)
         self.assertAlmostEqual(GSD1[0.1]*1000, 0.0693032, places=6)
         
+    def testCvs_Erhg_graded_result(self):
+        vls = 3.0
+        Dp = 0.5
+        GSD = {0.85:1.20/1000, 0.5:0.4/1000, 0.11:0.075/1000}
+        GSD1 = DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhos = 2.65
+        rhol = DHLLDV_constants.water_density[20]
+        Cvs = 0.1
+        Erhg = DHLLDV_framework.Cvs_Erhg_graded(vls, Dp, GSD1, epsilon, nu, rhol, rhos, Cvs)
+        self.assertAlmostEqual(Erhg, 0.0528735)
+        
+    def testCvs_Erhg_graded_result_fig8_16_16(self):
+        vls = 4.2
+        Dp = 0.762
+        GSD = {0.85:3./1000, 0.5:1./1000, 0.05:0.075/1000}
+        GSD1 = DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhos = 2.65
+        rhol = DHLLDV_constants.water_density[20]
+        Cvs = 0.2
+        Erhg = DHLLDV_framework.Cvs_Erhg_graded(vls, Dp, GSD1, epsilon, nu, rhol, rhos, Cvs)
+        self.assertAlmostEqual(Erhg, 0.23)
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
