@@ -234,13 +234,12 @@ class Test(unittest.TestCase):
     
     def test_calc_GSD_fractions_others(self):
         GSD = {0.85:1.20, 0.5:0.35, 0.11:0.075}
-        GSD = DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
-        print GSD
-        fracs = sorted(GSD.keys())
-        self.assertAlmostEqual(GSD[0.5], 0.35, places=6)
-        self.assertAlmostEqual(GSD[0.9], 1.7063602762, places=6)
-        self.assertAlmostEqual(GSD[0.7], 0.70769644947624, places=6)
-        self.assertAlmostEqual(GSD[0.1], 0.0693032, places=6)
+        GSD1 = DHLLDV_framework.calc_GSD_fractions(GSD, n=10)
+        fracs = sorted(GSD1.keys())
+        self.assertAlmostEqual(GSD1[0.5], 0.35, places=6)
+        self.assertAlmostEqual(GSD1[0.9], 1.7063602762, places=6)
+        self.assertAlmostEqual(GSD1[0.7], 0.70769644947624, places=6)
+        self.assertAlmostEqual(GSD1[0.1], 0.0693032, places=6)
         
 
 if __name__ == "__main__":

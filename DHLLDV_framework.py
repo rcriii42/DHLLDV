@@ -305,7 +305,7 @@ def calc_GSD_fractions(GSD, n=10):
         lowslope = lowslope/2.
     f_uf = fracs[0] - (log10(sizes[0])-log10(d_uf))*lowslope
     GSD[f_uf] = d_uf
-    if len(GSD) <= n:
+    if len(GSD) >= n:
         return GSD
     
     #The n fractions - note you could end up with n + len(GSD) + 1
@@ -313,13 +313,15 @@ def calc_GSD_fractions(GSD, n=10):
     sizes = [GSD[p] for p in fracs]
     f_index = 1
     for i in range(n-1):
-        this_frac = (i+1)/n
+        this_frac = float((i+1))/n
         if this_frac > fracs[f_index]:
             f_index = min(f_index+1, len(fracs)-1)
         slope = (fracs[f_index] - fracs[f_index-1])/(log10(sizes[f_index])-log10(sizes[f_index-1]))
         if this_frac>fracs[-1]:
             slope = slope/2 #halve the slope above the largest given size
-        log_size = (this_frac - fracs[f_index-1])/slope + log10(sizes[f_index-1])
+            log_size = (this_frac - fracs[f_index])/slope + log10(sizes[f_index])
+        else:
+            log_size = (this_frac - fracs[f_index-1])/slope + log10(sizes[f_index-1])
         this_size = 10**log_size
         GSD[this_frac] = this_size
     return GSD
