@@ -30,11 +30,11 @@ def swamee_jain_ff(Re, Dp, epsilon):
     """
     if Re <= 2320:
         #laminar flow
-        return 64./Re
-    c1 = epsilon/(3.7*Dp)
-    c2 = 5.75/Re**0.9
-    bottom = log(c1+c2)**2
-    return 1.325/bottom
+        return 64. / Re
+    c1 = epsilon / (3.7 * Dp)
+    c2 = 5.75 / Re**0.9
+    bottom = log(c1 + c2)**2
+    return 1.325 / bottom  # eqn 8.7-3
 
 def fluid_pressure_loss(vls, Dp, epsilon, nu, rhol):
     """
@@ -66,14 +66,14 @@ def fluid_head_loss(vls, Dp, epsilon, nu, rhol):
 def relative_viscosity(Cvs):
     """
     Return the relative viscosity (nu-m/nu-l) of a pseudo-homogeneous slurry, using the 
-    Thomas (21965) approach.
+    Thomas (1965) approach.
     Cvs is the volume concentration of fines. 
     """
-    return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)
+    return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)  # eqn 8.15-2
 
 def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """Return the Ergh value for homogeneous flow.
-    Use the Thomas correction for slurry density.
+    Use the Talmon (2013) correction for slurry density.
     vls: line speed in m/sec
     Dp: Pipe diameter in m
     d: Particle diameter in m (not used, here for consitency)
@@ -86,6 +86,8 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     lambda1 = swamee_jain_ff(Re, Dp, epsilon)
     Rsd = (rhos-rhol)/rhol
     rhom = rhol+Cvs*(rhos-rhol)
+    
+    # equation 8.7-4
     sb = ((Acv/kvK)*log(rhom/rhol)*(lambda1/8)**0.5+1)**2
     top = 1+Rsd*Cvs - sb
     bottom = Rsd*Cvs*sb
