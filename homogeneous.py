@@ -9,7 +9,7 @@ Created on Oct 7, 2014
 from math import log, exp
 from DHLLDV_constants import gravity
 
-Acv = 1.3   #coefficient homogeneous regime
+Acv = 1.3   #coefficient homogeneous regime #Note will be 3 in next version per SAM email
 kvK = 0.4 #von Karman constant
 
 def pipe_reynolds_number(vls, Dp, nu):
@@ -72,26 +72,26 @@ def relative_viscosity(Cvs):
     return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)  # eqn 8.15-2
 
 def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
-    """Return the Ergh value for homogeneous flow.
+    """Return the Erhg value for homogeneous flow.
     Use the Talmon (2013) correction for slurry density.
     vls: line speed in m/sec
     Dp: Pipe diameter in m
-    d: Particle diameter in m (not used, here for consitency)
+    d: Particle diameter in m (not used, here for consistency)
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
-    Cvs - in situ volume concentration of solids
+    Cvs - spatial (insitu) volume concentration of solids
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
-    lambda1 = swamee_jain_ff(Re, Dp, epsilon)
+    lmbda1 = swamee_jain_ff(Re, Dp, epsilon)
     Rsd = (rhos-rhol)/rhol
     rhom = rhol+Cvs*(rhos-rhol)
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     
     # equation 8.7-4
-    sb = ((Acv/kvK)*log(rhom/rhol)*(lambda1/8)**0.5+1)**2
+    sb = ((Acv/kvK)*log(rhom/rhol)*(lmbda1/8)**0.5+1)**2
     top = 1+Rsd*Cvs - sb
     bottom = Rsd*Cvs*sb
-    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     return il*top/bottom
 
 def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
@@ -102,7 +102,7 @@ def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
-    Cvs - in situ volume concentration of solids
+    Cvs - spatial (insitu) volume concentration of solids
     """
     return homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
 
@@ -114,7 +114,7 @@ def homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
-    Cvs - in situ volume concentration of solids
+    Cvs - spatial (insitu) volume concentration of solids
     """
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos-rhol)/rhol
