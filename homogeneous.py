@@ -9,7 +9,7 @@ Created on Oct 7, 2014
 from math import log, exp
 from DHLLDV_constants import gravity
 
-Acv = 1.3   #coefficient homogeneous regime #Note will be 3 in next version per SAM email
+Acv = 3.   #coefficient homogeneous regime, advised in section 8.7.
 kvK = 0.4 #von Karman constant
 
 def pipe_reynolds_number(vls, Dp, nu):
@@ -52,7 +52,7 @@ def fluid_pressure_loss(vls, Dp, epsilon, nu, rhol):
 
 def fluid_head_loss(vls, Dp, epsilon, nu, rhol):
     """
-    Return the head loss (il in m.w.c) per m of pipe
+    Return the head loss (il in m.l.c) per m of pipe
     vls: line speed in m/sec
     Dp: Pipe diameter in m
     epsilon: pipe absolute roughness in m
@@ -83,16 +83,16 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     Cvs - spatial (insitu) volume concentration of solids
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
-    lmbda1 = swamee_jain_ff(Re, Dp, epsilon)
+    lambda1 = swamee_jain_ff(Re, Dp, epsilon)
     Rsd = (rhos-rhol)/rhol
     rhom = rhol+Cvs*(rhos-rhol)
-    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    deltav_to_d = min((11.6*nu)/((lambda1/8)**0.5*vls*d), 1)    #eqn 8.7-7
     
-    # equation 8.7-4
-    sb = ((Acv/kvK)*log(rhom/rhol)*(lmbda1/8)**0.5+1)**2
+    sb = ((Acv/kvK)*log(rhom/rhol)*(lambda1/8)**0.5+1)**2
     top = 1+Rsd*Cvs - sb
     bottom = Rsd*Cvs*sb
-    return il*top/bottom
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    return il*(1-(1-top/bottom)*(1-deltav_to_d))                    #eqn 8.7-8
 
 def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """
@@ -108,7 +108,7 @@ def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
 
 def homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """
-    Return the head loss (m.w.c per m) for (pseudo) homogeneous flow incorporating viscosity correction.
+    Return the head loss (m.l.c per m) for (pseudo) homogeneous flow incorporating viscosity correction.
     vls: line speed in m/sec
     Dp: Pipe diameter in m
     epsilon: pipe absolute roughness in m
