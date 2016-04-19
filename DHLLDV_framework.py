@@ -341,9 +341,9 @@ def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False)
         if i == 1:  # First fraction after uf
             fhere = (fracs[i]-fracs[i-1]) + (fracs[i+1]-fracs[i])/2
         elif i == len(fracs)-1:  # last fraction
-            fhere = (fracs[i]-fracs[i-1])/2 + fracs[i]
+            fhere = (fracs[i]-fracs[i-1])/2 + (1. - fracs[i])
         else:  # intermediate fractions
-            fhere = (fracs[i]-fracs[i-1])/2 + (fracs[i+1]-fracs[i])/2
+            fhere = (fracs[i] - fracs[i - 1])/2 + (fracs[i + 1] - fracs[i])/2
         fracs_rep.append(fhere)
     
     # the Cvs for each fraction
@@ -353,17 +353,17 @@ def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False)
     
     # The im for each fraction and total
     im_tot = 0
-    for i in range(1,len(sizes)):
+    for i in range(1, len(sizes)):
         d_i = sizes[i]
         Cvs_i = Cvs_fracs[i]
-        Erhg_i = Cvs_Erhg(vls, Dp, d_i, epsilon, nu_uf, rho_uf, rhos, Cvs_i, False)
+        Erhg_i = Cvs_Erhg(vls, Dp, d_i, epsilon, nu_uf, rho_uf, rhos, Cvs, False)
         il_uf = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_uf, rho_uf)
-        im_i = Erhg_i * Rsd_uf * Cvs_i + il_uf
-        im_tot += im_i * Cvs_i/Cvs_c
+        im_i = Erhg_i * Rsd_uf * Cvs + il_uf
+        im_tot += im_i * Cvs_i / Cvs_c
         
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    Rsd = (rhos-rhol)/rhol
-    return (im_tot - il) / (Rsd*Cvs)
+    Rsd = (rhos - rhol) / rhol
+    return (im_tot - il) / (Rsd * Cvs)
 
 if __name__ == '__main__':
     pass

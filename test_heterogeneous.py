@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Rsd = (rhos-rhol)/rhol
-        self.assertAlmostEqual(heterogeneous.vt_grace(0.0075/1000, Rsd, nu), 0.0000249)
+        self.assertAlmostEqual(heterogeneous.vt_grace(0.075/1000, Rsd, nu), 0.0024768)
         self.assertAlmostEqual(heterogeneous.vt_grace(0.2/1000, Rsd, nu), 0.0134016)#, places=5)
         self.assertAlmostEqual(heterogeneous.vt_grace(0.4/1000, Rsd, nu), 0.0346031)#, places=5)
         self.assertAlmostEqual(heterogeneous.vt_grace(1.6/1000, Rsd, nu), 0.1253364)#, places=4)
@@ -30,7 +30,7 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.0075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0000051)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0008793)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0119203)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0528735)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.1512408)
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.0075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0000051)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0008793)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0119203)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0528735)
         self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.1512408)
