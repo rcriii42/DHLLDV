@@ -15,12 +15,16 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Rsd = (rhos-rhol)/rhol
-        self.assertAlmostEqual(heterogeneous.vt_grace(0.075/1000, Rsd, nu), 0.0024768)
-        self.assertAlmostEqual(heterogeneous.vt_grace(0.2/1000, Rsd, nu), 0.0134016)#, places=5)
-        self.assertAlmostEqual(heterogeneous.vt_grace(0.4/1000, Rsd, nu), 0.0346031)#, places=5)
-        self.assertAlmostEqual(heterogeneous.vt_grace(1.6/1000, Rsd, nu), 0.1253364)#, places=4)
-        self.assertAlmostEqual(heterogeneous.vt_grace(10./1000, Rsd, nu), 0.3642040, places=2)
-        self.assertAlmostEqual(heterogeneous.vt_grace(75./1000, Rsd, nu), 0.9010960, places=1)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(0.075/1000, Rsd, nu), 0.0044591)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(0.2/1000, Rsd, nu), 0.0256840)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(0.4/1000, Rsd, nu), 0.0592375)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(0.8/1000, Rsd, nu), 0.1020475)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(1.6/1000, Rsd, nu), 0.1549654)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(10./1000, Rsd, nu), 0.4018323)
+        self.assertAlmostEqual(heterogeneous.vt_ruby(20./1000, Rsd, nu), 0.5691956)
+
+    def test_hinderedSettling(self):
+        pass #Not sure we need this yet
         
     def test_Ehrg_nosf(self):
         vls = 3.0

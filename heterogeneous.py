@@ -11,25 +11,16 @@ from math import pi, sin, log, cosh
 particle_ratio = 0.015          #Particle to pipe diameter ratio for sliding flow per Sellgren & Wilson
 from stratified import musf     #Sliding friction factor
 
-def vt_grace(d, Rsd, nu, K=0.26):
-    """vt_grace - terminal settling velocity via the Grace method (equations 4.4-21 - 4.4-27)
+def vt_ruby(d, Rsd, nu, K=0.26):
+    """vt_ruby - terminal settling velocity via the Ruby & Zanke formula (eqn 8.2-2)
        d particle diameter (m)
        Rsd relative solids density
        nu fluid kinematic viscosity in m2/sec
-       k particle shape factor (sand = 0.26)
+       k particle shape factor (sand = 0.26) (not used, included for compatibility
     """
-    Dstar = d*(Rsd*gravity/nu**2)**(1./3.)
-    if Dstar < 3.8:
-        vtstar = Dstar**2/18. - 3.1234e-04*Dstar**5. + 1.6415e-06*Dstar**8. - 7.278e-10*Dstar**11
-    elif 3.8 <= Dstar < 7.58:
-        vtstar =10**(-1.5446 + 2.9162*log(Dstar,10) - 1.0432*log(Dstar,10)**2)
-    elif 7.58 <= Dstar < 227:
-        vtstar = 10**(-1.64758 + 2.94786*log(Dstar,10) - 1.09703*log(Dstar,10)**2 + 0.17129*log(Dstar,10)**3)
-    else: #227 <= Dstar < 3500
-        vtstar = 10**(5.1837 - 4.51034*log(Dstar,10) + 1.687*log(Dstar,10)**2 - 0.189135*log(Dstar,10)**3)
-    vts = vtstar * (1/(nu*Rsd*gravity)**(-1./3.))
-    xi = 10**(-0.55+K-0.0015*K**(-2)+0.03*(1000)**(K-0.524)+(-0.045+0.05*K**(-0.6)-0.0287*(55000)**(K-0.524))/cosh(2.55*(log(Dstar,10)-1.114)))
-    return xi*vts
+    right = 10*nu/d
+    left = (1+(Rsd*gravity*d**3)/(100*nu**2))**0.5 -1
+    return right * left
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Relative excess pressure gradient, per equation 8.5-2
@@ -44,7 +35,7 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
        use_sf: Whether to apply the sliding flow correction
     """
     Rsd = (rhos-rhol)/rhol
-    vt = vt_grace(d, Rsd, nu)
+    vt = vt_ruby(d, Rsd, nu)
     Rep = vt*d/nu  #eqn 4.2-6
     top = 4.7 + 0.41*Rep**0.75
     bottom = 1. + 0.175*Rep**0.75
