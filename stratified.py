@@ -25,9 +25,9 @@ def areas(Dp, Cvs):
        A2 = Area of bed
     """
     Arel = Cvs/Cvb
-    Ap = pi*(Dp/2)**2
+    Ap = pi*(Dp/2)**2   #Eqn 8.4-5
     A2 = Ap * Arel
-    A1 = Ap - A2
+    A1 = Ap - A2 #Eqn 8.4-7
     return Ap, A1, A2
 
 
@@ -39,9 +39,9 @@ def perimeters(Dp, Cvs):
        O2  = The length of pipewall/bed contact
     """
     B = beta(Cvs)
-    Op = pi * Dp
-    O1 = (pi - B) * Dp
-    O12 = Dp * sin(B)
+    Op = pi * Dp #Eqn 8.4-1
+    O1 = (pi - B) * Dp #Eqn 8.4-2
+    O12 = Dp * sin(B)  #Eqn 8.4-4
     O2 = Op - O1
     return Op, O1, O12, O2
 
@@ -57,7 +57,7 @@ def lambda1(Dp_H, v1, epsilon, nu_l):
     c1 = 0.27*epsilon/Dp_H
     c2 = 5.75/Re**0.9
     bottom = log(c1+c2)**2
-    return 1.325/bottom
+    return 1.325/bottom #Eqn 8.4-12
 
 
 def lambda12(Dp_H, d, v1, v2, nu_l):
@@ -72,7 +72,7 @@ def lambda12(Dp_H, d, v1, v2, nu_l):
     c1 = 0.27 * d/Dp_H
     c2 = 5.75/Re**0.9
     bottom = log(c1+c2)**2
-    return 1.325/bottom
+    return 1.325/bottom #Eqn 8.4-13
 
 
 def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s):
@@ -105,17 +105,17 @@ def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """
     Ap, A1, A2 = areas(Dp, Cvs)
     Op, O1, O12, O2 = perimeters(Dp, Cvs)
-    Dp_H = 4*A1/(O1 + O12)
+    Dp_H = 4*A1/(O1 + O12) #Eqn 8.4-8
     v1 = vls*Ap/A1
     v2 = 0.0
     lbd1 = lambda1(Dp_H, v1, epsilon, nu)
-    tau1_l = lbd1*rhol*v1**2/8
-    F1_l = tau1_l * O1
+    tau1_l = lbd1*rhol*v1**2/8 #Eqn 8.4-12
+    F1_l = tau1_l * O1 #Eqn 8.4-17
     lbd12 = min(lambda12(Dp_H, d, v1, v2, nu),
                 lambda12_sf(Dp_H, d, v1, v2, epsilon, nu, rhol, rhos))
-    tau12_l = lbd12*rhol*v1**2/8
-    F12_l = tau12_l * O12
-    return (F1_l + F12_l)/A1
+    tau12_l = lbd12*rhol*v1**2/8 #Eqn 8.4-13 and 8.4-14
+    F12_l = tau12_l * O12 #Eqn8.4-18
+    return (F1_l + F12_l)/A1 #Eqn8.4-19
 
 
 def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
