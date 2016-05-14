@@ -34,7 +34,7 @@ def swamee_jain_ff(Re, Dp, epsilon):
     c1 = epsilon / (3.7 * Dp)
     c2 = 5.75 / Re**0.9
     bottom = log(c1 + c2)**2
-    return 1.325 / bottom  # eqn 8.7-3
+    return 1.325 / bottom  # eqn 8.2-7
 
 def fluid_pressure_loss(vls, Dp, epsilon, nu, rhol):
     """
@@ -47,7 +47,7 @@ def fluid_pressure_loss(vls, Dp, epsilon, nu, rhol):
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
     lmbda = swamee_jain_ff(Re, Dp, epsilon)
-    return lmbda*rhol*vls**2/(2*Dp)
+    return lmbda*rhol*vls**2/(2*Dp) #eqn 8.2-5
     
 
 def fluid_head_loss(vls, Dp, epsilon, nu, rhol):
@@ -61,15 +61,55 @@ def fluid_head_loss(vls, Dp, epsilon, nu, rhol):
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
     lmbda = swamee_jain_ff(Re, Dp, epsilon)
-    return lmbda*vls**2/(2*gravity*Dp)
+    return lmbda*vls**2/(2*gravity*Dp) #eqn 8.2-6
 
-def relative_viscosity(Cvs):
+def apparent_density(rhol, rhos, Cvs, f):
     """
-    Return the relative viscosity (nu-m/nu-l) of a pseudo-homogeneous slurry, using the 
+    Return the apparent density of the fluid given the fraction of fines
+    rhol: fluid density in ton/m3
+    rhos: particle density in ton/m3
+    Cvs - spatial (insitu) volume concentration of solids
+    f is the fraction of fines
+    """
+    Rsd = (rhos-rhol)/rhol
+    return rhol*(1+Rsd*f*Cvs) #eqn 8.3-1
+
+def apparent_viscosity(nu, rhol, rhos, Cvs, f):
+    """
+    Return the apparent viscosity (nu-l,h) of a pseudo-homogeneous slurry, using the 
     Thomas (1965) approach.
-    Cvs is the volume concentration of fines. 
+    nu: fluid kinematic viscosity in m2/sec
+    rhol: fluid density in ton/m3
+    rhos: particle density in ton/m3
+    Cvs - spatial (insitu) volume concentration of solids
+    f is the fraction of fines
     """
-    return 1 + 2.5*Cvs + 10.05*Cvs**2 + 0.00273*exp(16.6*Cvs)  # eqn 8.15-2
+    Rsd = (rhos-rhol)/rhol
+    top = nu * (1 + 2.5*f*Cvs + 10.05*(f*Cvs)**2 + 0.00273*exp(16.6*f*Cvs))
+    bottom = 1+Rsd*f*Cvs
+    return   top/bottom # eqn 8.3-2 modified to take nu directly
+
+def apparent_concentration(Cvs, f):
+    """
+    Return the apparent concentration of solids in a pseudo-homogeneous fluid
+    Cvs - spatial (insitu) volume concentration of solids
+    f is the fraction of fines
+    """
+    return (1 - f) * Cvs #Eqn 8.3-3
+
+def limiting_particle(Dp, nu, rhol, rhos, Stk = 0.03):
+    """
+    Return the limiting particle diameter for the particles influencing the 
+    viscosity
+    Dp: Pipe diameter in m
+    nu: fluid kinematic viscosity in m2/sec
+    rhol: fluid density in ton/m3
+    rhos: particle density in ton/m3
+    Stk is the stokes number, here using 0.03 as a first approximation
+    """
+    top = Stk * 9 * rhol * nu * Dp
+    bottom = rhos * 6 * Dp**0.4
+    return (top/bottom)**0.5 #Eqn 8.3-4
 
 def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """Return the Erhg value for homogeneous flow.
@@ -80,6 +120,7 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
+    rhos: particle density in ton/m3
     Cvs - spatial (insitu) volume concentration of solids
     """
     Re = pipe_reynolds_number(vls, Dp, nu)

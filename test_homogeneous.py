@@ -33,6 +33,37 @@ class Test(unittest.TestCase):
         Re = 2320  #laminar
         lmbda = homogeneous.swamee_jain_ff(Re, 0.5, DHLLDV_constants.steel_roughness)
         self.assertAlmostEqual(lmbda, 2.75862069e-02)
+        
+    def test_apparent_density(self):
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.1), 1.039495)
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.5), 1.204675)
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 1.0), 1.41115)
+        
+    def test_apparent_viscosity(self):
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.apparent_viscosity(nu, rhol, rhos, Cvs, 0.1)*1.0E+06, 1.0373114)
+        self.assertAlmostEqual(homogeneous.apparent_viscosity(nu, rhol, rhos, Cvs, 0.5)*1.0E+06, 1.2440956)
+        self.assertAlmostEqual(homogeneous.apparent_viscosity(nu, rhol, rhos, Cvs, 1.0)*1.0E+06, 1.7279746)
+        
+    def test_apparent_copncentration(self):
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 0.1), 0.225)
+        self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 0.5), 0.125)
+        self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 1.0), 0.0)
+        
+    def test_limiting_particle(self):
+        Dp =0.5
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        self.assertAlmostEqual(homogeneous.limiting_particle(Dp, nu, rhol, rhos)*1000, 0.1061102535055)
 
     def test_Erhg(self):
         vls = 3.0
