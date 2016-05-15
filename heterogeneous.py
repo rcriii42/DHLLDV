@@ -45,7 +45,7 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    Srs = 7.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(8./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
+    Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
     f = d/(particle_ratio * Dp)  #eqn 8.7-4
     if not use_sf or f<1:
         return Shr + Srs

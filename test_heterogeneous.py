@@ -34,13 +34,13 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0008793)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0119203)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0528735)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.1512408)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 1.6/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.2493150)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 10./1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.4106565, places=1)
-        
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0016021)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0517285)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.2495003)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.4793151)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 1.6/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.6133468)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 10./1000, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.7417270)
+
     def test_Ehrg_with_sf(self):
         vls = 3.0
         Dp = 0.5
@@ -49,13 +49,13 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0008793)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0119203)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0528735)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.1512408)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 1.6/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.2493150)
-        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 10./1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.4117424, places=1)
-        
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.075/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0016021)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.2/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.0517285)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.4/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.2495003)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 0.8/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.4793151)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 1.6/1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.6133468)
+        self.assertAlmostEqual(heterogeneous.Erhg(vls, Dp, 10./1000, epsilon, nu, rhol, rhos, Cvs, use_sf=True), 0.6600452)
+
     def test_head_loss(self):
         vls = 3.0
         Dp = 0.5
@@ -65,8 +65,8 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.heterogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0206256)
-        self.assertAlmostEqual(heterogeneous.heterogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.2026330)
+        self.assertAlmostEqual(heterogeneous.heterogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0531630)
+        self.assertAlmostEqual(heterogeneous.heterogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.5222911)
 
 
 if __name__ == "__main__":
