@@ -98,6 +98,18 @@ class Test(unittest.TestCase):
         rhos = 2.65
         Cvs = 0.25
         self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.00633356768663)
+        
+    def test_Erhg_sf(self):
+        vls = 3.0
+        Dp =0.5
+        d=8.0/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        rhos = 2.65
+        Cvs = 0.25
+        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.00465260820521)
+        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.0302993)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

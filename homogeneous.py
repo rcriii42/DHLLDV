@@ -8,9 +8,12 @@ Created on Oct 7, 2014
 
 from math import log, exp
 from DHLLDV_constants import gravity
+import heterogeneous
 
 Acv = 3.   #coefficient homogeneous regime, advised in section 8.7.
 kvK = 0.4 #von Karman constant
+
+from stratified import musf     #Sliding friction factor
 
 def pipe_reynolds_number(vls, Dp, nu):
     """
@@ -111,17 +114,18 @@ def limiting_particle(Dp, nu, rhol, rhos, Stk = 0.03):
     bottom = rhos * 6 * Dp**0.4
     return (top/bottom)**0.5 #Eqn 8.3-4
 
-def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
+def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Return the Erhg value for homogeneous flow.
     Use the Talmon (2013) correction for slurry density.
     vls: line speed in m/sec
     Dp: Pipe diameter in m
-    d: Particle diameter in m (not used, here for consistency)
+    d: Particle diameter in m
     epsilon: pipe absolute roughness in m
     nu: fluid kinematic viscosity in m2/sec
     rhol: fluid density in ton/m3
     rhos: particle density in ton/m3
     Cvs - spatial (insitu) volume concentration of solids
+    use_sf: Whether to apply the sliding flow correction
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
     lambda1 = swamee_jain_ff(Re, Dp, epsilon)
@@ -133,7 +137,12 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     top = 1+Rsd*Cvs - sb
     bottom = Rsd*Cvs*sb
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    return il*(1-(1-top/bottom)*(1-deltav_to_d))                    #eqn 8.7-8
+    f = d/(heterogeneous.particle_ratio * Dp)  #eqn 8.8-4
+    if not use_sf or f<1:
+        return il*(1-(1-top/bottom)*(1-deltav_to_d))            #eqn 8.7-8
+    else:
+        #Sliding flow per equation 8.8-5
+        return (il*(1-(1-top/bottom)*(1-deltav_to_d)) + (f-1)*musf)/f
 
 def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """

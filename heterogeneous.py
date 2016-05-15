@@ -41,19 +41,17 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     bottom = 1. + 0.175*Rep**0.75
     beta = top/bottom  #eqn 4.6-4
     KC = 0.175*(1+beta)
-    Shr = vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
+    Shr = vt*(1-Cvs/KC)**beta /vls #Eqn 8.6-2
     
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
-    f = d/(particle_ratio * Dp)  #eqn 8.7-4
+    Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.6-2
+    f = d/(particle_ratio * Dp)  #eqn 8.8-4
     if not use_sf or f<1:
         return Shr + Srs
     else:
-        #Sliding flow per equation 8.7-4 and 8.7-5
-          
+        #Sliding flow per equation 8.8-5
         return (Shr + Srs + (f-1)*musf)/f
-        
 
 def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
