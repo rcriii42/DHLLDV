@@ -7,7 +7,7 @@ Created on Oct 7, 2014
 '''
 
 from math import log, exp
-from DHLLDV_constants import gravity
+from DHLLDV_constants import gravity, musf, particle_ratio
 import heterogeneous
 
 Acv = 3.   #coefficient homogeneous regime, advised in section 8.7.
@@ -137,7 +137,7 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     top = 1+Rsd*Cvs - sb
     bottom = Rsd*Cvs*sb
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    f = d/(heterogeneous.particle_ratio * Dp)  #eqn 8.8-4
+    f = d/(particle_ratio * Dp)  #eqn 8.8-4
     if not use_sf or f<1:
         return il*(1-(1-top/bottom)*(1-deltav_to_d))            #eqn 8.7-8
     else:

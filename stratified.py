@@ -6,12 +6,9 @@ Created on Oct 22, 2014
 @author: RCRamsdell
 '''
 
-from DHLLDV_constants import gravity, Arel_to_beta
+from DHLLDV_constants import gravity, Arel_to_beta, musf, Cvb
 import homogeneous
 from math import pi, sin, log
-
-musf = 0.415    #Sliding friction coefficient
-Cvb = 0.6       #The bed concentration
 
 def beta(Cvs):
     """Return the angle beta based on the Cvs and Cvb"""

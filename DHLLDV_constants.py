@@ -8,6 +8,9 @@ from DHLLDV_Utils import interpDict
 
 steel_roughness = 4.5e-05  #new steel pipe absolute roughness in m
 gravity =  9.80665  #m/s2
+musf = 0.415    #Sliding friction coefficient
+Cvb = 0.6       #The bed concentration
+particle_ratio = 0.015          #Particle to pipe diameter ratio for sliding flow per Sellgren & Wilson
 
 water_density = interpDict({00: 0.99984, #deg C, density in ton/m**3 per wikipedia
                             04: 0.99997,

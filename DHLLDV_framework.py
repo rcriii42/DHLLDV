@@ -14,7 +14,6 @@ alpha_xi = 0    # alpha in equation 8.12-6
 d_uf = 0.057/1000    # particle size that affects viscosity (m) per eqn 8.15-1
                      # and discussion
 
-
 def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     """
     Cvs_Erhg - Calculate the Erhg for the given slurry, using the appropriate model
