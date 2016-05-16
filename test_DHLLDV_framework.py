@@ -79,7 +79,102 @@ class Test(unittest.TestCase):
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(Erhg, 0.06351955, places=6)
         self.assertAlmostEqual(Erhg_regime,'fixed bed')
-    
+
+    def testLDV_very_small(self):
+        vls = 1
+        Dp = 0.5
+        d = 0.01/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.1
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
+        self.assertAlmostEqual(LDV, 0.8288413, places=4)
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
+        self.assertAlmostEqual(LDV, 0.8288413, places=6)
+         
+    def testLDV_small(self):
+        vls = 4.17
+        Dp = 0.5
+        d = 0.15/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.1
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
+        self.assertAlmostEqual(LDV, 3.5639770, places=4)
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
+        self.assertAlmostEqual(LDV, 3.5639770, places=5)
+         
+    def testLDV_large(self):
+        vls = 4.3897193
+        Dp = 0.5
+        d = 0.4/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.1
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
+        self.assertAlmostEqual(LDV, 4.8025714, places=5)
+          
+    def testLDV_large2(self):
+        vls = 4.4226477
+        Dp = 0.5
+        d = 0.8/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.1
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
+        self.assertAlmostEqual(LDV, 4.4192975, places=5)
+      
+    def testLDV_drough(self):
+        vls = 4.0917049
+        Dp = 0.5
+        d = 2.1/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.1
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
+        self.assertAlmostEqual(LDV, 4.0917049, places=5)
+         
+    def testLDV_SBHe1(self):
+        vls = 1.7689662
+        Dp = 0.5
+        d = 0.8/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.0025
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
+        self.assertAlmostEqual(LDV, 1.7689662, places=5) # Gives 1.827
+     
+    def testLDV_SBHe2(self):
+        vls = 2.4907119
+        Dp = 0.5
+        d = 2.1/1000
+        epsilon = DHLLDV_constants.steel_roughness
+        nu = 0.001005/(0.9982*1000)
+        rhol = DHLLDV_constants.water_density[20]
+        rhos = 2.65
+        Cvs = 0.0025
+        Rsd = (rhos-rhol)/rhol
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
+        self.assertAlmostEqual(LDV, 2.4907119, places=5)
+
 #     def testLDV_fig8_11_2(self):
 #         # stratified.musf = 0.52
 # #         vls = 0.7
@@ -95,97 +190,7 @@ class Test(unittest.TestCase):
 # #         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
 # #         self.assertAlmostEqual(LDV, 1.6/fbot)#, places, msg, delta)
 #         pass
-#     
-#     def testLDV_very_small(self):
-#         vls = 1
-#         Dp = 0.5
-#         d = 0.0075/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.1
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-#         self.assertAlmostEqual(LDV, 0.8288413, places=4)
-#         
-#     def testLDV_small(self):
-#         vls = 3.5502843557
-#         Dp = 0.5
-#         d = 0.2/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.1
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-#         self.assertAlmostEqual(LDV, 3.5502843557, places=4)
-#         
-#     def testLDV_large(self):
-#         vls = 4.3897193
-#         Dp = 0.5
-#         d = 0.4/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.1
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-#         self.assertAlmostEqual(LDV, 4.3897193, places=5)
-#          
-#     def testLDV_large2(self):
-#         vls = 4.4226477
-#         Dp = 0.5
-#         d = 0.8/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.1
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-#         self.assertAlmostEqual(LDV, 4.4192975, places=5)
-#      
-#     def testLDV_drough(self):
-#         vls = 4.0917049
-#         Dp = 0.5
-#         d = 2.1/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.1
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
-#         self.assertAlmostEqual(LDV, 4.0917049, places=5)
-#         
-#     def testLDV_SBHe1(self):
-#         vls = 1.7689662
-#         Dp = 0.5
-#         d = 0.8/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.0025
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
-#         self.assertAlmostEqual(LDV, 1.7689662, places=5) # Gives 1.827
-#     
-#     def testLDV_SBHe2(self):
-#         vls = 2.4907119
-#         Dp = 0.5
-#         d = 2.1/1000
-#         epsilon = DHLLDV_constants.steel_roughness
-#         nu = 0.001005/(0.9982*1000)
-#         rhol = DHLLDV_constants.water_density[20]
-#         rhos = 2.65
-#         Cvs = 0.0025
-#         Rsd = (rhos-rhol)/rhol
-#         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=20)
-#         self.assertAlmostEqual(LDV, 2.4907119, places=5)
+
 #     
 #     def test_Xi_p4(self):
 #         vls = 3.0
