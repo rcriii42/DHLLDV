@@ -160,7 +160,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     A = -1
     B = vt*(1-Cvs/KC)**beta/stratified.musf
     C = ((8.5**2/lambdal)*(vt/(gravity*d)**0.5)**(10./3)*(nu*gravity)**(2./3))/stratified.musf
-    vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   # Eqn 8.11-11
+    vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   # Eqn 8.10-11
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
@@ -169,11 +169,11 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         A = -1
         B = vt*(1-Cvs/KC)**beta/stratified.musf
         C = ((8.5**2/lambdal)*(vt/(gravity*d)**0.5)**(10./3)*(nu*gravity)**(2./3))/stratified.musf
-        vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   # Eqn 8.11-11
+        vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   # Eqn 8.10-11
         steps += 1
-    FL_ll = vlsldv/fbot # Eqn 8.11-12
+    FL_ll = vlsldv/fbot # Eqn 8.10-12
 
-    FL = max(FL_ul, FL_ll)  # Eqn 8.11-13
+    FL = max(FL_ul, FL_ll)  # Eqn 8.10-13
     return FL*fbot
 
 
