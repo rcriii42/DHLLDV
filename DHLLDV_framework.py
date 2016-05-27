@@ -90,14 +90,14 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     vls = 1.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # eqn 8.11-1
+    FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # eqn 8.10-1
     vlsldv = FL_vs*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # eqn 8.11-1
+        FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # eqn 8.10-1
         vlsldv = FL_vs*fbot
         steps += 1
     
@@ -105,51 +105,54 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     vls = 4.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    alphap = 3.3 * (1.65/Rsd)**(1./8) #Eqn 8.11-3
+    alphap = 3.4 * (1.65/Rsd)**(2./9) #Eqn 8.10-3
     vt = heterogeneous.vt_ruby(d, Rsd, nu)
     Rep = vt*d/nu  # eqn 4.2-6
     top = 4.7 + 0.41*Rep**0.75
     bottom = 1. + 0.175*Rep**0.75
     beta = top/bottom  # eqn 4.6-4
     KC = 0.175*(1+beta)
-    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # eqn 8.11-3
+    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # eqn 8.10-3
     vlsldv = FL_ss*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # eqn 8.11-3
+        FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # eqn 8.10-3
         vlsldv = FL_ss*fbot
         steps += 1
     
-    FL_s = max(FL_vs, FL_ss)    #Eqn 8.11-4
+    FL_s = max(FL_vs, FL_ss)    #Eqn 8.10-4
     
-    
-    vls=4.5
+    #Large particles
+    vls=4.3
     if d <= 0.015*Dp:
-        Cvr_ldv = 0.0065/(2*gravity*Rsd*Dp) # Eqn 8.11-7
+        Cvr_ldv = 0.0065/(2*gravity*Rsd*Dp) # Eqn 8.10-7
     else:
-        Cvr_ldv = 0.053*(d/Dp)**0.5/(2*gravity*Rsd*Dp) # Eqn 8.11-7
-    FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.11-6
+        Cvr_ldv = 0.053*(d/Dp)**0.5/(2*gravity*Rsd*Dp) # Eqn 8.10-7
+    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+    lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+    FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.10-6
     vlsldv = FL_r*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.11-6
+        FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.10-6
         vlsldv = FL_r*fbot
         steps += 1
     
-    d0 = 0.00042*(1.65/Rsd)**0.5
+    #The Upper limit
+    d0 = 0.0005*(1.65/Rsd)**0.5 #Eqn 8.10-8
     drough = 2./1000 # note: only valid for sand with Rsd=1.65
     if d > drough:
         FL_ul = FL_r
     elif FL_s <= FL_r:
         FL_ul = FL_s
     else:
-        FL_ul = FL_s*exp(-1*d/d0) + FL_r*(1-exp(-1*d/d0))   # Eqn 8.11-8
+        FL_ul = FL_s*exp(-1*d/d0) + FL_r*(1-exp(-1*d/d0))   # Eqn 8.10-8
     
     vls = 2.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
