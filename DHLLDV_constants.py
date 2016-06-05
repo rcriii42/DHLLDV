@@ -11,6 +11,7 @@ gravity =  9.80665  #m/s2
 musf = 0.415    #Sliding friction coefficient
 Cvb = 0.6       #The bed concentration
 particle_ratio = 0.015          #Particle to pipe diameter ratio for sliding flow per Sellgren & Wilson
+alpha_tel = 1.0 #Televantos alpgha in eqn 8.3-13
 
 water_density = interpDict({00: 0.99984, #deg C, density in ton/m**3 per wikipedia
                             04: 0.99997,
