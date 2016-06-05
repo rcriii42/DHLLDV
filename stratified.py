@@ -102,17 +102,17 @@ def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """
     Ap, A1, A2 = areas(Dp, Cvs)
     Op, O1, O12, O2 = perimeters(Dp, Cvs)
-    Dp_H = 4*A1/(O1 + O12) #Eqn 8.4-8
+    DH1 = 4*A1/(O1 + O12) #Eqn 8.3-8
     v1 = vls*Ap/A1
     v2 = 0.0
-    lbd1 = lambda1(Dp_H, v1, epsilon, nu)
-    tau1_l = lbd1*rhol*v1**2/8 #Eqn 8.4-12
-    F1_l = tau1_l * O1 #Eqn 8.4-17
-    lbd12 = max(lambda12(Dp_H, d, v1, v2, nu),
-                lambda12_sf(Dp_H, d, v1, v2, epsilon, nu, rhol, rhos))
-    tau12_l = lbd12*rhol*v1**2/8 #Eqn 8.4-13 and 8.4-14
-    F12_l = tau12_l * O12 #Eqn8.4-18
-    return (F1_l + F12_l)/A1 #Eqn8.4-19
+    lbd1 = lambda1(DH1, v1, epsilon, nu)
+    tau1_l = lbd1*rhol*v1**2/8 #Eqn 8.3-12
+    F1_l = tau1_l * O1 #Eqn 8.3-15
+    lbd12 = max(lambda12(DH1, d, v1, v2, nu),
+                lambda12_sf(DH1, d, v1, v2, epsilon, nu, rhol, rhos))
+    tau12_l = lbd12*rhol*v1**2/8 #Eqn 8.3-13 and 8.3-14
+    F12_l = tau12_l * O12 #Eqn8.3-16
+    return (F1_l + F12_l)/A1 #Eqn8.3-17
 
 
 def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
