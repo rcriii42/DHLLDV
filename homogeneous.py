@@ -22,7 +22,7 @@ def pipe_reynolds_number(vls, Dp, nu):
     Dp: pipe diameter in m
     nu: fluid kinematic viscosity in m2/sec
     """
-    return vls*Dp/nu
+    return vls*Dp/nu    #Eqn3.2-1
     
 def swamee_jain_ff(Re, Dp, epsilon):
     """
@@ -131,7 +131,7 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     lambda1 = swamee_jain_ff(Re, Dp, epsilon)
     Rsd = (rhos-rhol)/rhol
     rhom = rhol+Cvs*(rhos-rhol)
-    deltav_to_d = min((11.6*nu)/((lambda1/8)**0.5*vls*d), 1)    #eqn 8.7-7
+    deltav_to_d = min((11.6*nu)/((lambda1/8)**0.5*vls*d), 1)    #eqn 8.6-7
     
     sb = ((Acv/kvK)*log(rhom/rhol)*(lambda1/8)**0.5+1)**2
     top = 1+Rsd*Cvs - sb
@@ -139,7 +139,7 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     f = d/(particle_ratio * Dp)  #eqn 8.8-4
     if not use_sf or f<1:
-        return il*(1-(1-top/bottom)*(1-deltav_to_d))            #eqn 8.7-8
+        return il*(1-(1-top/bottom)*(1-deltav_to_d))            #eqn 8.6-8
     else:
         #Sliding flow per equation 8.8-5
         return (il*(1-(1-top/bottom)*(1-deltav_to_d)) + (f-1)*musf)/f
