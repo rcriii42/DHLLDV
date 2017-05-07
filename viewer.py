@@ -14,8 +14,9 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     
-    Dp = 0.762
-    d = .3/1000
+
+    Dp = 0.762  #Pipe diameter
+    d = 2/1000.
     epsilon = DHLLDV_constants.steel_roughness
     nu = DHLLDV_constants.water_viscosity[20] 
     rhos = 2.65
@@ -74,7 +75,10 @@ if __name__ == '__main__':
     
     
     HG_title = "Hydraulic gradient for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cvs, rhom)
-    HG_plot = fig.add_subplot(212, title=HG_title, xlim=(0,10), ylim=(0,0.5))
+
+    spot10 = vls_list.index(10)
+    hg_ymax = max(SB_im_list[spot10], Ho_im_list[spot10], He_im_list[spot10])*1.5
+    HG_plot = fig.add_subplot(212, title=HG_title, xlim=(0,10), ylim=(0,hg_ymax))
     HG_plot.plot(vls_list, FB_im_list, linewidth=1, linestyle='--', color='c')
     HG_plot.plot(vls_list, SB_im_list, linewidth=1, linestyle='--', color='brown')
     HG_plot.plot(vls_list, He_im_list, linewidth=1, linestyle='--', color='b')
