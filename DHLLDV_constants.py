@@ -13,9 +13,9 @@ Cvb = 0.6       #The bed concentration
 particle_ratio = 0.015          #Particle to pipe diameter ratio for sliding flow per Sellgren & Wilson
 alpha_tel = 1.0 #Televantos alpgha in eqn 8.3-13
 
-water_density = interpDict({00: 0.99984, #deg C, density in ton/m**3 per wikipedia
-                            04: 0.99997,
-                            05: 0.99996,
+water_density = interpDict({0: 0.99984, #deg C, density in ton/m**3 per wikipedia
+                            4: 0.99997,
+                            5: 0.99996,
                             10: 0.99970,
                             15: 0.99910,
                             20: 0.99820,
@@ -37,9 +37,9 @@ water_density = interpDict({00: 0.99984, #deg C, density in ton/m**3 per wikiped
                             100: 0.95835,
                             })
 
-water_dynamic_viscosity = interpDict({00: 1.7921E-03,   ##Dynamic Viscosity (mu or eta) in Pa-s per wikipedia
-                                      04: 1.5717E-03,
-                                      05: 1.5188E-03,
+water_dynamic_viscosity = interpDict({0: 1.7921E-03,   ##Dynamic Viscosity (mu or eta) in Pa-s per wikipedia
+                                      4: 1.5717E-03,
+                                      5: 1.5188E-03,
                                       10: 1.3077E-03,
                                       15: 1.1404E-03,
                                       20: 1.0050E-03,

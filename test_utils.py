@@ -10,9 +10,9 @@ import DHLLDV_Utils
 class TestInterpDict(unittest.TestCase):
 
     def testInstantiateWithDict(self):
-        t1 = DHLLDV_Utils.interpDict({00:0.99984, #deg C, density in ton/m**3 per wikipedia
-                                      04:0.99997,
-                                      05:0.99996,
+        t1 = DHLLDV_Utils.interpDict({0:0.99984, #deg C, density in ton/m**3 per wikipedia
+                                      4:0.99997,
+                                      5:0.99996,
                                       10:0.99970,
                                       15:0.99910,
                                       20:0.99820,})

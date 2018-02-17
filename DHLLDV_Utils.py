@@ -22,8 +22,7 @@ class interpDict(dict):
         try:
             val = dict.__getitem__(self, key)
         except KeyError:
-            keys = self.keys()
-            keys.sort()
+            keys = sorted(self.keys())
             index = bisect.bisect(keys, key)
             if index and index!=len(keys):
                 x1 = keys[index-1]
