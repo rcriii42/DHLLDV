@@ -24,8 +24,23 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(heterogeneous.vt_ruby(20./1000, Rsd, nu), 0.5691956)
 
     def test_hinderedSettling(self):
-        pass #Not sure we need this yet
-        
+        nu = 0.001005/(0.9982*1000)
+        rhos = 2.65
+        rhol = DHLLDV_constants.water_density[20]
+        Rsd = (rhos-rhol)/rhol
+        Cvs = 0.1
+        self.assertAlmostEqual(heterogeneous.vth_RZ(0.075/1000, Rsd, nu, Cvs), 0.002766062)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(0.200/1000, Rsd, nu, Cvs), 0.017171128)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(0.400/1000, Rsd, nu, Cvs), 0.042443520)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(0.800/1000, Rsd, nu, Cvs), 0.076343479)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(1.600/1000, Rsd, nu, Cvs), 0.118563740)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(10.000/1000, Rsd, nu, Cvs), 0.313060300)
+        self.assertAlmostEqual(heterogeneous.vth_RZ(20.000/1000, Rsd, nu, Cvs), 0.444118731)
+
+
+
+
+
     def test_Ehrg_nosf(self):
         vls = 3.0
         Dp = 0.5
