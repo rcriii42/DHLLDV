@@ -20,6 +20,20 @@ def vt_ruby(d, Rsd, nu, K=0.26):
     left = (1+(Rsd*gravity*d**3)/(100*nu**2))**0.5 -1
     return right * left #Eqn 8.2-2
 
+def vth_RZ(d, Rsd, nu, Cvs, K=0.26):
+    """vt_RZ - hindered settling velocity via the Richardson & Zaki formula (eqn 8.2-3)
+       d particle diameter (m)
+       Rsd relative solids density
+       nu fluid kinematic viscosity in m2/sec
+       k particle shape factor (sand = 0.26) (not used, included for compatibility
+    """
+    vt = vt_ruby(d, Rsd, nu)
+    Rep = vt*d/nu  #eqn 8.2-4
+    top = 4.7 + 0.41*Rep**0.75
+    bottom = 1. + 0.175*Rep**0.75
+    beta = top/bottom  #eqn 8.2-4
+    return vt*(1-Cvs)**beta
+
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Relative excess pressure gradient, per equation 8.5-2
@@ -41,7 +55,7 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     beta = top/bottom  #eqn 8.2-4
     KC = 0.175*(1+beta)
     Shr = vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
-    
+
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
     Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
