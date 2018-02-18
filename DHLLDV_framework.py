@@ -188,6 +188,8 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     rhos = particle density (ton/m3)
     Cvt = transport volume concentration
     """
+    if vls == 0.0:
+        vls = 0.01
     Rsd = (rhos-rhol)/rhol
     vt = heterogeneous.vt_ruby(d, Rsd, nu)  # particle shape factor assumed for sand for now
     CD = (4/3.)*((gravity*Rsd*d)/vt**2)      # eqn 4.4-6 without the shape factor
