@@ -163,7 +163,7 @@ def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    return sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
+    return sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*gravity*rhol
 
 
 def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):

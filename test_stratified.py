@@ -77,9 +77,9 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(stratified.fb_pressure_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
                                2.05519475, places=4)
         self.assertAlmostEqual(stratified.fb_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.20919431, places=4)
+                               0.20994945, places=4)
         self.assertAlmostEqual(stratified.fb_Erhg(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               1.19241379, places=4)
+                               1.19697717, places=4)
         
     def test_sliding_bed_pressure_loss(self):
         vls = 3.0
@@ -91,7 +91,7 @@ class Test(unittest.TestCase):
         rho_l = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         self.assertAlmostEqual(stratified.sliding_bed_pressure_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.79134558773497)#, places=5)
+                               0.788499308)#, places=5)
         self.assertAlmostEqual(stratified.sliding_bed_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
                                0.08054954196153)#, places=6)
         self.assertAlmostEqual(stratified.Erhg(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
