@@ -27,7 +27,8 @@ def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     Cvs = insitu volume concentration
     get_dict: if true return the dict with all models.
     """
-    Erhg_obj = {'FB': stratified.fb_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
+    Erhg_obj = {'il': homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol),
+                'FB': stratified.fb_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
                 'SB':    stratified.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
                 'He': heterogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
                 'Ho':   homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
