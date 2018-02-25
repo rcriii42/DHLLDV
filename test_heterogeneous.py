@@ -80,8 +80,8 @@ class Test(unittest.TestCase):
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
-        self.assertAlmostEqual(heterogeneous.heterogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.0531630)
-        self.assertAlmostEqual(heterogeneous.heterogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.5222911)
+        self.assertAlmostEqual(heterogeneous.heterogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False)*10, 0.0531630*10)
+        self.assertAlmostEqual(heterogeneous.heterogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.5204125)
 
 
 if __name__ == "__main__":

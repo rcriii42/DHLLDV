@@ -77,7 +77,7 @@ def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_s
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    return heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf)*gravity/rhol
+    return heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf)*gravity*rhol
 
 def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Return the head loss (m.w.c per m) for (pseudo) heterogeneous flow.
