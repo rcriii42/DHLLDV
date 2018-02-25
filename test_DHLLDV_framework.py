@@ -20,7 +20,7 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         Erhg_obj = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict=True)
-        self.assertAlmostEqual(Erhg_obj['FB'], 0.13556340, places=6)
+        self.assertAlmostEqual(Erhg_obj['FB'], 0.13631182, places=6)
         self.assertAlmostEqual(Erhg_obj['SB'], 0.415)
         self.assertAlmostEqual(Erhg_obj['He'], 0.2495003)
         self.assertAlmostEqual(Erhg_obj['Ho'], 0.00640100645523)
@@ -36,7 +36,7 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         Erhg_obj = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict=True)
-        self.assertAlmostEqual(Erhg_obj['FB'], 0.439003630, places=5)
+        self.assertAlmostEqual(Erhg_obj['FB'], 0.44104037, places=5)
         self.assertAlmostEqual(Erhg_obj['SB'], 0.415)
         self.assertAlmostEqual(Erhg_obj['He'], 0.1451765)
         self.assertAlmostEqual(Erhg_obj['Ho'], 0.01051754196773)
@@ -51,7 +51,7 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(Erhg, 0.13556340, places=6)
+        self.assertAlmostEqual(Erhg, 0.13631182, places=6)
          
     def testCvs_Erhg_result2(self):
         #test at a higher velocity to trigger He
@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         Cvs = 0.1
         Erhg_regime = DHLLDV_framework.Cvs_regime(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
-        self.assertAlmostEqual(Erhg, 0.13556340, places=6)
+        self.assertAlmostEqual(Erhg, 0.13631182, places=6)
         self.assertAlmostEqual(Erhg_regime,'fixed bed')
  
     def testLDV_very_small(self):
