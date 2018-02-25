@@ -65,8 +65,9 @@ water_dynamic_viscosity = interpDict({0: 1.7921E-03,   ##Dynamic Viscosity (mu o
 water_viscosity = interpDict(dict((t,water_dynamic_viscosity[t]/(1000*water_density[t])) for t in water_density.keys()))
 
 Arel_to_beta = interpDict({0.00000: 0.0000000,  ##lookup table for calculating the angle beta for a given proportion of a pipe filled
-                           0.00007: 0.0698132,  ##Arel = Adesired/Atotal
-                           0.00058: 0.1396263,  ##beta in radians
+                           0.0000721: 0.0698132,  ##Arel = Adesired/Atotal
+                           0.000575: 0.1396263,  ##beta in radians
+                           0.00112: 0.1745329,
                            0.00193: 0.2094395,
                            0.00455: 0.2792527,
                            0.01506: 0.4188790,
@@ -75,7 +76,9 @@ Arel_to_beta = interpDict({0.00000: 0.0000000,  ##lookup table for calculating t
                            0.16355: 0.9773844,
                            0.23014: 1.1170107,
                            0.25000: 1.1549420,
+                           0.26722: 1.1868239,
                            0.28659: 1.2217305,
+                           0.31149: 1.2653637,
                            0.33709: 1.3089969,
                            0.39001: 1.3962634,
                            0.44459: 1.4835299,
