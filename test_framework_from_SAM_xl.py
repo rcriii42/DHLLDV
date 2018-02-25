@@ -65,14 +65,19 @@ class Test(unittest.TestCase):
 
         self.assertAlmostEqual(stratified.beta(self.Cvs_175), prediction, places=3)
 
-    # def test_fixed_hyd_grad_6ms(self):
-    #     il_fb = stratified.fb_head_loss(self.vls_6ms, self.Dp, self.d_med, self.epsilon,
-    #                                     self.nul, self.rhol, self.rhos, self.Cvs_175)
-    #     self.assertAlmostEqual(il_fb, 0.647189382)
-    #
-    # def test_fixed_6ms(self):
-    #     self.assertAlmostEqual(self.Erhg_obj_6_med['FB'], 2.932702071)#, places=4)
-    #
-    # def test_fixed_3ms(self):
-    #     self.assertAlmostEqual(self.Erhg_obj_3_med['FB'], 0.151968611)#, places=5)
+    def test_fixed_hyd_grad_3ms(self):
+        i_fb = stratified.fb_head_loss(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                        self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(i_fb*10, 0.039702736*10, places=3)
+
+    def test_fixed_hyd_grad_6ms(self):
+        i_fb = stratified.fb_head_loss(self.vls_6ms, self.Dp, self.d_med, self.epsilon,
+                                        self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(i_fb, 0.647189382, places=3)
+
+    def test_fixed_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['FB'], 0.119193987, places=3)
+
+    def test_fixed_6ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
 
