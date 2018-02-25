@@ -127,7 +127,7 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
        Cvs = insitu volume concentration
     """
     delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
-    return delta_p * rhol/gravity
+    return delta_p /(rhol*gravity)
 
 def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the ERHG for the fixed-bed case.

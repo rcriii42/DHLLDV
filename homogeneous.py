@@ -154,7 +154,7 @@ def homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     rhol: fluid density in ton/m3
     Cvs - spatial (insitu) volume concentration of solids
     """
-    return homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*gravity/rhol
+    return homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*gravity*rhol
 
 def homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs):
     """

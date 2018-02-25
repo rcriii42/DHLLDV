@@ -52,7 +52,7 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(homogeneous.apparent_viscosity(nu, rhol, rhos, Cvs, 0.5)*1.0E+06, 1.2440956)
         self.assertAlmostEqual(homogeneous.apparent_viscosity(nu, rhol, rhos, Cvs, 1.0)*1.0E+06, 1.7279746)
         
-    def test_apparent_copncentration(self):
+    def test_apparent_concentration(self):
         Cvs = 0.25
         self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 0.1), 0.225)
         self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 0.5), 0.125)
@@ -85,8 +85,8 @@ class Test(unittest.TestCase):
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.01678936498079)
-        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.16494432587543)
+        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*10, 0.01678936498079*10)
+        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.164351061)
     
     def test_Erhg_med_sand(self):
         vls = 3.0
