@@ -81,3 +81,14 @@ class Test(unittest.TestCase):
     def test_fixed_6ms(self):
         self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
 
+    def test_SB_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['SB'], 0.415)
+
+    def test_SB_im_3ms(self):
+        sb_im = stratified.sliding_bed_head_loss(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                                 self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(sb_im, 0.121770867, places=5)
+
+    def test_He_Erhg_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.275529271)
+
