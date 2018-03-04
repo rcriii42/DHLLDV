@@ -81,3 +81,6 @@ class Test(unittest.TestCase):
     def test_fixed_6ms(self):
         self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
 
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
