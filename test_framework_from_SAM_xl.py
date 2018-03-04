@@ -11,6 +11,8 @@ import stratified
 import homogeneous
 
 from math import pi, cos, sin
+from heterogeneous import vt_ruby
+import heterogeneous
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -18,7 +20,6 @@ class Test(unittest.TestCase):
         self.nul = 0.0000013
         self.Dp = 0.762
         self.d_med = .5/1000.
-        self.d_fine = .2/1000.
         self.epsilon = 0.0000010
         self.rhos = 2.65
         self.Cvs_175 = 0.175
@@ -80,6 +81,17 @@ class Test(unittest.TestCase):
 
     def test_fixed_6ms(self):
         self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
+        
+    def test_vt(self):
+        Rsd = (self.rhos-self.rhol)/self.rhol
+        vt = heterogeneous.vt_ruby(self.d_med, Rsd, self.nul)
+        self.assertAlmostEqual(vt*10, 0.06593595*10, places=3)
+
+    def test_heterogeneous_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.275529271)
+
+    def test_heterogeneous_6ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.027189304*10)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
