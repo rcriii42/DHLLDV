@@ -81,17 +81,29 @@ class Test(unittest.TestCase):
 
     def test_fixed_6ms(self):
         self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
-        
+
     def test_vt(self):
         Rsd = (self.rhos-self.rhol)/self.rhol
         vt = heterogeneous.vt_ruby(self.d_med, Rsd, self.nul)
         self.assertAlmostEqual(vt*10, 0.06593595*10, places=3)
 
-    def test_heterogeneous_3ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.275529271)
+    def test_Shr_3ms(self):
+        shr = heterogeneous.Shr(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(shr*100, 0.009046131889*100, places=3)
 
-    def test_heterogeneous_6ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.027189304*10)
+    def test_Srs_3ms(self):
+        srs = heterogeneous.Srs(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(srs, 0.289797544)
+
+    def test_heterogeneous_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.298843677)
+
+
+
+#     def test_heterogeneous_6ms(self):
+#         self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.087289317*10)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
