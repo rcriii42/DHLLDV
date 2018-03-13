@@ -35,6 +35,25 @@ def vth_RZ(d, Rsd, nu, Cvs, K=0.26):
     return vt*(1-Cvs)**beta
 
 
+def Shr(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
+    """Potential energy loss contribution to the Erhg"""
+    Rsd = (rhos-rhol)/rhol
+    vt = vt_ruby(d, Rsd, nu)
+    Rep = vt*d/nu  #eqn 8.2-4
+    top = 4.7 + 0.41*Rep**0.75
+    bottom = 1. + 0.175*Rep**0.75
+    beta = top/bottom  #eqn 8.2-4
+    KC = 0.175*(1+beta)
+    return vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
+
+def Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
+    """Kinetic energy loss contribution to the Erhg"""
+    Rsd = (rhos-rhol)/rhol
+    vt = vt_ruby(d, Rsd, nu)
+    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+    lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+    return 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
+
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Relative excess pressure gradient, per equation 8.5-2
        vls = average line speed (velocity, m/sec)
@@ -47,24 +66,27 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
        Cvs = insitu volume concentration
        use_sf: Whether to apply the sliding flow correction
     """
-    Rsd = (rhos-rhol)/rhol
-    vt = vt_ruby(d, Rsd, nu)
-    Rep = vt*d/nu  #eqn 8.2-4
-    top = 4.7 + 0.41*Rep**0.75
-    bottom = 1. + 0.175*Rep**0.75
-    beta = top/bottom  #eqn 8.2-4
-    KC = 0.175*(1+beta)
-    Shr = vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
+#     Rsd = (rhos-rhol)/rhol
+#     vt = vt_ruby(d, Rsd, nu)
+#     Rep = vt*d/nu  #eqn 8.2-4
+#     top = 4.7 + 0.41*Rep**0.75
+#     bottom = 1. + 0.175*Rep**0.75
+#     beta = top/bottom  #eqn 8.2-4
+#     KC = 0.175*(1+beta)
+#     Shr = vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
+#
+#     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+#     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+#     Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
+    Erhg_ho = Shr(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs) + \
+                Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
 
-    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
-    lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    Srs = 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
     f = d/(particle_ratio * Dp)  #eqn 8.8-4
     if not use_sf or f<1:
-        return Shr + Srs
+        return Erhg_ho
     else:
         #Sliding flow per equation 8.8-5
-        return (Shr + Srs + (f-1)*musf)/f
+        return (Erhg_ho + (f-1)*musf)/f
 
 def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
