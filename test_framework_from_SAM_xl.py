@@ -25,6 +25,7 @@ class Test(unittest.TestCase):
         self.Cvs_175 = 0.175
         self.vls_6ms = 6.03
         self.vls_3ms = 3.06
+        DHLLDV_framework.use_sqrtcx = True
         self.Erhg_obj_3_med = DHLLDV_framework.Cvs_Erhg(self.vls_3ms, self.Dp, self.d_med,
                                                         self.epsilon, self.nul, self.rhol,
                                                         self.rhos, self.Cvs_175, get_dict=True)
@@ -100,10 +101,19 @@ class Test(unittest.TestCase):
     def test_heterogeneous_3ms(self):
         self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.298843677)
 
+    def test_heterogeneous_6ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.087289317*10)
 
+    def test_Erhg_regime_Ho(self):
+        vls = 37.26
 
-#     def test_heterogeneous_6ms(self):
-#         self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.087289317*10)
+        Erhg_regime = DHLLDV_framework.Cvs_regime(vls, self.Dp, self.d_med, self.epsilon,
+                                                  self.nul, self.rhol, self.rhos, self.Cvs_175)
+        Erhg = DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.d_med, self.epsilon,
+                                         self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(Erhg, 0.374666087, places=3)
+        self.assertAlmostEqual(Erhg_regime,'homogeneous')
+
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
