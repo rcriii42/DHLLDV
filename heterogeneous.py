@@ -47,7 +47,19 @@ def Shr(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     return vt*(1-Cvs/KC)**beta /vls #Eqn 8.5-2
 
 def sqrtcx(vt, d):
-    """Corrected sqrtcx based on Sape's code and Figure 7.5-2"""
+    """Corrected sqrtcx based on Sape's code and Figure 7.5-2
+
+    Factor = 0.6
+  SmallFactor = 1.8
+  Froude = vt / (G * d) ^ 0.5
+  Wilson = 0.226 * (G / d) ^ 0.1667
+  Gibert = 1 / Froude ^ (10 / 9)
+  If Gibert > SmallFactor Then Gibert = SmallFactor * (Gibert / SmallFactor) ^ 0.75
+  If Gibert < Wilson Then
+    Gibert = Gibert * Factor + Wilson * (1 - Factor)
+  End If
+  SqrtCx = Gibert
+  """
     wilson_factor = 0.6
     small_factor = 1.8
     froude = vt / (gravity * d) ** 0.5
@@ -70,7 +82,6 @@ def Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, use_sqrtcx=True):
     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
     if not use_sqrtcx:
         return 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
-
     return 8.5**2 * (1/lbdl) * (1/sqrtcx(vt, d))**(3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.5-2
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True, use_sqrtcx=True):
