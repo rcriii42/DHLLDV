@@ -14,6 +14,9 @@ alpha_xi = 0    # alpha in equation 8.12-6
 d_uf = 0.057/1000    # particle size that affects viscosity (m) per eqn 8.15-1
                      # and discussion
 
+use_sf = True        #use these corrections by default, but can be overridden
+use_sqrtcx = True
+
 def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     """
     Cvs_Erhg - Calculate the Erhg for the given slurry, using the appropriate model
@@ -30,23 +33,23 @@ def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     Erhg_obj = {'il': homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol),
                 'FB': stratified.fb_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
                 'SB':    stratified.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
-                'He': heterogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
+                'He': heterogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf, use_sqrtcx),
                 'Ho':   homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
                 }
-    
+
     if Erhg_obj['FB'] < Erhg_obj['SB']:
         regime = 'FB'
     else:
         regime = 'SB'
-    
+
     if Erhg_obj[regime] > Erhg_obj['He']:
         regime = 'He'
-    
+
     if Erhg_obj[regime] < Erhg_obj['Ho']:
         regime = 'Ho'
-    
+
     Erhg_obj['regime'] = regime
-    
+
     if get_dict:
         return Erhg_obj
     else:
@@ -71,8 +74,8 @@ def Cvs_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
             'He': 'heterogeneous',
             'Ho': 'homogeneous',
             }[Erhg_obj['regime']]
-    
-    
+
+
 def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     """
     Return the LDV for the given slurry.
@@ -86,7 +89,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     """
     Rsd = (rhos-rhol)/rhol
     fbot = (2*gravity*Rsd*Dp)**0.5
-    
+
     #Very Small Particles
     vls = 1.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
@@ -101,7 +104,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # eqn 8.10-1
         vlsldv = FL_vs*fbot
         steps += 1
-    
+
     #Small Particles
     vls = 4.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
@@ -123,9 +126,9 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # eqn 8.10-3
         vlsldv = FL_ss*fbot
         steps += 1
-    
+
     FL_s = max(FL_vs, FL_ss)    #Eqn 8.10-4
-    
+
     #Large particles
     vls=4.3
     if d <= 0.015*Dp:
@@ -144,7 +147,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.10-6
         vlsldv = FL_r*fbot
         steps += 1
-    
+
     #The Upper limit
     d0 = 0.0005*(1.65/Rsd)**0.5 #Eqn 8.10-8
     drough = 2./1000 # note: only valid for sand with Rsd=1.65
@@ -154,7 +157,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         FL_ul = FL_s
     else:
         FL_ul = FL_s*exp(-1*d/d0) + FL_r*(1-exp(-1*d/d0))   # Eqn 8.10-8
-    
+
     vls = 2.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
@@ -201,15 +204,15 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     KC = 0.175*(1+beta)
     vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     Xi_ldv = (1/(2*CD)) * (1-Cvt/KC)**beta * (vls_ldv/vls)  # eqn 8.12-1
-    
+
     vs_ldv = vls_ldv * Xi_ldv
     Kldv = 1/(1 - Xi_ldv)   # eqn 7.9-14
     Xi_fb = 1-((Cvt*vs_ldv)/(stratified.Cvb-Kldv*Cvt)*(vs_ldv-vls)+Kldv*Cvt*vs_ldv)  # eqn 8.12-2
     Xi_th = min(Xi_fb, Xi_ldv)  # eqn 8.12-3
-    
+
     vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1./4) # eqn8.12-4
     Xi_t = (1-Cvt/stratified.Cvb) * (1-(4./5)*(vls/vls_t))  # 8.12-5
-    
+
     Xi = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t *(vls/vls_t)**alpha_xi    # eqn 8.12-7
     return min(max(Xi, 0.0),1.0)
 
@@ -254,7 +257,7 @@ def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
         return Erhg_obj
     else:
         return Erhg_obj[Erhg_obj['regime']]
-    
+
 def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
     Return the name of the regime for the given slurry and velocity in the Cvt case
@@ -298,7 +301,7 @@ def calc_GSD_fractions(GSD, n=10):
     GSD[f_uf] = d_uf
     if len(GSD) >= n:
         return GSD
-    
+
     # The n fractions - note you could end up with n + len(GSD) + 1
     fracs = sorted(GSD.keys())
     sizes = [GSD[p] for p in fracs]
@@ -342,7 +345,7 @@ def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False)
     rho_uf = (rhol*(1-Cvs_uf-Cvs_c) + rhos*Cvs_uf)/(1-Cvs_c)
     nu_uf = mu_uf/(1000*rho_uf)
     Rsd_uf = (rhos-rho_uf)/rho_uf
-    
+
     # The fractions represented by each GSD_frac
     fracs_rep = [fracs[0]]
     for i in range(1, len(fracs)):
@@ -353,12 +356,12 @@ def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False)
         else:  # intermediate fractions
             fhere = (fracs[i] - fracs[i - 1])/2 + (fracs[i + 1] - fracs[i])/2
         fracs_rep.append(fhere)
-    
+
     # the Cvs for each fraction
     Cvs_fracs = [Cvs_uf]
     for f in fracs_rep:
         Cvs_fracs.append(Cvs * f)
-    
+
     # The im for each fraction and total
     im_tot = 0
     for i in range(1, len(sizes)):
@@ -368,7 +371,7 @@ def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False)
         il_uf = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_uf, rho_uf)
         im_i = Erhg_i * Rsd_uf * Cvs + il_uf
         im_tot += im_i * Cvs_i / Cvs_c
-        
+
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos - rhol) / rhol
     return (im_tot - il) / (Rsd * Cvs)

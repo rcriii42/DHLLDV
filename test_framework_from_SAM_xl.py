@@ -11,6 +11,8 @@ import stratified
 import homogeneous
 
 from math import pi, cos, sin
+from heterogeneous import vt_ruby
+import heterogeneous
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -18,12 +20,12 @@ class Test(unittest.TestCase):
         self.nul = 0.0000013
         self.Dp = 0.762
         self.d_med = .5/1000.
-        self.d_fine = .2/1000.
         self.epsilon = 0.0000010
         self.rhos = 2.65
         self.Cvs_175 = 0.175
         self.vls_6ms = 6.03
         self.vls_3ms = 3.06
+        DHLLDV_framework.use_sqrtcx = True
         self.Erhg_obj_3_med = DHLLDV_framework.Cvs_Erhg(self.vls_3ms, self.Dp, self.d_med,
                                                         self.epsilon, self.nul, self.rhol,
                                                         self.rhos, self.Cvs_175, get_dict=True)
@@ -44,10 +46,10 @@ class Test(unittest.TestCase):
                                places=4)
 
     def test_carrier_il_3ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_3_med['il']*100, 0.006633672*100, places=3)
+        self.assertAlmostEqual(self.Erhg_obj_3_med['il']*100, 0.006635938*100, places=5)
 
     def test_carrier_il_6ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_6_med['il']*10, 0.023246084*10, places=3)
+        self.assertAlmostEqual(self.Erhg_obj_6_med['il']*10, 0.023254025*10, places=5)
 
     def test_FB_beta(self):
         """
@@ -68,18 +70,18 @@ class Test(unittest.TestCase):
     def test_fixed_hyd_grad_3ms(self):
         i_fb = stratified.fb_head_loss(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
                                         self.nul, self.rhol, self.rhos, self.Cvs_175)
-        self.assertAlmostEqual(i_fb*10, 0.039702736*10, places=3)
+        self.assertAlmostEqual(i_fb*10, 0.039727455*10, places=5)
 
     def test_fixed_hyd_grad_6ms(self):
         i_fb = stratified.fb_head_loss(self.vls_6ms, self.Dp, self.d_med, self.epsilon,
                                         self.nul, self.rhol, self.rhos, self.Cvs_175)
-        self.assertAlmostEqual(i_fb, 0.647189382, places=3)
+        self.assertAlmostEqual(i_fb, 0.647686509, places=5)
 
     def test_fixed_3ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_3_med['FB'], 0.119193987, places=3)
+        self.assertAlmostEqual(self.Erhg_obj_3_med['FB'], 0.119274917, places=5)
 
     def test_fixed_6ms(self):
-        self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.24893848/10, places=3)
+        self.assertAlmostEqual(self.Erhg_obj_6_med['FB']/10, 2.250701697/10, places=5)
 
     def test_SB_3ms(self):
         self.assertAlmostEqual(self.Erhg_obj_3_med['SB'], 0.415)
@@ -92,3 +94,52 @@ class Test(unittest.TestCase):
     def test_He_Erhg_3ms(self):
         self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.275529271)
 
+    def test_sliding_hyd_grade_3ms(self):
+        i_sb = stratified.sliding_bed_head_loss(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                                self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(i_sb, 0.121773134, places=7)
+
+    def test_sliding_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['SB'], 0.415, places=7)
+
+    def test_vt(self):
+        Rsd = (self.rhos-self.rhol)/self.rhol
+        vt = heterogeneous.vt_ruby(self.d_med, Rsd, self.nul)
+        self.assertAlmostEqual(vt*10, 0.0659215101289695*10, places=7)
+
+    def test_Shr_3ms(self):
+        shr = heterogeneous.Shr(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(shr*100,  0.009044122977315*100, places=7)
+
+    def test_sqrtcx(self):
+        Rsd = (self.rhos-self.rhol)/self.rhol
+        vt = heterogeneous.vt_ruby(self.d_med, Rsd, self.nul)
+        self.assertAlmostEqual(heterogeneous.sqrtcx(0.06593595, self.d_med), 1.11123615097589)
+        self.assertAlmostEqual(heterogeneous.sqrtcx(vt, self.d_med), 1.11123615097589)
+
+    def test_Srs_3ms(self):
+        srs = heterogeneous.Srs(self.vls_3ms, self.Dp, self.d_med, self.epsilon,
+                                self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(srs, 0.289725547872382)
+
+    def test_heterogeneous_3ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_3_med['He'], 0.298769671)
+
+    def test_heterogeneous_6ms(self):
+        self.assertAlmostEqual(self.Erhg_obj_6_med['He']*10, 0.087267752*10)
+
+    def test_Erhg_regime_Ho(self):
+        vls = 37.26
+
+        Erhg_regime = DHLLDV_framework.Cvs_regime(vls, self.Dp, self.d_med, self.epsilon,
+                                                  self.nul, self.rhol, self.rhos, self.Cvs_175)
+        Erhg = DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.d_med, self.epsilon,
+                                         self.nul, self.rhol, self.rhos, self.Cvs_175)
+        self.assertAlmostEqual(Erhg, 0.374794074, places=3)
+        self.assertAlmostEqual(Erhg_regime,'homogeneous')
+
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
