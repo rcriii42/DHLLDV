@@ -2,7 +2,12 @@
 *.png
 *.jpg
 *.pdf
+*py.cover
+.coverage
 06 Dredging Processes -  Hydraulic Transport - Theory New.pdf
+graphs/
+Old_book/
+htmlcov/
 .project
 .pydevproject
 .idea/
