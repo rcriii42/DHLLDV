@@ -4,9 +4,9 @@ Created on Mar 4, 2015
 @author: rcriii
 '''
 import unittest
-import DHLLDV_constants
-import DHLLDV_framework
-import stratified
+
+from DHLLDV import DHLLDV_constants
+from DHLLDV import DHLLDV_framework
 
 class Test(unittest.TestCase):
 
