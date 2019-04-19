@@ -6,9 +6,11 @@ Created on Oct 22, 2014
 @author: RCRamsdell
 '''
 
-from DHLLDV_constants import gravity, Arel_to_beta, musf, Cvb, alpha_tel
-import homogeneous
 from math import pi, sin, log
+
+from .DHLLDV_constants import gravity, Arel_to_beta, musf, Cvb, alpha_tel
+from . import homogeneous
+
 
 def beta(Cvs):
     """Return the angle beta based on the Cvs and Cvb"""

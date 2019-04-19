@@ -4,7 +4,7 @@ Created on Oct 8, 2014
 
 @author: RCRamsdell
 '''
-from DHLLDV_Utils import interpDict
+from .DHLLDV_Utils import interpDict
 
 steel_roughness = 4.5e-05  #new steel pipe absolute roughness in m
 gravity =  9.80665  #m/s2

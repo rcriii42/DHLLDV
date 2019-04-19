@@ -7,13 +7,11 @@ Created on Oct 7, 2014
 '''
 
 from math import log, exp
-from DHLLDV_constants import gravity, musf, particle_ratio
-import heterogeneous
+
+from .DHLLDV_constants import gravity, musf, particle_ratio
 
 Acv = 3.   #coefficient homogeneous regime, advised in section 8.7.
 kvK = 0.4 #von Karman constant
-
-from stratified import musf     #Sliding friction factor
 
 def pipe_reynolds_number(vls, Dp, nu):
     """

@@ -4,10 +4,10 @@ Created on Mar 3, 2015
 @author: rcriii
 '''
 
-import stratified
-import heterogeneous
-import homogeneous
-from DHLLDV_constants import gravity
+from . import stratified
+from . import heterogeneous
+from . import homogeneous
+from .DHLLDV_constants import gravity
 from math import pi, exp, log10
 
 alpha_xi = 0    # alpha in equation 8.12-6

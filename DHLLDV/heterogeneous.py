@@ -4,10 +4,9 @@ Created on Feb 21, 2015
 
 @author: rcriii
 '''
-from DHLLDV_constants import gravity, Arel_to_beta, musf, particle_ratio
-import homogeneous
-import stratified
-from math import pi, sin, log, cosh
+
+from .DHLLDV_constants import gravity, Arel_to_beta, musf, particle_ratio
+from . import homogeneous
 
 def vt_ruby(d, Rsd, nu, K=0.26):
     """vt_ruby - terminal settling velocity via the Ruby & Zanke formula (eqn 8.2-2)
