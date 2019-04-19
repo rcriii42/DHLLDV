@@ -4,15 +4,15 @@ Created on Feb 24, 2018
 
 @author: rcriii
 '''
-import unittest
-import DHLLDV_constants
-import DHLLDV_framework
-import stratified
-import homogeneous
 
-from math import pi, cos, sin
-from heterogeneous import vt_ruby
-import heterogeneous
+import unittest
+from math import sin
+
+from DHLLDV import DHLLDV_constants
+from DHLLDV import DHLLDV_framework
+from DHLLDV import stratified
+from DHLLDV import heterogeneous
+from DHLLDV import homogeneous
 
 class Test(unittest.TestCase):
     def setUp(self):

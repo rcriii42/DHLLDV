@@ -3,8 +3,10 @@ Created on Oct 23, 2014
 
 @author: RCRamsdell
 '''
+
 import unittest
-import DHLLDV_Utils
+
+from DHLLDV import DHLLDV_Utils
 
 
 class TestInterpDict(unittest.TestCase):

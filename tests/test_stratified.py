@@ -3,9 +3,11 @@ Created on Oct 31, 2014
 
 @author: RCRamsdell
 '''
+
 import unittest
-import stratified
-import DHLLDV_constants
+
+from DHLLDV import stratified
+from DHLLDV import DHLLDV_constants
 
 
 class Test(unittest.TestCase):

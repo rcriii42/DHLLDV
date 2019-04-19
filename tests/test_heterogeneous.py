@@ -4,8 +4,9 @@ Created on Feb 22, 2015
 @author: rcriii
 '''
 import unittest
-import heterogeneous
-import DHLLDV_constants
+
+from DHLLDV import heterogeneous
+from DHLLDV import DHLLDV_constants
 
 
 class Test(unittest.TestCase):

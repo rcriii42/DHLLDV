@@ -5,9 +5,11 @@ Created on Oct 7, 2014
 
 Testing the homogeneous module and water constants
 '''
+
 import unittest
-import homogeneous
-import DHLLDV_constants
+
+from DHLLDV import homogeneous
+from DHLLDV import DHLLDV_constants
 
 
 class Test(unittest.TestCase):
