@@ -6,7 +6,7 @@ Created on Feb 24, 2018
 '''
 
 import unittest
-from math import sin
+from math import sin, cos, pi
 
 from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
@@ -137,7 +137,7 @@ class Test(unittest.TestCase):
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.d_med, self.epsilon,
                                          self.nul, self.rhol, self.rhos, self.Cvs_175)
         self.assertAlmostEqual(Erhg, 0.374794074, places=3)
-        self.assertAlmostEqual(Erhg_regime,'homogeneous')
+        self.assertEqual(Erhg_regime, 'homogeneous')
 
 
 if __name__ == "__main__":
