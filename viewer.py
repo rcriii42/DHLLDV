@@ -98,6 +98,11 @@ if __name__ == '__main__':
         HG_plot.plot(vls_list, Cvt_im_list, linewidth=2, linestyle='--', color='g')
         HG_plot.grid(True)
 
+        Cvs_title = "Cvs given Cvt for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cvt=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        Cvs_plot = fig.add_subplot(313, title=Cvs_title, xlim=(0, 10), ylim=(0, 1))
+        Cvs_plot.plot(vls_list, Cvs_from_Cvt_list, linewidth=1, linestyle='--', color='c')
+        Cvs_plot.grid(True)
+
     #     def on_plot_hover(event):
     #         for curve in Erhg_plot.get_lines():
     #             if curve.contains(event)[0]:
