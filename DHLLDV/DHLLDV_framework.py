@@ -230,7 +230,7 @@ def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     get_dict: if true return the dict with all models.
     """
     Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    return (1/(1-Xi)) * Cvt # eqn8.12-8
+    return (1/(1-Xi)) * Cvt # eqn8.12-12
 
 def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     """
@@ -246,6 +246,7 @@ def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     get_dict: if true return the dict with all models.
     """
     Cvs = Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     Erhg_obj = Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict=True)
     if Erhg_obj['regime'] == "FB":
         # Use min of SB, He if in fixed bed region
@@ -254,9 +255,9 @@ def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
         else:
             Erhg_obj['regime'] = "He"
     if get_dict:
-        return Erhg_obj
+        return {regime: e*1/(1-Xi) for regime, e in Erhg_obj.items()} # Eqn 8.12-12
     else:
-        return Erhg_obj[Erhg_obj['regime']]
+        return Erhg_obj[Erhg_obj['regime']]*1/(1-Xi) # Eqn 8.12-12
 
 def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
