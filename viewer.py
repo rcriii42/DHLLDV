@@ -66,7 +66,8 @@ if __name__ == '__main__':
     erhg_file = open("eerhg.csv", 'w')
 
     if plt:
-        fig = plt.figure()
+        fig = plt.figure(figsize=(11,8))
+
         # log x and y axis
         Erhg_title = "Erhg for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
         Erhg_plot = fig.add_subplot(311, title=Erhg_title, xlim=(.001, 1.0), ylim=(0.001, 3))
