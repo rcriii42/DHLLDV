@@ -74,7 +74,7 @@ def lambda12(Dp_H, d, v1, v2, nu_l):
     return 1.325*alpha_tel/bottom # Eqn 8.4-13
 
 
-def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s):
+def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rhol, rhos):
     """Return the bed friction factor lambda12 (eqn 8.4-14, with sheet flow)
        Dp = Pipe diameter (m)
        d = Particle diameter (m)
@@ -82,12 +82,12 @@ def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rho_l, rho_s):
        v2 = velocity of the bed (m/sec)
        epsilon = absolute pipe roughness (m)
        nu_l = fluid kinematic viscosity in m2/sec
-       rho_l = density of the fluid (ton/m3)
-       rho_s = particle density (ton/m3)
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
     """
-    Rsd = (rho_s - rho_l)/rho_l     # Eqn 8.2-1
+    Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
     first = ((v1-v2)/(2*gravity*Dp_H*Rsd)**0.5)**2.73
-    second = ((rho_s*(pi/6)*d**3)/rho_l)**0.094
+    second = ((rhos*(pi/6)*d**3)/rhol)**0.094
     return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second    # Eqn 8.4-14
 
 
@@ -135,7 +135,7 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
 def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the ERHG for the fixed-bed case.
     """
-    Rsd = (rho_s - rho_l)/rho_l     # Eqn 8.2-1
+    Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     im = fb_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
     return (im - il)/(Rsd * Cvs)    # Eqn 8.2-9
@@ -167,7 +167,7 @@ def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
        Cvs = insitu volume concentration
     """
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    Rsd = (rho_s - rho_l)/rho_l     # Eqn 8.2-1
+    Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
     return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il # Eqn 8.5-2
 
 
