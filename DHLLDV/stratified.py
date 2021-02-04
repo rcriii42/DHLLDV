@@ -135,7 +135,7 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
 def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the ERHG for the fixed-bed case.
     """
-    Rsd = (rhos-rhol)/rhol
+    Rsd = (rho_s - rho_l)/rho_l     # Eqn 8.2-1
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     im = fb_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
     return (im - il)/(Rsd * Cvs)    # Eqn 8.2-9
@@ -167,7 +167,7 @@ def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
        Cvs = insitu volume concentration
     """
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    Rsd = (rhos-rhol)/rhol
+    Rsd = (rho_s - rho_l)/rho_l     # Eqn 8.2-1
     return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il # Eqn 8.5-2
 
 
