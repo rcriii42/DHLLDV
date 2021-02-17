@@ -41,9 +41,9 @@ class Test(unittest.TestCase):
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.1), 1.039495)
-        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.5), 1.204675)
-        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 1.0), 1.41115)
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.1), 1.05148387)
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.5), 1.23417143)
+        self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 1.0), 1.411150)
         
     def test_apparent_viscosity(self):
         rhol = DHLLDV_constants.water_density[20]
@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
-        self.assertAlmostEqual(homogeneous.limiting_particle(Dp, nu, rhol, rhos)*1000, 0.1061102535055)
+        self.assertAlmostEqual(homogeneous.limiting_particle(Dp, nu, rhol, rhos)*1000, 0.09490789)
 
     def test_Erhg(self):
         vls = 3.0

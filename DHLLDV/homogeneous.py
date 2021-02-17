@@ -75,8 +75,8 @@ def apparent_density(rhol, rhos, Cvs, X):
     Cvs - spatial (insitu) volume concentration of solids
     X is the fraction of fines
     """
-    Rsd = (rhos-rhol)/rhol
-    return rhol*(1+Rsd*f*Cvs) #eqn 8.3-1
+    Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
+    return rhol + rhol*Rsd*X*Cvs/(1-Cvs+Cvs*X) # Eqn 8.3-1
 
 
 def apparent_viscosity(nu, rhol, rhos, Cvs, X):
@@ -115,8 +115,9 @@ def limiting_particle(Dp, nu, rhol, rhos, Stk = 0.03):
     Stk is the stokes number, here using 0.03 as a first approximation
     """
     top = Stk * 9 * rhol * nu * Dp
-    bottom = rhos * 6 * Dp**0.4
-    return (top/bottom)**0.5 #Eqn 8.3-4
+    bottom = rhos * 7.5 * Dp**0.4
+    return (top/bottom)**0.5 # Eqn 8.15-2
+
 
 def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     """Return the Erhg value for homogeneous flow.
