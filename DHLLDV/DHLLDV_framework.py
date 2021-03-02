@@ -196,19 +196,27 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
     if vls == 0.0:
         vls = 0.01
-    Rsd = (rhos-rhol)/rhol
+    Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
+    Cvr = Cvt/stratified.Cvb
     vt = heterogeneous.vt_ruby(d, Rsd, nu)  # Particle shape factor assumed for sand for now
-    CD = (4/3.)*((gravity*Rsd*d)/vt**2)      # Eqn 4.4-6 without the shape factor
-    Rep = vt*d/nu  # Eqn 4.2-6
+    CD = (4/3.)*((gravity*Rsd*d)/vt**2)     # Eqn 4.4-6 without the shape factor
+    Rep = vt*d/nu       # Eqn 4.2-6
     top = 4.7 + 0.41*Rep**0.75
     bottom = 1. + 0.175*Rep**0.75
-    beta = top/bottom  # Eqn 4.6-4
+    beta = top/bottom   # Eqn 4.6-4
     KC = 0.175*(1+beta)
     vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    Xi_ldv = (1/(2*CD)) * (1-Cvt/KC)**beta * (vls_ldv/vls)  # Eqn 8.12-2 TODO: Update
+
+
+
+
+    alpha = 0.58*Cvr**-0.42
+    ex1 = -(0.83 + stratified.musf/4 + (Cvr - 0.5 - 0.075*Dp)**2 + (0.025*Dp))
+    ex2 = Dp**0.025*(vls_ldv/vls_lsdv)**alpha*Cvr**0.65*(Rsd/1.585)**0.1
+    Xi_aldv = (1-Cvr) * exp(ex1*ex2)  # Eqn 8.12-2
 
     vs_ldv = vls_ldv * Xi_ldv
-    Kldv = 1/(1 - Xi_ldv)   # Eqn 7.9-14
+    Kldv = 1/(1 - Xi_ldv)       # Eqn 7.9-14
     Xi_fb = 1-((Cvt*vs_ldv)/(stratified.Cvb-Kldv*Cvt)*(vs_ldv-vls)+Kldv*Cvt*vs_ldv) # Eqn 8.12-3 TODO: Fix
     Xi_th = min(Xi_fb, Xi_ldv)  # eqn 8.12-3
 
