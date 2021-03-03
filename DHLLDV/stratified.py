@@ -140,6 +140,34 @@ def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     im = fb_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
     return (im - il)/(Rsd * Cvs)    # Eqn 8.2-9
 
+def vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvs,
+             max_steps=20, e=0.415/1000):
+    """Return the transition line speed between fixed and sliding bed.
+       This is the same as the limit of stationary deposition, Vls_lsdv.
+           Dp = Pipe diameter (m)
+           d = Particle diameter (m)
+           epsilon = absolute pipe roughness (m)
+           nu = fluid kinematic viscosity in m2/sec
+           rhol = density of the fluid (ton/m3)
+           rhos = particle density (ton/m3)
+           Cvs = insitu volume concentration
+           max_steps = The maximum steps to take (default 20)
+           e = The error term (default musf/1000)
+
+        Note you could calculate this using eqn 7.8-10, but that is implicit in lambda,
+        which is a function of vls. Instead I use Newton's method on the calculated Ergh.
+        """
+    vls_fb = 1
+    dv = 0.1
+    for n in range(max_steps):
+        fn = fb_Erhg(vls_fb, Dp,  d, epsilon, nu, rhol, rhos, Cvs)-musf
+        if abs(fn) < e:
+            return vls_fb
+        dfndv = (fb_Erhg(vls_fb + dv, Dp, d, epsilon, nu, rhol, rhos, Cvs) - musf - fn) / dv
+        #print(f"{n:6d} {vls_fb:6.3f} {fn:9.4f} {dfndv:10.5f}")
+        vls_fb = vls_fb - fn/dfndv
+    return vls_fb
+
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the relative excess hydraulic gradient for a sliding bed
