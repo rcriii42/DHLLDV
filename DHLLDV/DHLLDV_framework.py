@@ -7,10 +7,10 @@ Created on Mar 3, 2015
 from . import stratified
 from . import heterogeneous
 from . import homogeneous
-from .DHLLDV_constants import gravity
+from .DHLLDV_constants import gravity, particle_ratio
 from math import pi, exp, log10
 
-alpha_xi = 0    # alpha in Eqn 8.12-6 / 8.12-7
+alpha_xi = 0.5    # alpha in Eqn 8.12-9
 d_uf = 0.057/1000    # particle size that affects viscosity (m) per Eqn 8.15-1
                      # and discussion
 
@@ -197,7 +197,8 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     if vls == 0.0:
         vls = 0.01
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
-    Cvr = Cvt/stratified.Cvb
+    Cvb = stratified.Cvb
+    Cvr = Cvt/Cvb
     vt = heterogeneous.vt_ruby(d, Rsd, nu)  # Particle shape factor assumed for sand for now
     CD = (4/3.)*((gravity*Rsd*d)/vt**2)     # Eqn 4.4-6 without the shape factor
     Rep = vt*d/nu       # Eqn 4.2-6
@@ -206,26 +207,43 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     beta = top/bottom   # Eqn 4.6-4
     KC = 0.175*(1+beta)
     vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
+    vls_lsdv = stratified.vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvt)
 
-
-
+    Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
+    lambda_l = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
+    Xi_HeHo = 8.5*(1/lambda_l)*(vt/(gravity*d)**0.5)**5/3*((nu*gravity)**(1/3)/vls)*(vt/vls) # Eqn 8.12-1
 
     alpha = 0.58*Cvr**-0.42
     ex1 = -(0.83 + stratified.musf/4 + (Cvr - 0.5 - 0.075*Dp)**2 + (0.025*Dp))
     ex2 = Dp**0.025*(vls_ldv/vls_lsdv)**alpha*Cvr**0.65*(Rsd/1.585)**0.1
-    Xi_aldv = (1-Cvr) * exp(ex1*ex2)  # Eqn 8.12-2
+    Xi_ldv = (1-Cvr) * exp(ex1*ex2)  # Eqn 8.12-2
+    Xi_aldv = Xi_ldv * (vls_ldv/vls)**4
+    vls_t = (5 * exp(ex1 * ex2)) ** 0.25 * vls_ldv  # Eqn 8.12-7
 
-    vs_ldv = vls_ldv * Xi_ldv
     Kldv = 1/(1 - Xi_ldv)       # Eqn 7.9-14
-    Xi_fb = 1-((Cvt*vs_ldv)/(stratified.Cvb-Kldv*Cvt)*(vs_ldv-vls)+Kldv*Cvt*vs_ldv) # Eqn 8.12-3 TODO: Fix
-    Xi_th = min(Xi_fb, Xi_ldv)  # eqn 8.12-3
+    Xi_fb = 1-((Cvt*vls_ldv)/(Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv) # Eqn 8.12-3
 
-    vls_t = vls_ldv*(5 * (1/(2*CD)) * (1-Cvt/KC)**beta * (1-Cvt/stratified.Cvb)**(-1))**(1./4) # Eqn 8.12-7 TODO: Update
-    Xi_t = (1-Cvt/stratified.Cvb) * (1-(4./5)*(vls/vls_t))  # Eqn 8.12-8
+    ex2 = Dp ** 0.025 * (vls / vls_lsdv) ** alpha * Cvr ** 0.65 * (Rsd / 1.585) ** 0.1
+    Xi_3LM = (1 - Cvr) * exp(ex1 * ex2)  # Eqn 8.12-4
 
-    Xi = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t *(vls/vls_t)**alpha_xi    # TODO: Seems to be replaced by 8.12-10 / 8.12-11
-    return min(max(Xi, 0.0),1.0)
+    if Xi_fb < Xi_aldv:     # Eqn 8.12-5
+        Xi_th = Xi_fb
+    elif Xi_HeHo > Xi_aldv:
+        Xi_th = Xi_HeHo
+    else:
+        Xi_th = Xi_aldv
 
+    if vls < vls_t:
+        Xi_t = (1 - Cvr) * (1 - (4. / 5.) * (vls / vls_t))  # Eqn 8.12-8
+        Xi_SBHeHo = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t*(vls/vls_t)**alpha_xi # Eqn 8.12-9
+    else:
+        Xi_SBHeHo = Xi_th # Eqn 8.12-9
+    Xi_SBHeHo = max(Xi_SBHeHo, Xi_3LM) # Eqn 8.12-9
+
+    f = 4./3. - (1./3.)*(d/Dp)/particle_ratio # Eqn 8.12-10 TODO: update with dynamic particle ratio in section 7.7.5
+    f = min(max(f, 0), 1)
+    Xi_SF = Xi_SBHeHo * f + Xi_3LM*(1-f)    # Eqn 8.12-11
+    return Xi_SF
 
 def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
