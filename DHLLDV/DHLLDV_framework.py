@@ -207,7 +207,7 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     beta = top/bottom   # Eqn 4.6-4
     KC = 0.175*(1+beta)
     vls_ldv = LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    vls_lsdv = stratified.vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvt)
+    vls_lsdv = stratified.vls_lsdv(Dp,  d, epsilon, nu, rhol, rhos, Cvt)
 
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambda_l = homogeneous.swamee_jain_ff(Re, Dp, epsilon)

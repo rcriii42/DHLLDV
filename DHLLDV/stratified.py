@@ -167,6 +167,7 @@ def vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvs,
         #print(f"{n:6d} {vls_fb:6.3f} {fn:9.4f} {dfndv:10.5f}")
         vls_fb = vls_fb - fn/dfndv
     return vls_fb
+vls_lsdv = vls_FBSB # Theses are the same value, see discussion in section 7.8.6
 
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
