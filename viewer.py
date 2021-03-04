@@ -110,4 +110,5 @@ if __name__ == '__main__':
     #                 print "over %s" % curve.get_gid()
     #
     #     fig.canvas.mpl_connect('motion_notify_event', on_plot_hover)
+        plt.tight_layout()
         plt.show()
