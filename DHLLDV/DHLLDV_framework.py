@@ -7,12 +7,10 @@ Created on Mar 3, 2015
 from . import stratified
 from . import heterogeneous
 from . import homogeneous
-from .DHLLDV_constants import gravity, particle_ratio
+from .DHLLDV_constants import gravity, particle_ratio, stk_fine
 from math import pi, exp, log10
 
 alpha_xi = 0.5    # alpha in Eqn 8.12-9
-d_uf = 0.057/1000    # particle size that affects viscosity (m) per Eqn 8.15-1
-                     # and discussion
 
 use_sf = True        # use these corrections by default, but can be overridden
 use_sqrtcx = True
@@ -309,12 +307,32 @@ def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
             'Ho': 'homogeneous',
             }[Erhg_obj['regime']]
 
+def add_dlim_to_GSD(GSD, Dp, nu, rhol, rhos):
+    """
+    Return the name of the regime for the given slurry and velocity in the Cvt case
+    GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
+    Dp = Pipe diameter (m)
+    nu = fluid kinematic viscosity in m2/sec
+    rhol = density of the fluid (ton/m3)
+    rhos = particle density (ton/m3)
+    """
+
+    dlim = (stk_fine*9*rhol*nu*Dp / (rhos*7.5*Dp))**0.5 # Eqn 8.15-2
+    if len(GSD)<2:
+        GSD[dlim] = 0
+        return GSD
+    fracs = sorted(GSD.keys())
+    sizes = [GSD[p] for p in fracs]
+    lowslope = (fracs[1] - fracs[0]) / (log10(sizes[1]) - log10(sizes[0]))
+    GSD[dlim] = fracs[0] - (log10(sizes[0])-log10(dlim))*lowslope
+    return GSD
+
 
 def calc_GSD_fractions(GSD, n=10):
     """
-    Break the given Grain Size Distribution into n fractions, and add % passing d_uf.
+    Break the given Grain Size Distribution into n fractions, and add % passing d_lim.
     GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
-    Cvs = Spatial volume cioncentration
+    Cvs = Spatial volume concentration
     n: number of fractions (including d=0.057)
     Scheme:
     Find fraction <.057
@@ -326,14 +344,6 @@ def calc_GSD_fractions(GSD, n=10):
         return GSD
     fracs = sorted(GSD.keys())
     sizes = [GSD[p] for p in fracs]
-    # First the .057 fraction
-    lowslope = (fracs[1] - fracs[0])/(log10(sizes[1])-log10(sizes[0]))
-    if sizes[0]>=d_uf:
-        lowslope = lowslope/2.
-    f_uf = fracs[0] - (log10(sizes[0])-log10(d_uf))*lowslope
-    GSD[f_uf] = d_uf
-    if len(GSD) >= n:
-        return GSD
 
     # The n fractions - note you could end up with n + len(GSD) + 1
     fracs = sorted(GSD.keys())
