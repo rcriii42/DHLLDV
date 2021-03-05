@@ -12,7 +12,8 @@ gravity =  9.80665          # m/s2
 musf = 0.415                # Sliding friction coefficient
 Cvb = 0.6                   # The bed concentration
 particle_ratio = 0.015      # Particle to pipe diameter ratio for sliding flow per Sellgren & Wilson
-alpha_tel = 1.0             # Televantos alpgha in eqn 8.4-13
+alpha_tel = 1.0             # Televantos alpha in eqn 8.4-13
+stk_fine = 0.03             # The stokes number for particles forming the pseudo liquid (Sec 8.15.2)
 
 water_density = interpDict({0: 0.99984, # deg C, density in ton/m**3 per wikipedia
                             4: 0.99997,
