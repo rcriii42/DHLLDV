@@ -14,28 +14,34 @@ class Test(unittest.TestCase):
         self.gsd = {0.85: 1.200 / 1000,
                     0.50: 0.350 / 1000,
                     0.11: 0.075 / 1000, }
-        self.gsd500 = DHLLDV_framework.add_dlim_to_GSD(self.gsd,
-                                                       0.50,
-                                                       0.001005 / (0.9982 * 1000),
-                                                       DHLLDV_constants.water_density[20],
-                                                       2.65,)
-        self.gsd762 = DHLLDV_framework.add_dlim_to_GSD(self.gsd,
-                                                       0.762,
-                                                       0.001005 / (0.9982 * 1000),
-                                                       DHLLDV_constants.water_density[20],
-                                                       2.65, )
+        # self.gsd500 = DHLLDV_framework.add_dlim_to_GSD(self.gsd,
+        #                                                0.50,
+        #                                                DHLLDV_constants.water_viscosity[20],
+        #                                                DHLLDV_constants.water_density[20],
+        #                                                2.65)
+        # self.gsd762 = DHLLDV_framework.add_dlim_to_GSD(self.gsd,
+        #                                                0.762,
+        #                                                DHLLDV_constants.water_viscosity[20],
+        #                                                DHLLDV_constants.water_density[20],
+        #                                                2.65)
         self.gsd2 = DHLLDV_framework.calc_GSD_fractions(self.gsd)
 
     def test_dlim_500(self):
         """Test the dlim for 500mm pipe"""
-        fracs = sorted(self.gsd500.keys())
-        self.assertAlmostEqual(9.49079*10**5, self.gsd500[fracs[0]]*10**5)
+        dlim = DHLLDV_framework.pseudo_dlim(0.50,
+                                            DHLLDV_constants.water_viscosity[20],
+                                            DHLLDV_constants.water_density[20],
+                                            2.65)
+        self.assertAlmostEqual(9.4907896, dlim * 10**5)
 
 
     def test_dlim_762(self):
         """Test the dlim for 762mm pipe"""
-        fracs = sorted(self.gsd762.keys())
-        self.assertAlmostEqual(1.07696 * 10 ** 4, self.gsd762[fracs[0]] * 10 ** 4)
+        dlim = DHLLDV_framework.pseudo_dlim(0.762,
+                                            DHLLDV_constants.water_viscosity[20],
+                                            DHLLDV_constants.water_density[20],
+                                            2.65)
+        self.assertAlmostEqual(1.0769557, dlim * 10 ** 4)
 
 
     def test_intermediate_diam(self):

@@ -307,25 +307,25 @@ def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
             'Ho': 'homogeneous',
             }[Erhg_obj['regime']]
 
-def add_dlim_to_GSD(GSD, Dp, nu, rhol, rhos):
+
+def pseudo_dlim(Dp, nu, rhol, rhos):
     """
-    Return the name of the regime for the given slurry and velocity in the Cvt case
-    GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
+    Return the maximum particle diameter that affects the pseudoliquid
     Dp = Pipe diameter (m)
     nu = fluid kinematic viscosity in m2/sec
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
     """
 
-    dlim = (stk_fine*9*rhol*nu*Dp / (rhos*7.5*Dp))**0.5 # Eqn 8.15-2
-    if len(GSD)<2:
-        GSD[dlim] = 0
-        return GSD
-    fracs = sorted(GSD.keys())
-    sizes = [GSD[p] for p in fracs]
-    lowslope = (fracs[1] - fracs[0]) / (log10(sizes[1]) - log10(sizes[0]))
-    GSD[dlim] = fracs[0] - (log10(sizes[0])-log10(dlim))*lowslope
-    return GSD
+    dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5 # Eqn 8.15-2
+    # if len(GSD)<2:
+    #     return GSD
+    # fracs = sorted(GSD.keys())
+    # sizes = [GSD[p] for p in fracs]
+    # lowslope = (fracs[1] - fracs[0]) / (log10(sizes[1]) - log10(sizes[0]))
+    # fraclim = fracs[0] - (log10(sizes[0])-log10(dlim))*lowslope
+    # GSD[fraclim] = dlim
+    return dlim
 
 
 def calc_GSD_fractions(GSD, n=10):
