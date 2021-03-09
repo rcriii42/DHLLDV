@@ -45,7 +45,9 @@ if __name__ == '__main__':
     Cvt = Cv
     Cvs_from_Cvt_list = [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt) for vls in vls_list]
     Cvt_Erhg_list = [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
-    
+    GSD = {0.11:0.075/1000, 0.5:d, 0.85:d*2.72}
+    graded_Erhg_list = [DHLLDV_framework.Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
+
     #The im curves
     im_list = [Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
     FB_im_list = [FB_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
@@ -54,6 +56,7 @@ if __name__ == '__main__':
     ELM_im_list = [il_list[i]*rhom for i in range(200)]
     Ho_im_list = [Ho_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
     Cvt_im_list = [Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
+    graded_im_list = [graded_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
     
     #The LDV
     Cv_list = [(i+1)/100. for i in range(50)]
@@ -67,11 +70,11 @@ if __name__ == '__main__':
     erhg_file = open("eerhg.csv", 'w')
 
     if plt:
-        fig = plt.figure(figsize=(11,8))
+        fig = plt.figure(figsize=(11,7.5))
 
         # log x and y axis
         Erhg_title = "Erhg for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
-        Erhg_plot = fig.add_subplot(311, title=Erhg_title, xlim=(.001, 1.0), ylim=(0.001, 3))
+        Erhg_plot = fig.add_subplot(211, title=Erhg_title, xlim=(.001, 1.0), ylim=(0.001, 3))
         Erhg_plot.loglog(il_list, FB_Erhg_list, linewidth=1, linestyle='--', color='c', label="FB Cvs=c")
         Erhg_plot.loglog(il_list, SB_Erhg_list, linewidth=1, linestyle='--', color='brown', label="SB Cvs=c")
         Erhg_plot.loglog(il_list, He_Erhg_list, linewidth=1, linestyle='--', color='b', label="He Cvs=c")
@@ -79,6 +82,7 @@ if __name__ == '__main__':
         Erhg_plot.loglog(il_list, Ho_Erhg_list, linewidth=2, linestyle='--', color='brown', label="Ho Cvs=c")
         Erhg_plot.loglog(il_list, Erhg_list, linewidth=2, color='r', label="Resulting Cvs=c")
         Erhg_plot.loglog(il_list, Cvt_Erhg_list, linewidth=2, linestyle='--', color='g', label="Resulting Cvt=c")
+        Erhg_plot.loglog(il_list, graded_Erhg_list, linewidth=2, linestyle='dotted', color='r', label="Resulting graded")
         Erhg_plot.grid(True)
         legend = Erhg_plot.legend()
         for label in legend.get_texts():
@@ -89,7 +93,7 @@ if __name__ == '__main__':
 
         spot10 = vls_list.index(10)
         hg_ymax = max(SB_im_list[spot10], Ho_im_list[spot10], He_im_list[spot10])*1.5
-        HG_plot = fig.add_subplot(312, title=HG_title, xlim=(0,10), ylim=(0,hg_ymax))
+        HG_plot = fig.add_subplot(212, title=HG_title, xlim=(0,10), ylim=(0,hg_ymax))
         HG_plot.plot(vls_list, FB_im_list, linewidth=1, linestyle='--', color='c')
         HG_plot.plot(vls_list, SB_im_list, linewidth=1, linestyle='--', color='brown')
         HG_plot.plot(vls_list, He_im_list, linewidth=1, linestyle='--', color='b')
@@ -98,12 +102,13 @@ if __name__ == '__main__':
         HG_plot.plot(vls_list, im_list, linewidth=2.5, color='r')
         HG_plot.plot(LDV_vls_list, LDV_im_list, linewidth=1, linestyle='dotted', color='r')
         HG_plot.plot(vls_list, Cvt_im_list, linewidth=2, linestyle='--', color='g')
+        HG_plot.plot(vls_list, graded_im_list, linewidth=2, linestyle='dotted', color='r')
         HG_plot.grid(True)
 
-        Cvs_title = "Cvs given Cvt for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cvt=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
-        Cvs_plot = fig.add_subplot(313, title=Cvs_title, xlim=(0, 10), ylim=(0, 1))
-        Cvs_plot.plot(vls_list, Cvs_from_Cvt_list, linewidth=1, linestyle='--', color='c')
-        Cvs_plot.grid(True)
+        # Cvs_title = "Cvs given Cvt for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cvt=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        # Cvs_plot = fig.add_subplot(313, title=Cvs_title, xlim=(0, 10), ylim=(0, 1))
+        # Cvs_plot.plot(vls_list, Cvs_from_Cvt_list, linewidth=1, linestyle='--', color='c')
+        # Cvs_plot.grid(True)
 
     #     def on_plot_hover(event):
     #         for curve in Erhg_plot.get_lines():
