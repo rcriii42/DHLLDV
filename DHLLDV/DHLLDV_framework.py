@@ -318,50 +318,7 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     """
 
     dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5 # Eqn 8.15-2
-    # if len(GSD)<2:
-    #     return GSD
-    # fracs = sorted(GSD.keys())
-    # sizes = [GSD[p] for p in fracs]
-    # lowslope = (fracs[1] - fracs[0]) / (log10(sizes[1]) - log10(sizes[0]))
-    # fraclim = fracs[0] - (log10(sizes[0])-log10(dlim))*lowslope
-    # GSD[fraclim] = dlim
     return dlim
-
-
-def calc_GSD_fractions(GSD, n=10):
-    """
-    Break the given Grain Size Distribution into n fractions, and add % passing d_lim.
-    GSD: A dict with a grain size distribution in the form {% Passing:d,...}, must have len>1
-    Cvs = Spatial volume concentration
-    n: number of fractions (including d=0.057)
-    Scheme:
-    Find fraction <.057
-    separate GSD into n even pieces, _add_ these to the GSD dict
-    Interpolate between the given fractions, assuming log scale on the x-axis
-    Note that at the top and bottom the slope is halved
-    """
-    if len(GSD) < 2:
-        return GSD
-    fracs = sorted(GSD.keys())
-    sizes = [GSD[p] for p in fracs]
-
-    # The n fractions - note you could end up with n + len(GSD) + 1
-    fracs = sorted(GSD.keys())
-    sizes = [GSD[p] for p in fracs]
-    f_index = 1
-    for i in range(n-1):
-        this_frac = float((i+1))/n
-        if this_frac > fracs[f_index]:
-            f_index = min(f_index+1, len(fracs)-1)
-        slope = (fracs[f_index] - fracs[f_index-1])/(log10(sizes[f_index])-log10(sizes[f_index-1]))
-        if this_frac > fracs[-1]:
-            slope = slope/2  # halve the slope above the largest given size
-            log_size = (this_frac - fracs[f_index])/slope + log10(sizes[f_index])
-        else:
-            log_size = (this_frac - fracs[f_index-1])/slope + log10(sizes[f_index-1])
-        this_size = 10**log_size
-        GSD[this_frac] = this_size
-    return GSD
 
 
 def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
