@@ -1,8 +1,8 @@
-'''
+"""
 Created on Mar 3, 2015
 
 @author: rcriii
-'''
+"""
 
 from . import stratified
 from . import heterogeneous
@@ -94,14 +94,14 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     vls = 1.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # Eqn 8.11-1
+    FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot  # Eqn 8.11-1
     vlsldv = FL_vs*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot # Eqn 8.11-1
+        FL_vs = 1.4*(nu*Rsd*gravity)**(1./3.)*(8/lambdal)**0.5/fbot  # Eqn 8.11-1
         vlsldv = FL_vs*fbot
         steps += 1
 
@@ -109,48 +109,50 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     vls = 4.0
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    alphap = 3.4 * (1.65/Rsd)**(2./9) # Eqn 8.11-3
+    alphap = 3.4 * (1.65/Rsd)**(2./9)  # Eqn 8.11-3
     vt = heterogeneous.vt_ruby(d, Rsd, nu)
     Rep = vt*d/nu  # Eqn 4.2-6
     top = 4.7 + 0.41*Rep**0.75
     bottom = 1. + 0.175*Rep**0.75
     beta = top/bottom  # Eqn 4.6-4
     KC = 0.175*(1+beta)
-    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # Eqn 8.11-3
+    FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3)  # Eqn 8.11-3
     vlsldv = FL_ss*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3) # Eqn 8.11-3
+        FL_ss = alphap * (vt*Cvs*(1-Cvs/KC)**beta/(lambdal*fbot))**(1./3)  # Eqn 8.11-3
         vlsldv = FL_ss*fbot
         steps += 1
 
     FL_s = max(FL_vs, FL_ss)    # Eqn 8.11-4
 
     # Large particles
-    vls=4.3
+    vls = 4.3
     if d <= 0.015*Dp:
-        Cvr_ldv = 0.0065/(2*gravity*Rsd*Dp) # Eqn 8.11-7
+        Cvr_ldv = 0.0065/(2*gravity*Rsd*Dp)  # Eqn 8.11-7
     else:
-        Cvr_ldv = 0.053*(d/Dp)**0.5/(2*gravity*Rsd*Dp) # Eqn 8.11-7
+        Cvr_ldv = 0.053*(d/Dp)**0.5/(2*gravity*Rsd*Dp)  # Eqn 8.11-7
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.11-6
+    FL_r = alphap*((1-Cvs/KC)**beta * Cvs *
+                   (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3)  # Eqn 8.11-6
     vlsldv = FL_r*fbot
     steps = 0
     while not (1.00001 >= vls/vlsldv > 0.99999) and steps < max_steps:
         vls = (vls + vlsldv)/2
         Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
         lambdal = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-        FL_r = alphap*((1-Cvs/KC)**beta * Cvs * (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3) # Eqn 8.11-6
+        FL_r = alphap*((1-Cvs/KC)**beta * Cvs *
+                       (stratified.musf*stratified.Cvb*pi/8)**0.5 * Cvr_ldv**0.5/lambdal)**(1./3)  # Eqn 8.11-6
         vlsldv = FL_r*fbot
         steps += 1
 
     # The Upper limit
-    d0 = 0.0005*(1.65/Rsd)**0.5 # Eqn 8.11-8
-    drough = 2./1000 # Note: only valid for sand with Rsd=1.65
+    d0 = 0.0005*(1.65/Rsd)**0.5  # Eqn 8.11-8
+    drough = 2./1000  # Note: only valid for sand with Rsd=1.65
     if d > drough:
         FL_ul = FL_r
     elif FL_s <= FL_r:
@@ -175,7 +177,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
         C = ((8.5**2/lambdal)*(vt/(gravity*d)**0.5)**(10./3)*(nu*gravity)**(2./3))/stratified.musf
         vlsldv = (-1*B - (B**2-4*A*C)**0.5)/(2*A)   # Eqn 8.11-11
         steps += 1
-    FL_ll = vlsldv/fbot # Eqn 8.11-12
+    FL_ll = vlsldv/fbot  # Eqn 8.11-12
 
     FL = max(FL_ul, FL_ll)  # Eqn 8.11-13
     return FL*fbot
@@ -209,7 +211,7 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
 
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambda_l = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    Xi_HeHo = 8.5*(1/lambda_l)*(vt/(gravity*d)**0.5)**5/3*((nu*gravity)**(1/3)/vls)*(vt/vls) # Eqn 8.12-1
+    Xi_HeHo = 8.5*(1/lambda_l)*(vt/(gravity*d)**0.5)**5/3*((nu*gravity)**(1/3)/vls)*(vt/vls)  # Eqn 8.12-1
 
     alpha = 0.58*Cvr**-0.42
     ex1 = -(0.83 + stratified.musf/4 + (Cvr - 0.5 - 0.075*Dp)**2 + (0.025*Dp))
@@ -219,7 +221,7 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     vls_t = (5 * exp(ex1 * ex2)) ** 0.25 * vls_ldv  # Eqn 8.12-7
 
     Kldv = 1/(1 - Xi_ldv)       # Eqn 7.9-14
-    Xi_fb = 1-((Cvt*vls_ldv)/(Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv) # Eqn 8.12-3
+    Xi_fb = 1-((Cvt*vls_ldv)/(Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv)  # Eqn 8.12-3
 
     ex2 = Dp ** 0.025 * (vls / vls_lsdv) ** alpha * Cvr ** 0.65 * (Rsd / 1.585) ** 0.1
     Xi_3LM = (1 - Cvr) * exp(ex1 * ex2)  # Eqn 8.12-4
@@ -233,9 +235,9 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
 
     if vls < vls_t:
         Xi_t = (1 - Cvr) * (1 - (4. / 5.) * (vls / vls_t))  # Eqn 8.12-8
-        Xi_SBHeHo = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t*(vls/vls_t)**alpha_xi # Eqn 8.12-9
+        Xi_SBHeHo = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t*(vls/vls_t)**alpha_xi  # Eqn 8.12-9
     else:
-        Xi_SBHeHo = Xi_th # Eqn 8.12-9
+        Xi_SBHeHo = Xi_th  # Eqn 8.12-9
     Xi_SBHeHo = max(Xi_SBHeHo, Xi_3LM) # Eqn 8.12-9
 
     f = 4./3. - (1./3.)*(d/Dp)/particle_ratio # Eqn 8.12-10 TODO: update with dynamic particle ratio in section 7.7.5
@@ -321,61 +323,81 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     return dlim
 
 
-def Cvs_Erhg_graded(vls, Dp,  GSD, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
+def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_dict=False):
     """
     Cvs_Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
+    GSD = Particle size distribution dict: {x:d_x, y:d_y, ...}, len(GSD>2)
     vls = average line speed (velocity, m/sec)
     Dp = Pipe diameter (m)
-    GSD = Particle size distribution dict: {f1:d1, f2:d2, ...}
-          assume GSD is already in proper fractions
     epsilon = absolute pipe roughness (m)
     nu = fluid kinematic viscosity in m2/sec
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
     Cvs = insitu volume concentration
+    num_fracs = The number of fractions to divide the GSD
     get_dict: Does nothing for now
     """
-    # first adjust the liquid density
-    GSD = calc_GSD_fractions(GSD, n=1)  # This ensures there is a fraction for the ultra_fines
-    fracs = sorted(GSD.keys())
-    sizes = [GSD[p] for p in fracs]
-    Cvs_uf = Cvs*fracs[0]
-    Cvs_c = Cvs - Cvs_uf
-    mul = nu * 1000 * rhol
-    mu_uf = mul * (1 + 2.5*Cvs_uf + 10.05*Cvs_uf**2 + 0.00273*exp(16.6*Cvs_uf))
-    rho_uf = (rhol*(1-Cvs_uf-Cvs_c) + rhos*Cvs_uf)/(1-Cvs_c)
-    nu_uf = mu_uf/(1000*rho_uf)
-    Rsd_uf = (rhos-rho_uf)/rho_uf
+    fracs = iter(sorted(GSD, key=lambda key: GSD[key]))
+    flow = next(fracs)
+    dlow = GSD[flow]
+    fnext = next(fracs)
+    dnext = GSD[fnext]
 
-    # The fractions represented by each GSD_frac
-    fracs_rep = [fracs[0]]
-    for i in range(1, len(fracs)):
-        if i == 1:  # First fraction after uf
-            fhere = (fracs[i]-fracs[i-1]) + (fracs[i+1]-fracs[i])/2
-        elif i == len(fracs)-1:  # last fraction
-            fhere = (fracs[i]-fracs[i-1])/2 + (1. - fracs[i])
-        else:  # intermediate fractions
-            fhere = (fracs[i] - fracs[i - 1])/2 + (fracs[i + 1] - fracs[i])/2
-        fracs_rep.append(fhere)
+    Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
 
-    # the Cvs for each fraction
-    Cvs_fracs = [Cvs_uf]
-    for f in fracs_rep:
-        Cvs_fracs.append(Cvs * f)
+    # The limiting diameter for pseudoliquid and it's fraction X
+    dmin = pseudo_dlim(Dp, nu, rhol, rhos)
+    while dmin > dnext:
+        ftemp = next(fracs, None)
+        if ftemp:
+            dlow = dnext
+            flow = fnext
+            fnext = ftemp
+            dnext = GSD[fnext]
+    X = fnext - (log10(dnext)-log10(dlow))*(fnext-flow)/(log10(dnext)-log10(dlow))
+    rhox = rhol + rhol*(X*Cvs*Rsd)/(1-Cvs+Cvs*X)    # Eqn 8.15-3
+    Cvs_x = (1 - X) * Cvs                           # Eqn 8.15-5
+    mu_l = nu * rhol
+    mu_x = mu_l*(1 + 2.5*Cvs_x + 10.5*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
+    nu_x = mu_x / rhox                              # Eqn 8.15-7
+    Rsd_x = (rhos - rhox)/rhox
 
-    # The im for each fraction and total
-    im_tot = 0
-    for i in range(1, len(sizes)):
-        d_i = sizes[i]
-        Cvs_i = Cvs_fracs[i]
-        Erhg_i = Cvs_Erhg(vls, Dp, d_i, epsilon, nu_uf, rho_uf, rhos, Cvs, False)
-        il_uf = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_uf, rho_uf)
-        im_i = Erhg_i * Rsd_uf * Cvs + il_uf
-        im_tot += im_i * Cvs_i / Cvs_c
-
+    frac_size = (1.0 - X)/(num_fracs-1)
+    ims = []  # This will be a list of the fi, i_mxi
+    fthis = flow
+    logdlast = log10(dmin)
+    while fthis < 1.0:
+        fthis += frac_size
+        while fthis > fnext:
+            ftemp = next(fracs, None)
+            if ftemp:
+                dlow = dnext
+                flow = fnext
+                fnext = ftemp
+                dnext = GSD[fnext]
+        logdthis = log10(dnext) - (log10(dnext)-log10(dlow))*(fnext-fthis)/(fnext-flow)
+        logdx = (logdthis - logdlast)/2
+        logdlast = logdthis
+        dx = 10**logdx
+        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cvs_x, get_dict=True)
+        regime = Erhg_x['regime']
+        il_x = Erhg_x['il']
+        i_mxi = Erhg_x[regime] * Rsd_x * Cvs_x + il_x
+        ims.append(i_mxi)
+    im_x = sum(frac_size*imxi for imxi in ims)/ (1-X)
+    il_x = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_x, rhox)
+    im = rhox*im_x/rhol
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    Rsd = (rhos - rhol) / rhol
-    return (im_tot - il) / (Rsd * Cvs)
+    Erhg = (im - il)/(Rsd*Cvs)
+    if get_dict:
+        return {'ims':ims,
+                'im_x':im_x,
+                'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_x),
+                'Erhg': Erhg,
+                'il': il,
+                'dmin':dmin}
+    else:
+        return Erhg
 
 
 if __name__ == '__main__':
