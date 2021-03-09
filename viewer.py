@@ -31,9 +31,10 @@ if __name__ == '__main__':
     rhom = Cv*(rhos-rhol)+rhol
     
     vls_list = [(i+1)/10. for i in range(200)]
-    il_list = [homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol) for vls in vls_list]
+
     Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in vls_list]
-    
+    il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
+
     #The Erhg Curves
     Erhg_list = [Erhg_obj[Erhg_obj['regime']] for Erhg_obj in Erhg_obj_list]
     FB_Erhg_list = [Erhg_obj['FB'] for Erhg_obj in Erhg_obj_list]
