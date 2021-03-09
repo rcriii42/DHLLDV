@@ -342,6 +342,7 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     dlow = GSD[flow]
     fnext = next(fracs)
     dnext = GSD[fnext]
+    print(flow, dlow, fnext, dnext)
 
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
 
@@ -354,20 +355,26 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
             flow = fnext
             fnext = ftemp
             dnext = GSD[fnext]
-    X = fnext - (log10(dnext)-log10(dlow))*(fnext-flow)/(log10(dnext)-log10(dlow))
+        else:
+            break
+    print(flow, dlow, fnext, dnext)
+    X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
     rhox = rhol + rhol*(X*Cvs*Rsd)/(1-Cvs+Cvs*X)    # Eqn 8.15-3
     Cvs_x = (1 - X) * Cvs                           # Eqn 8.15-5
     mu_l = nu * rhol
     mu_x = mu_l*(1 + 2.5*Cvs_x + 10.5*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
     nu_x = mu_x / rhox                              # Eqn 8.15-7
     Rsd_x = (rhos - rhox)/rhox
+    print(f"ERHG_graded: dmin={dmin*1000:0.4f} X={X:0.3f}")
 
-    frac_size = (1.0 - X)/(num_fracs-1)
+    frac_size = (1.0 - X)/(num_fracs)
+    print(f"Frac size: {frac_size:0.3f}")
     ims = []  # This will be a list of the fi, i_mxi
-    fthis = flow
+    fthis = X
     logdlast = log10(dmin)
-    while fthis < 1.0:
+    while fthis <= (1.0 - frac_size):
         fthis += frac_size
+        print(fthis)
         while fthis > fnext:
             ftemp = next(fracs, None)
             if ftemp:
@@ -375,6 +382,8 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
                 flow = fnext
                 fnext = ftemp
                 dnext = GSD[fnext]
+            else:
+                break
         logdthis = log10(dnext) - (log10(dnext)-log10(dlow))*(fnext-fthis)/(fnext-flow)
         logdx = (logdthis - logdlast)/2
         logdlast = logdthis
