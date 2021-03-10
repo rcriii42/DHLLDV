@@ -372,6 +372,9 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     ims = []  # This will be a list of the fi, i_mxi
     fthis = X
     logdlast = log10(dmin)
+    frac_list = [fthis]
+    ds = [10**logdlast]
+    dxs = []
     while fthis <= (1.0 - frac_size):
         fthis += frac_size
         print(fthis)
@@ -392,6 +395,9 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
         regime = Erhg_x['regime']
         il_x = Erhg_x['il']
         i_mxi = Erhg_x[regime] * Rsd_x * Cvs_x + il_x
+        frac_list.append(fthis)
+        ds.append(10**logdthis)
+        dxs.append(dx)
         ims.append(i_mxi)
     im_x = sum(frac_size*imxi for imxi in ims)/ (1-X)
     il_x = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_x, rhox)
@@ -404,7 +410,11 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
                 'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_x),
                 'Erhg': Erhg,
                 'il': il,
-                'dmin':dmin}
+                'dmin':dmin,
+                'X': X,
+                'fracs': frac_list,
+                'ds': ds,
+                'dxs':dxs}
     else:
         return Erhg
 
