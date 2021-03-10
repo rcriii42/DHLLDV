@@ -357,10 +357,10 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
             dnext = GSD[fnext]
         else:
             break
-    print(flow, dlow, fnext, dnext)
     X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
     rhox = rhol + rhol*(X*Cvs*Rsd)/(1-Cvs+Cvs*X)    # Eqn 8.15-3
-    Cvs_x = (1 - X) * Cvs                           # Eqn 8.15-5
+    Cvs_x = rhol + rhol*((X*Cvs*Rsd)/(1-Cvs+Cvs*X))
+    Cvs_r = (1 - X) * Cvs                           # Eqn 8.15-5
     mu_l = nu * rhol
     mu_x = mu_l*(1 + 2.5*Cvs_x + 10.5*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
     nu_x = mu_x / rhox                              # Eqn 8.15-7
@@ -377,7 +377,6 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     dxs = []
     while fthis <= (1.0 - frac_size):
         fthis += frac_size
-        print(fthis)
         while fthis > fnext:
             ftemp = next(fracs, None)
             if ftemp:
@@ -391,12 +390,12 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
         logdx = (logdthis - logdlast)/2
         logdlast = logdthis
         dx = 10**logdx
-        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cvs_x, get_dict=True)
+        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cvs_r, get_dict=True)
         regime = Erhg_x['regime']
         il_x = Erhg_x['il']
-        i_mxi = Erhg_x[regime] * Rsd_x * Cvs_x + il_x
+        i_mxi = Erhg_x[regime] * Rsd_x * Cvs_r + il_x
         frac_list.append(fthis)
-        ds.append(10**logdthis)
+        ds.append(10.0**logdthis)
         dxs.append(dx)
         ims.append(i_mxi)
     im_x = sum(frac_size*imxi for imxi in ims)/ (1-X)
@@ -405,16 +404,11 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Erhg = (im - il)/(Rsd*Cvs)
     if get_dict:
-        return {'ims':ims,
-                'im_x':im_x,
-                'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_x),
-                'Erhg': Erhg,
-                'il': il,
-                'dmin':dmin,
-                'X': X,
-                'fracs': frac_list,
-                'ds': ds,
-                'dxs':dxs}
+        return {'ims':ims, 'im_x':im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_x),
+                'Erhg': Erhg, 'il': il,
+                'dmin':dmin, 'X': X, 'fracs': frac_list, 'ds': ds, 'dxs':dxs,
+                'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, 'Rsd_x':Rsd_x, 'Cvs_x': Cvs_x, 'Cvs_r': Cvs_r,
+                }
     else:
         return Erhg
 
