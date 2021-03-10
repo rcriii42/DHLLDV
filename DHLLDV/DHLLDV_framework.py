@@ -359,10 +359,10 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
             break
     X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
     rhox = rhol + rhol*(X*Cvs*Rsd)/(1-Cvs+Cvs*X)    # Eqn 8.15-3
-    Cvs_x = rhol + rhol*((X*Cvs*Rsd)/(1-Cvs+Cvs*X))
+    Cvs_x = (X*Cvs)/(1-Cvs+Cvs*X)
     Cvs_r = (1 - X) * Cvs                           # Eqn 8.15-5
     mu_l = nu * rhol
-    mu_x = mu_l*(1 + 2.5*Cvs_x + 10.5*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
+    mu_x = mu_l*(1 + 2.5*Cvs_x + 10.05*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
     nu_x = mu_x / rhox                              # Eqn 8.15-7
     Rsd_x = (rhos - rhox)/rhox
     print(f"ERHG_graded: dmin={dmin*1000:0.4f} X={X:0.3f}")
