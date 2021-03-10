@@ -19,7 +19,7 @@ class Test(unittest.TestCase):
         Rsd = (rhos - rhol) / rhol
         Cv = 0.175
         rhom = Cv * (rhos - rhol) + rhol
-        GSD = {0.11: 0.075 / 1000, 0.5: d, 0.85: d * 2.72}
+        GSD = {0.11: 0.075 / 1000, 0.5: d, 0.85: d * 2.71}
 
         self.Erhg_obj = DHLLDV_framework.Cvs_Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
                                                          get_dict=True)
@@ -61,6 +61,21 @@ class Test(unittest.TestCase):
         for i, d in enumerate(ds):
             self.assertAlmostEqual(self.Erhg_obj['ds'][i]*1000, d)
 
+    def test_rhox(self):
+        self.assertAlmostEqual(self.Erhg_obj['rhox'], 1.05388688)
 
 
+    def test_Cvs_x(self):
+        self.assertAlmostEqual(self.Erhg_obj['Cvs_x'], 0.033712847)
 
+
+    def test_Cvs_r(self):
+        self.assertAlmostEqual(self.Erhg_obj['Cvs_x'], 0.146216529)
+
+
+    def test_mu_x(self):
+        self.assertAlmostEqual(self.Erhg_obj['mu_x']*10**6, 1.1059845)
+
+
+    def test_nu_x(self):
+        self.assertAlmostEqual(self.Erhg_obj['nu_x']*10**6, 1.0494338)
