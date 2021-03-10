@@ -70,7 +70,7 @@ class Test(unittest.TestCase):
 
 
     def test_Cvs_r(self):
-        self.assertAlmostEqual(self.Erhg_obj['Cvs_x'], 0.146216529)
+        self.assertAlmostEqual(self.Erhg_obj['Cvs_r'], 0.146216529)
 
 
     def test_mu_x(self):
