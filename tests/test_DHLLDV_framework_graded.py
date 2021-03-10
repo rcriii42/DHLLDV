@@ -61,6 +61,14 @@ class Test(unittest.TestCase):
         for i, d in enumerate(ds):
             self.assertAlmostEqual(self.Erhg_obj['ds'][i]*1000, d)
 
+
+    def test_ERHG_graded_dx(self):
+        dxs = [3.688486149, 2.907296691, 2.291556403, 1.806224581, 1.42368184,
+              1.119365591, 0.751119082, 0.431226721, 0.247572574, 0.142134466]
+        dxs.reverse()
+        for i, d in enumerate(dxs):
+            self.assertAlmostEqual(self.Erhg_obj['dxs'][i] * 1000, d)
+
     def test_rhox(self):
         self.assertAlmostEqual(self.Erhg_obj['rhox'], 1.05388688)
 
