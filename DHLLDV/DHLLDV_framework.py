@@ -342,7 +342,6 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     dlow = GSD[flow]
     fnext = next(fracs)
     dnext = GSD[fnext]
-    print(flow, dlow, fnext, dnext)
 
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
 
@@ -365,10 +364,8 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     mu_x = mu_l*(1 + 2.5*Cvs_x + 10.05*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
     nu_x = mu_x / rhox                              # Eqn 8.15-7
     Rsd_x = (rhos - rhox)/rhox
-    print(f"ERHG_graded: dmin={dmin*1000:0.4f} X={X:0.3f}")
 
     frac_size = (1.0 - X)/(num_fracs)
-    print(f"Frac size: {frac_size:0.3f}")
     ims = []  # This will be a list of the fi, i_mxi
     fthis = X
     logdlast = log10(dmin)
@@ -387,7 +384,7 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
             else:
                 break
         logdthis = log10(dnext) - (log10(dnext)-log10(dlow))*(fnext-fthis)/(fnext-flow)
-        logdx = (logdthis - logdlast)/2
+        logdx = (logdthis + logdlast)/2.0
         logdlast = logdthis
         dx = 10**logdx
         Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cvs_r, get_dict=True)
@@ -404,7 +401,8 @@ def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, ge
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Erhg = (im - il)/(Rsd*Cvs)
     if get_dict:
-        return {'ims':ims, 'im_x':im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_x),
+        print(dxs)
+        return {'ims':ims, 'im_x':im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_r),
                 'Erhg': Erhg, 'il': il,
                 'dmin':dmin, 'X': X, 'fracs': frac_list, 'ds': ds, 'dxs':dxs,
                 'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, 'Rsd_x':Rsd_x, 'Cvs_x': Cvs_x, 'Cvs_r': Cvs_r,
