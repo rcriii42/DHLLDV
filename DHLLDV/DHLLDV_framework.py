@@ -323,7 +323,7 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     return dlim
 
 
-def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, num_fracs=10, get_dict=False):
+def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num_fracs=10, get_dict=False):
     """
     Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
     GSD = Particle size distribution dict: {x:d_x, y:d_y, ...}, len(GSD>2)
