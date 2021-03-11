@@ -21,8 +21,8 @@ class Test(unittest.TestCase):
         rhom = Cv * (rhos - rhol) + rhol
         GSD = {0.11: 0.075 / 1000, 0.5: d, 0.85: d * 2.71}
 
-        self.Erhg_obj = DHLLDV_framework.Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
-                                                     get_dict=True)
+        self.Cvs_Erhg_obj = DHLLDV_framework.Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
+                                                         Cvt_eq_Cvs=False, get_dict=True)
 
     def test_dlim_500(self):
         """Test the dlim for 500mm pipe"""
@@ -42,7 +42,7 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(1.0769557, dlim * 10 ** 4)
 
     def test_Erhg_graded_X(self):
-        self.assertAlmostEqual(self.Erhg_obj['X'], 0.16447698)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['X'], 0.16447698)
 
     def test_Erhg_graded_fracs(self):
         fs = [1.00000000, 0.91644770, 0.83289540, 0.74934309, 0.66579079,
@@ -50,7 +50,7 @@ class Test(unittest.TestCase):
               0.16447698]
         fs.reverse()
         for i, f in enumerate(fs):
-            self.assertAlmostEqual(self.Erhg_obj['fracs'][i], f)
+            self.assertAlmostEqual(self.Cvs_Erhg_obj['fracs'][i], f)
 
 
     def test_Erhg_graded_ds(self):
@@ -59,7 +59,7 @@ class Test(unittest.TestCase):
               0.1076956]
         ds.reverse()
         for i, d in enumerate(ds):
-            self.assertAlmostEqual(self.Erhg_obj['ds'][i]*1000, d)
+            self.assertAlmostEqual(self.Cvs_Erhg_obj['ds'][i] * 1000, d)
 
 
     def test_ERHG_graded_dx(self):
@@ -67,23 +67,23 @@ class Test(unittest.TestCase):
               1.119365591, 0.751119082, 0.431226721, 0.247572574, 0.142134466]
         dxs.reverse()
         for i, d in enumerate(dxs):
-            self.assertAlmostEqual(self.Erhg_obj['dxs'][i] * 1000, d)
+            self.assertAlmostEqual(self.Cvs_Erhg_obj['dxs'][i] * 1000, d)
 
     def test_rhox(self):
-        self.assertAlmostEqual(self.Erhg_obj['rhox'], 1.05388688)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['rhox'], 1.05388688)
 
 
     def test_Cvs_x(self):
-        self.assertAlmostEqual(self.Erhg_obj['Cv_x'], 0.033712847)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['Cv_x'], 0.033712847)
 
 
     def test_Cvs_r(self):
-        self.assertAlmostEqual(self.Erhg_obj['Cv_r'], 0.146216529)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['Cv_r'], 0.146216529)
 
 
     def test_mu_x(self):
-        self.assertAlmostEqual(self.Erhg_obj['mu_x']*10**6, 1.1059845)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['mu_x'] * 10 ** 6, 1.1059845)
 
 
     def test_nu_x(self):
-        self.assertAlmostEqual(self.Erhg_obj['nu_x']*10**6, 1.0494338)
+        self.assertAlmostEqual(self.Cvs_Erhg_obj['nu_x'] * 10 ** 6, 1.0494338)
