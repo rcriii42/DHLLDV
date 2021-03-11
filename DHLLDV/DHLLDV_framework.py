@@ -323,7 +323,7 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     return dlim
 
 
-def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_dict=False):
+def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, num_fracs=10, get_dict=False):
     """
     Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
     GSD = Particle size distribution dict: {x:d_x, y:d_y, ...}, len(GSD>2)
@@ -333,7 +333,7 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_di
     nu = fluid kinematic viscosity in m2/sec
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
-    Cvs = insitu volume concentration
+    Cv = insitu volume concentration
     num_fracs = The number of fractions to divide the GSD
     get_dict: Does nothing for now
     """
@@ -357,11 +357,11 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_di
         else:
             break
     X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
-    rhox = rhol + rhol*(X*Cvs*Rsd)/(1-Cvs+Cvs*X)    # Eqn 8.15-3
-    Cvs_x = (X*Cvs)/(1-Cvs+Cvs*X)
-    Cvs_r = (1 - X) * Cvs                           # Eqn 8.15-5
+    rhox = rhol + rhol*(X*Cv*Rsd)/(1-Cv+Cv*X)    # Eqn 8.15-3
+    Cv_x = (X*Cv)/(1-Cv+Cv*X)
+    Cv_r = (1 - X) * Cv                           # Eqn 8.15-5
     mu_l = nu * rhol
-    mu_x = mu_l*(1 + 2.5*Cvs_x + 10.05*Cvs_x**2 + 0.00273*exp(16.6*Cvs_x))   # Eqn 8.15-6
+    mu_x = mu_l*(1 + 2.5*Cv_x + 10.05*Cv_x**2 + 0.00273*exp(16.6*Cv_x))   # Eqn 8.15-6
     nu_x = mu_x / rhox                              # Eqn 8.15-7
     Rsd_x = (rhos - rhox)/rhox
 
@@ -387,10 +387,10 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_di
         logdx = (logdthis + logdlast)/2.0
         logdlast = logdthis
         dx = 10**logdx
-        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cvs_r, get_dict=True)
+        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cv_r, get_dict=True)
         regime = Erhg_x['regime']
         il_x = Erhg_x['il']
-        i_mxi = Erhg_x[regime] * Rsd_x * Cvs_r + il_x
+        i_mxi = Erhg_x[regime] * Rsd_x * Cv_r + il_x
         frac_list.append(fthis)
         ds.append(10.0**logdthis)
         dxs.append(dx)
@@ -399,13 +399,13 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_di
     il_x = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_x, rhox)
     im = rhox*im_x/rhol
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
-    Erhg = (im - il)/(Rsd*Cvs)
+    Erhg = (im - il)/(Rsd*Cv)
     if get_dict:
         print(dxs)
-        return {'ims':ims, 'im_x':im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cvs_r),
+        return {'ims':ims, 'im_x':im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cv_r),
                 'Erhg': Erhg, 'il': il,
                 'dmin':dmin, 'X': X, 'fracs': frac_list, 'ds': ds, 'dxs':dxs,
-                'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, 'Rsd_x':Rsd_x, 'Cvs_x': Cvs_x, 'Cvs_r': Cvs_r,
+                'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, 'Rsd_x':Rsd_x, 'Cv_x': Cv_x, 'Cv_r': Cv_r,
                 }
     else:
         return Erhg
