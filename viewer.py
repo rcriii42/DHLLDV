@@ -46,7 +46,7 @@ if __name__ == '__main__':
     Cvs_from_Cvt_list = [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt) for vls in vls_list]
     Cvt_Erhg_list = [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
     GSD = {0.11:0.075/1000, 0.5:d, 0.85:d*2.72}
-    graded_Erhg_list = [DHLLDV_framework.Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
+    graded_Erhg_list = [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
 
     #The im curves
     im_list = [Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]

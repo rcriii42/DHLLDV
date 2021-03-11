@@ -21,8 +21,8 @@ class Test(unittest.TestCase):
         rhom = Cv * (rhos - rhol) + rhol
         GSD = {0.11: 0.075 / 1000, 0.5: d, 0.85: d * 2.71}
 
-        self.Erhg_obj = DHLLDV_framework.Cvs_Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
-                                                         get_dict=True)
+        self.Erhg_obj = DHLLDV_framework.Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
+                                                     get_dict=True)
 
     def test_dlim_500(self):
         """Test the dlim for 500mm pipe"""

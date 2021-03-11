@@ -323,9 +323,9 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     return dlim
 
 
-def Cvs_Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_dict=False):
+def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cvs, num_fracs=10, get_dict=False):
     """
-    Cvs_Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
+    Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
     GSD = Particle size distribution dict: {x:d_x, y:d_y, ...}, len(GSD>2)
     vls = average line speed (velocity, m/sec)
     Dp = Pipe diameter (m)
