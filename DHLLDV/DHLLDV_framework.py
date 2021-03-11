@@ -278,16 +278,19 @@ def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     Cvs = Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     Erhg_obj = Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, get_dict=True)
+    for regime in ["FB", "SB", "He", "Ho"]:
+        Erhg_obj[regime] = Erhg_obj[regime]*1/(1-Xi)    # Eqn 8.12-12
     if Erhg_obj['regime'] == "FB":
-        # Use min of SB, He if in fixed bed region
+        # Use min of SB, He if in fixed bed region, text after Eqn 8.12-12
         if Erhg_obj["SB"] < Erhg_obj["He"]:
             Erhg_obj['regime'] = "SB"
         else:
             Erhg_obj['regime'] = "He"
+    Erhg_obj['Xi'] = Xi
     if get_dict:
-        return {regime: e*1/(1-Xi) for regime, e in Erhg_obj.items()} # Eqn 8.12-12
+        return Erhg_obj
     else:
-        return Erhg_obj[Erhg_obj['regime']]*1/(1-Xi) # Eqn 8.12-12
+        return Erhg_obj[Erhg_obj['regime']]
 
 
 def Cvt_regime(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
