@@ -23,6 +23,8 @@ class Test(unittest.TestCase):
 
         self.Cvs_Erhg_obj = DHLLDV_framework.Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
                                                          Cvt_eq_Cvs=False, get_dict=True)
+        self.Cvt_Erhg_obj = DHLLDV_framework.Erhg_graded(GSD, 5.0, Dp, epsilon, nu, rhol, rhos, Cv,
+                                                         Cvt_eq_Cvs=True, get_dict=True)
 
     def test_dlim_500(self):
         """Test the dlim for 500mm pipe"""
@@ -69,6 +71,7 @@ class Test(unittest.TestCase):
         for i, d in enumerate(dxs):
             self.assertAlmostEqual(self.Cvs_Erhg_obj['dxs'][i] * 1000, d)
 
+
     def test_rhox(self):
         self.assertAlmostEqual(self.Cvs_Erhg_obj['rhox'], 1.05388688)
 
@@ -87,3 +90,8 @@ class Test(unittest.TestCase):
 
     def test_nu_x(self):
         self.assertAlmostEqual(self.Cvs_Erhg_obj['nu_x'] * 10 ** 6, 1.0494338)
+
+
+    def test_if_Cvt_triggered(self):
+        """Just test that the Cvt Erhg is properly triggered"""
+        self.assertGreater(self.Cvt_Erhg_obj['Erhg'], self.Cvs_Erhg_obj['Erhg'])

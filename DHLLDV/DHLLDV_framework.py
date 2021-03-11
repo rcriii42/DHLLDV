@@ -390,7 +390,10 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
         logdx = (logdthis + logdlast)/2.0
         logdlast = logdthis
         dx = 10**logdx
-        Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cv_r, get_dict=True)
+        if Cvt_eq_Cvs:
+            Erhg_x = Cvt_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cv_r, get_dict=True)
+        else:
+            Erhg_x = Cvs_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cv_r, get_dict=True)
         regime = Erhg_x['regime']
         il_x = Erhg_x['il']
         i_mxi = Erhg_x[regime] * Rsd_x * Cv_r + il_x
