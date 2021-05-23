@@ -29,7 +29,8 @@ def Cvr_max(Dp, d, rhol, rhos):
         rhos = particle density (ton/m3)
     """
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
-    return 0.16*Dp**0.4 / (d**0.84 * (Rsd/1.65)**0.17)  # Eqn. 6.20-35
+    Cvrmx = 0.16*Dp**0.4 / (d**0.84 * (Rsd/1.65)**0.17)  # Eqn. 6.20-35
+    return min(0.66, max(0.05, Cvrmx))
 
 def Vsm(Dp, d, rhol, rhos, musf, Cv):
     """Return the maximum velocity at the limit of stationary deposition
