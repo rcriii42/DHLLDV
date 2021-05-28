@@ -407,7 +407,6 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Erhg = (im - il)/(Rsd*Cv)
     if get_dict:
-        print(dxs)
         return {'ims': ims, 'im_x': im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cv_r),
                 'Erhg': Erhg, 'il': il,
                 'dmin': dmin, 'X': X, 'fracs': frac_list, 'ds': ds, 'dxs': dxs,
