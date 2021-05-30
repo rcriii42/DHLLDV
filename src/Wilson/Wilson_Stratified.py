@@ -43,7 +43,6 @@ def Cvr_max(Dp, d, rhol, rhos):
 
 def Vsm(Dp, d, rhol, rhos, musf, Cv, Cvb=0.6, f=None):
     """Return the maximum velocity at the limit of stationary deposition
-
         Dp = Pipe diameter (m)
         d = Particle diameter (m)
         rhol = density of the fluid (ton/m3)
@@ -68,7 +67,7 @@ def Vsm(Dp, d, rhol, rhos, musf, Cv, Cvb=0.6, f=None):
 def Erhg(Vls, Dp, d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
     """Return the relative excess head loss
        Assume that Eqn. 6.20-41 is calibrated for musf=0.4, and adjust accordingly
-
+            Vls = average line speed (velocity, m/sec)
             Dp = Pipe diameter (m)
             d = Particle diameter (m)
             epsilon = absolute pipe roughness (m)
@@ -85,7 +84,7 @@ def Erhg(Vls, Dp, d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
 def stratified_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
     """Return the head loss for the Wilson stratified (sliding bed) case
        Assume that Eqn. 6.20-41 is calibrated for musf=0.4, and adjust accordingly
-
+            Vls = average line speed (velocity, m/sec)
             Dp = Pipe diameter (m)
             d = Particle diameter (m)
             epsilon = absolute pipe roughness (m)
