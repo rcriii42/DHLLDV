@@ -23,7 +23,7 @@ except:
 
 if __name__ == '__main__':
     Dp = 0.1524  #Pipe diameter
-    d = 0.25/1000.
+    d = 2.0/1000.
     GSD = {0.15: d / 2.72,
            0.50: d,
            0.85: d * 2.72}
@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
 
     #The im curves
-    im_list = [Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
+    im_list = [graded_Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
     Wilson_Stratified_im_list_50 = [Wilson_Stratified.stratified_head_loss(Vls, Dp, GSD[0.5], epsilon, nu, rhol, rhos, musf, Cv)
                                     for Vls in vls_list]
     Wilson_Stratified_im_list_85 = [Wilson_Stratified.stratified_head_loss(Vls, Dp, GSD[0.85], epsilon, nu, rhol, rhos, musf, Cv)
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     if plt:
         fig = plt.figure(figsize=(11,7.5))
         # log x and y axis
-        Erhg_title = "Erhg for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        Erhg_title = "Erhg for Dp=%0.3fm, d=%0.2fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
         Erhg_plot = fig.add_subplot(211, title=Erhg_title, xlim=(0.001, 1.0), ylim=(0.001, 2))
         Erhg_plot.loglog(il_list, il_list, linewidth=1, linestyle='--', color='blue')
         Erhg_plot.loglog(il_list, Cvt_Erhg_list, linewidth=2, color='red')
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 
         Erhg_plot.grid(b=True, which='both')
 
-        HG_title = "Hydraulic gradient for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        HG_title = "Hydraulic gradient for Dp=%0.3fm, d=%0.2fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
 
         spot10 = vls_list.index(10)
         hg_ymax = max(im_list[spot10], Wilson_Stratified_im_list_85[spot10])
