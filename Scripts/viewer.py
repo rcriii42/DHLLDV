@@ -81,7 +81,7 @@ if __name__ == '__main__':
     if plt:
         fig = plt.figure(figsize=(11,7.5))
         # log x and y axis
-        Erhg_title = "Erhg for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        Erhg_title = "Erhg for Dp=%0.3fm, d=%0.2fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
         Erhg_plot = fig.add_subplot(211, title=Erhg_title, xlim=(0.001, 1.0), ylim=(0.001, 2))
         #Erhg_plot.loglog(il_list, FB_Erhg_list, linewidth=1, linestyle='--', color='c')
         Erhg_plot.loglog(il_list, SB_Erhg_list, linewidth=3, linestyle='--', color='saddlebrown')
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         # Erhg_plot.loglog(il_list, Erhg_list, linewidth=2, color='r')
         Erhg_plot.grid(b=True, which='both')
 
-        HG_title = "Hydraulic gradient for Dp=%0.3fm, d=%0.1fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
+        HG_title = "Hydraulic gradient for Dp=%0.3fm, d=%0.2fmm, Rsd=%0.3f, Cv=%0.3f, rhom=%0.3f"%(Dp, d*1000, Rsd, Cv, rhom)
 
         spot10 = vls_list.index(10)
         hg_ymax = max(SB_im_list[spot10], Cvt_im_list[spot10])
