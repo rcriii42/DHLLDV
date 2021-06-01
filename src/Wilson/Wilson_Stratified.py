@@ -7,14 +7,14 @@ from math import log
 from DHLLDV.homogeneous import fluid_head_loss, swamee_jain_ff, pipe_reynolds_number
 from DHLLDV.DHLLDV_constants import gravity
 
-def Vsm_max(Dp, d, rhol, rhos, musf, f=None):
+def Vsm_max(Dp, d, rhol, rhos, musf=0.4, f=None):
     """Return the maximum velocity at the limit of stationary deposition
-
         Dp = Pipe diameter (m)
         d = Particle diameter (m)
         rhol = density of the fluid (ton/m3)
         rhos = particle density (ton/m3)
-        musf = The oefficient of sliding friction
+        musf = The coefficient of sliding friction, the default value of 0.4 is that used
+               by Wilson et al.
         f =The friction factor, if given use WASC2 Eqn 5.1
     """
     d_mm = d*1000.
@@ -29,7 +29,7 @@ def Vsm_max(Dp, d, rhol, rhos, musf, f=None):
         return top/bottom   # Eqn. 6.20-34
 
 def Cvr_max(Dp, d, rhol, rhos):
-    """Return the relative volume concetration at Vsm_max
+    """Return the relative volume concentration at Vsm_max
 
         Dp = Pipe diameter (m)
         d = Particle diameter (m)
@@ -42,7 +42,7 @@ def Cvr_max(Dp, d, rhol, rhos):
     return min(0.66, max(0.05, Cvrmx))
 
 def Vsm(Dp, d, rhol, rhos, musf, Cv, Cvb=0.6, f=None):
-    """Return the maximum velocity at the limit of stationary deposition
+    """Return the velocity at the limit of stationary deposition
         Dp = Pipe diameter (m)
         d = Particle diameter (m)
         rhol = density of the fluid (ton/m3)
@@ -57,7 +57,7 @@ def Vsm(Dp, d, rhol, rhos, musf, Cv, Cvb=0.6, f=None):
     Cvr = Cv/Cvb
     if Cvrmx <= 0.33:
         alpha = log(0.333)/log(Cvrmx)
-        Vs = Vsmx * 6.75 * Cvr**alpha * (1 - Cvr**alpha)**2 # Eqn. 6.20-36
+        Vs = Vsmx * 6.75 * (Cvr**alpha) * (1 - Cvr**alpha)**2 # Eqn. 6.20-36
     else:
         beta = log(0.666)/log(1-Cvrmx)
         Vs = Vsmx * 6.75 * (1-Cvr)**2*beta * (1-(1-Cvr)**beta)  # Eqn. 6.20-36
