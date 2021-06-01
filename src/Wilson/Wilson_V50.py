@@ -59,7 +59,7 @@ def V50(Dp, d50, d85, epsilon, nu, rhol, rhos):
     v50_last = w50 * sqrt(8/ff_last) * cosh(60*d50/Dp)
     Re = pipe_reynolds_number(v50_last, Dp, nu)
     ff_this = swamee_jain_ff(Re, Dp, epsilon)
-    while int(ff_this*1000) != int(ff_last*1000): #3 digit agreement
+    while int(ff_this*10000) != int(ff_last*10000): #4 digit agreement
         ff_last = ff_this
         v50_last = w50 * sqrt(8 / ff_last) * cosh(60 * d50 / Dp)
         Re = pipe_reynolds_number(v50_last, Dp, nu)
