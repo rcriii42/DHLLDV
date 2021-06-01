@@ -81,6 +81,20 @@ def Erhg(Vls, Dp, d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
     f = swamee_jain_ff(Re, Dp, epsilon)
     return musf/0.4 * (0.55*Vsm(Dp, d, rhol, rhos, musf, Cvt, f=f)/Vls)**0.25 # Eqn. 6.20-41 modified for musf
 
+def stratified_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
+    """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
+       vls = average line speed (velocity, m/sec)
+       Dp = Pipe diameter (m)
+       d = Particle diameter (m)
+       epsilon = absolute pipe roughness (m)
+       nu = fluid kinematic viscosity in m2/sec
+       rhol = density of the fluid (ton/m3)
+       rhos = particle density (ton/m3)
+       Cvs = insitu volume concentration
+       musf = The coefficient of sliding friction
+    """
+    return stratified_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6)*gravity*rhol
+
 def stratified_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
     """Return the head loss for the Wilson stratified (sliding bed) case
        Assume that Eqn. 6.20-41 is calibrated for musf=0.4, and adjust accordingly
