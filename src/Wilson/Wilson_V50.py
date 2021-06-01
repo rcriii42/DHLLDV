@@ -65,7 +65,6 @@ def V50(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos):
 
 def Erhg(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf):
     """Return the relative excess head loss using gthe Wilson V50 model
-       Assume that Eqn. 6.20-41 is calibrated for musf=0.4, and adjust accordingly
             Vls = average line speed (velocity, m/sec)
             Dp = Pipe diameter (m)
             d50 = Median Particle diameter (m)
@@ -80,11 +79,12 @@ def Erhg(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf):
     _V50 - V50(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos)
     return (musf/2)*(_V50/Vls)**_M
 
-def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, musf):
+def heterogeneous_pressure_loss(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, Cvs, musf):
     """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
-       d = Particle diameter (m)
+       d50 = Median Particle diameter (m)
+       d85 = Particle diameter coarser than 85% of the grains by weight
        epsilon = absolute pipe roughness (m)
        nu = fluid kinematic viscosity in m2/sec
        rhol = density of the fluid (ton/m3)
@@ -92,14 +92,15 @@ def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, musf)
        Cvs = insitu volume concentration
        musf = The coefficient of sliding friction
     """
-    return heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, musf)*gravity*rhol
+    return heterogeneous_head_loss(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, Cvs, musf)*gravity*rhol
 
 
-def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, musf):
+def heterogeneous_head_loss(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, Cvs, musf):
     """Return the head loss (m.w.c per m) for (pseudo) heterogeneous flow.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
-       d = Particle diameter (m)
+       d50 = Median Particle diameter (m)
+       d85 = Particle diameter coarser than 85% of the grains by weight
        epsilon = absolute pipe roughness (m)
        nu = fluid kinematic viscosity in m2/sec
        rhol = density of the fluid (ton/m3)
@@ -107,6 +108,6 @@ def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, musf):
        Cvs = insitu volume concentration
        musf = The coefficient of sliding friction
     """
-    il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
+    il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
-    return Erhg(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf)*Rsd*Cvs + il
+    return Erhg(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf)*Rsd*Cvs + il
