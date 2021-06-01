@@ -1,9 +1,11 @@
+"""Tests of the Wilson Stratified flow regime model,
+based on the example and Case Studies in
+Slurry Transport Using Centrifugal Pumps, 2nd ed.,
+by Wilson, Addie, Sellgren and Clift (WASC2)"""
+
 import unittest
 
 from Wilson import Wilson_Stratified
-from DHLLDV import DHLLDV_constants
-from DHLLDV import homogeneous
-
 
 class MyTestCase(unittest.TestCase):
 
@@ -43,6 +45,21 @@ class MyTestCase(unittest.TestCase):
             self.assertAlmostEqual(vsmx, 6.1, delta=0.1)
             vsmx = Wilson_Stratified.Vsm_max(0.65, 0.7 / 1000, .9982, 2.65, f=0.012)
             self.assertAlmostEqual(vsmx, 4.84, delta=0.01)
+
+    def test_HeadLoss_CaseStudy5_2(self):
+        """WASC2 Case Study 5.2, page 118"""
+        im = Wilson_Stratified.stratified_head_loss(4.6, 0.7, 100./1000,
+                                                    79.5e-05,.00109/1020,
+                                                    1.02, 1.790, 0.31, .0714)
+        self.assertAlmostEqual(im, 0.0564, delta=.00026)
+
+    def test_PressureLoss_CaseStudy5_2(self):
+        """WASC2 Case Study 5.2, page 118"""
+        #Note that the viscosity and ep[silon were chosen so that if=0.0314 as in WASC2
+        p = Wilson_Stratified.stratified_pressure_loss(4.6, 0.7, 100./1000, 79.5e-05,
+                                                       0.00109/1020, 1.02, 1.790, 0.31,
+                                                       0.0714)
+        self.assertAlmostEqual(p, 553./1000, delta=.015)
 
 if __name__ == '__main__':
     unittest.main()
