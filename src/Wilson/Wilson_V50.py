@@ -40,11 +40,11 @@ def M(Dp, d50, d85, nu, rhol, rhos):
             rhol = density of the fluid (ton/m3)
             rhos = particle density (ton/m3)
         """
-    return (0.25 + 13 * sigma(Dp, d50, d85, nu, rhol, rhos)**2)**(-0.5)
+    _M = (0.25 + 13 * sigma(Dp, d50, d85, nu, rhol, rhos)**2)**(-0.5)
+    return max(0.25, min(1.7, _M))
 
-def V50(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos):
+def V50(Dp, d50, d85, epsilon, nu, rhol, rhos):
     """Return the V50, the velocity at which half the particles are in contact with the pipe wall
-            Vls = average line speed (velocity, m/sec)
             Dp = Pipe diameter (m)
             d50 = Median Particle diameter (m)
             d85 = Particle diameter coarser than 85% of the grains by weight
@@ -53,10 +53,18 @@ def V50(Vls, Dp, d50, d85, epsilon, nu, rhol, rhos):
             rhol = density of the fluid (ton/m3)
             rhos = particle density (ton/m3)
         """
+
     w50 = w(d50, nu, rhol, rhos)
-    Re = pipe_reynolds_number(Vls, Dp, nu)
-    lamdal = swamee_jain_ff(Re, Dp, epsilon)
-    return w50 * sqrt(8/lamdal) * cosh(60*d50/Dp)
+    ff_last = 0.012
+    v50_last = w50 * sqrt(8/ff_last) * cosh(60*d50/Dp)
+    Re = pipe_reynolds_number(v50_last, Dp, nu)
+    ff_this = swamee_jain_ff(Re, Dp, epsilon)
+    while int(ff_this*1000) != int(ff_last*1000): #3 digit agreement
+        ff_last = ff_this
+        v50_last = w50 * sqrt(8 / ff_last) * cosh(60 * d50 / Dp)
+        Re = pipe_reynolds_number(v50_last, Dp, nu)
+        ff_this = swamee_jain_ff(Re, Dp, epsilon)
+    return w50 * sqrt(8/ff_this) * cosh(60*d50/Dp)
 
 def Erhg(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf):
     """Return the relative excess head loss using gthe Wilson V50 model
@@ -71,7 +79,7 @@ def Erhg(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, musf):
             musf = The coefficient of sliding friction
         """
     _M = M(Dp, d50, d85, nu, rhol, rhos)
-    _V50 = V50(vls, Dp, d50, d85, epsilon, nu, rhol, rhos)
+    _V50 = V50(Dp, d50, d85, epsilon, nu, rhol, rhos)
     return (musf/2)*(_V50/vls)**_M
 
 def heterogeneous_pressure_loss(vls, Dp, d50, d85, epsilon, nu, rhol, rhos, Cvs, musf):
