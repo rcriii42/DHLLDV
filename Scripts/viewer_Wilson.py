@@ -11,7 +11,7 @@ from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
 from DHLLDV import homogeneous
 
-from Wilson import Wilson_Stratified
+from Wilson import Wilson_Stratified, Wilson_V50
 
 #import numpy as np
 try:
@@ -53,6 +53,10 @@ if __name__ == '__main__':
     Wilson_Stratified_ERHG_list_85 = [Wilson_Stratified.Erhg(Vls, Dp, GSD[0.85], epsilon, nu, rhol, rhos, musf, Cv)
                                       for Vls in vls_list]
 
+    #Wilson V50 (heterogeneous)
+    Wilson_V50_ERHG_list = [Wilson_V50.Erhg(Vls, Dp, GSD[0.50], GSD[0.85], epsilon, nu, rhol, rhos, musf)
+                            for Vls in vls_list]
+
 
     #The im curves
     im_list = [graded_Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
@@ -60,6 +64,8 @@ if __name__ == '__main__':
                                     for Vls in vls_list]
     Wilson_Stratified_im_list_85 = [Wilson_Stratified.stratified_head_loss(Vls, Dp, GSD[0.85], epsilon, nu, rhol, rhos, musf, Cv)
                                     for Vls in vls_list]
+    Wilson_v50_im_list = [Wilson_V50.heterogeneous_head_loss(Vls, Dp, GSD[0.50], GSD[0.85], epsilon, nu, rhol, rhos, musf, Cv)
+                          for Vls in vls_list]
 
     if plt:
         fig = plt.figure(figsize=(11,7.5))
@@ -70,7 +76,7 @@ if __name__ == '__main__':
         Erhg_plot.loglog(il_list, Cvt_Erhg_list, linewidth=2, color='red')
         Erhg_plot.loglog(il_list, graded_Cvt_Erhg_list, linewidth=2, linestyle='--', color='red')
         Erhg_plot.loglog(il_list, Wilson_Stratified_ERHG_list_50, linewidth=2, linestyle='--', color='brown')
-        Erhg_plot.loglog(il_list, Wilson_Stratified_ERHG_list_85, linewidth=2, linestyle='dotted', color='brown')
+        Erhg_plot.loglog(il_list, Wilson_V50_ERHG_list, linewidth=2, linestyle='dotted', color='brown')
 
         Erhg_plot.grid(b=True, which='both')
 
@@ -82,7 +88,7 @@ if __name__ == '__main__':
         HG_plot.plot(vls_list, il_list, linewidth=1, linestyle='--', color='blue', label="il")
         HG_plot.plot(vls_list, im_list, linewidth=2, color='red', label="DHLLDV im Graded Cvt")
         HG_plot.plot(vls_list, Wilson_Stratified_im_list_50, linewidth=2, linestyle='--', color='brown', label="Wilson Sliding im D50")
-        HG_plot.plot(vls_list, Wilson_Stratified_im_list_85, linewidth=2, linestyle='dotted', color='brown', label="Wilson Sliding im D85")
+        HG_plot.plot(vls_list, Wilson_v50_im_list, linewidth=2, linestyle='dotted', color='brown', label="Wilson V50 im")
 
         HG_plot.grid(b=True, which='both')
         legend = HG_plot.legend()
