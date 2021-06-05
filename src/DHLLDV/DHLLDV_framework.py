@@ -373,8 +373,8 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     fthis = X
     logdlast = log10(dmin)
     frac_list = [fthis]
-    ds = [10**logdlast]
-    dxs = []
+    ds = [10**logdlast]                 #These are the boundaries of the fractions
+    dxs = []                            #These are the central diameter of the fractions
     while fthis <= (1.0 - frac_size):
         fthis += frac_size
         while fthis > fnext:
