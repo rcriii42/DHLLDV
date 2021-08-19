@@ -40,7 +40,7 @@ def generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
                                 for vls in vls_list],
             }
 
-def generate_im_curves(Erhg_curves, Rsd, Cv):
+def generate_im_curves(Erhg_curves, Rsd, Cv, rhom):
     """Generate the im curves, given the Erhg curves"""
     c = Erhg_curves
     il_list = c['il']
@@ -52,7 +52,7 @@ def generate_im_curves(Erhg_curves, Rsd, Cv):
             'Ho': [c['Ho'][i]*Rsd*Cv+il_list[i] for i in range(200)],
             'Cvt_im': [c['Cvt_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(200)],
             'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)],
-            'graded_Cvt': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)]
+            'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)]
             }
 
 def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     vls_list = [(i+1)/10. for i in range(200)]
 
     Erhg_curves = generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD)
-    im_curves = generate_im_curves(Erhg_curves, Rsd, Cv)
+    im_curves = generate_im_curves(Erhg_curves, Rsd, Cv, rhom)
     LDV_curves = generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos)
     il_list = Erhg_curves['il']
 
@@ -98,7 +98,7 @@ if __name__ == '__main__':
     Ho_im_list = im_curves['Ho']
     Cvt_im_list = im_curves['Cvt_im']
     graded_Cvs_im_list = im_curves['graded_Cvs_im']
-    graded_Cvt_im_list = im_curves['graded_Cvs_im']
+    graded_Cvt_im_list = im_curves['graded_Cvt_im']
     
     #The LDV
     Cv_list = LDV_curves['Cv']
