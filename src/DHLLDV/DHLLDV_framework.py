@@ -360,6 +360,8 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
         else:
             break
     X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
+    if X < 0:
+        X = 0
     rhox = rhol + rhol*(X*Cv*Rsd)/(1-Cv+Cv*X)    # Eqn 8.15-3
     Cv_x = (X*Cv)/(1-Cv+Cv*X)
     Cv_r = (1 - X) * Cv                           # Eqn 8.15-5
