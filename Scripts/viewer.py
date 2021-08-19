@@ -23,7 +23,6 @@ def generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
     """Generate a dict with the Erhg curves"""
     Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in
                      vls_list]
-    Rsd = (rhos - rhol) / rhol
     il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
     # Erhg for the ELM is just the il
     return {'Erhg_objects': Erhg_obj_list,
@@ -56,6 +55,20 @@ def generate_im_curves(Erhg_curves, Rsd, Cv):
             'graded_Cvt': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)]
             }
 
+def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
+    Rsd = (rhos - rhol) / rhol
+    Cv_list = [(i + 1) / 100. for i in range(50)]
+    LDV_vls_list = [DHLLDV_framework.LDV(1, Dp, d, epsilon, nu, rhol, rhos, Cv) for Cv in Cv_list]
+    LDV_il_list = [homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol) for vls in LDV_vls_list]
+    LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], Dp, d, epsilon, nu, rhol, rhos, Cv_list[i]) for i in
+                     range(50)]
+    LDV_im_list = [LDV_Ergh_list[i] * Rsd * Cv_list[i] + LDV_il_list[i] for i in range(50)]
+    return {'Cv': Cv_list,
+            'vls': LDV_vls_list,
+            'il': LDV_il_list,
+            'Erhg': LDV_Ergh_list,
+            'im': LDV_im_list}
+
 if __name__ == '__main__':
     Dp = 0.1524  #Pipe diameter
     d = 0.2/1000.
@@ -73,6 +86,7 @@ if __name__ == '__main__':
 
     Erhg_curves = generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD)
     im_curves = generate_im_curves(Erhg_curves, Rsd, Cv)
+    LDV_curves = generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos)
     il_list = Erhg_curves['il']
 
     #The im curves
@@ -87,11 +101,11 @@ if __name__ == '__main__':
     graded_Cvt_im_list = im_curves['graded_Cvs_im']
     
     #The LDV
-    Cv_list = [(i+1)/100. for i in range(50)]
-    LDV_vls_list = [DHLLDV_framework.LDV(1, Dp, d, epsilon, nu, rhol, rhos, Cv) for Cv in Cv_list]
-    LDV_il_list = [homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol) for vls in LDV_vls_list]
-    LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], Dp, d, epsilon, nu, rhol, rhos, Cv_list[i]) for i in range(50)]
-    LDV_im_list = [LDV_Ergh_list[i]*Rsd*Cv_list[i]+LDV_il_list[i] for i in range(50)]
+    Cv_list = LDV_curves['Cv']
+    LDV_vls_list = LDV_curves['vls']
+    LDV_il_list = LDV_curves['il']
+    LDV_Ergh_list = LDV_curves['Erhg']
+    LDV_im_list = LDV_curves['im']
     
     #regime_list = [Erhg_obj['regime'] for Erhg_obj in Erhg_curves'Erhg_objects'] ]
 
