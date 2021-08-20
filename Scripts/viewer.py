@@ -32,6 +32,7 @@ def generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
             'SB': [Erhg_obj['SB'] for Erhg_obj in Erhg_obj_list],
             'He': [Erhg_obj['He'] for Erhg_obj in Erhg_obj_list],
             'Ho': [Erhg_obj['Ho'] for Erhg_obj in Erhg_obj_list],
+            'Cvs_regime': [Erhg_obj['regime'] for Erhg_obj in Erhg_obj_list],
             'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list],
             'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list],
             'graded_Cvs_Erhg': [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False)
@@ -57,18 +58,21 @@ def generate_im_curves(Erhg_curves, Rsd, Cv, rhom):
             }
 
 def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
+    cv_points = 50
     Rsd = (rhos - rhol) / rhol
-    Cv_list = [(i + 1) / 100. for i in range(50)]
+    Cv_list = [(i + 1) / 100. for i in range(cv_points)]
     LDV_vls_list = [DHLLDV_framework.LDV(1, Dp, d, epsilon, nu, rhol, rhos, Cv) for Cv in Cv_list]
     LDV_il_list = [homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol) for vls in LDV_vls_list]
     LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], Dp, d, epsilon, nu, rhol, rhos, Cv_list[i]) for i in
-                     range(50)]
-    LDV_im_list = [LDV_Ergh_list[i] * Rsd * Cv_list[i] + LDV_il_list[i] for i in range(50)]
+                     range(cv_points)]
+    LDV_im_list = [LDV_Ergh_list[i] * Rsd * Cv_list[i] + LDV_il_list[i] for i in range(cv_points)]
     return {'Cv': Cv_list,
             'vls': LDV_vls_list,
             'il': LDV_il_list,
             'Erhg': LDV_Ergh_list,
-            'im': LDV_im_list}
+            'im': LDV_im_list,
+            'regime': [f'LDV for {d*1000:0.3f} mm particle at {Cv_list[i]}' for i in range(cv_points)]
+            }
 
 if __name__ == '__main__':
     Dp = 0.750  #Pipe diameter
