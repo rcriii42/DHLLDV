@@ -60,9 +60,9 @@ im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
 LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
                                           y=slurry.LDV_curves['im'],
                                           regime=slurry.LDV_curves['regime']))
-
-# Set up plot
-TOOLTIPS = [
+################
+# Set up HQ plot
+HQ_TOOLTIPS = [
     ('name', "$name"),
     ('index', "$index"),
     ("H (m/m)", "$y"),
@@ -72,9 +72,9 @@ TOOLTIPS = [
 HQ_plot = figure(height=450, width=725, title="im curves",
                  tools="crosshair,pan,reset,save,wheel_zoom",
                  x_range=[0, 10], y_range=[0, 0.6],
-                 tooltips=TOOLTIPS)
+                 tooltips=HQ_TOOLTIPS)
 
-HQ_plot.line('x', 'y', source=im_source,
+HQ_plot.line('v', 'graded_Cvt_im', source=im_source,
              color='black',
              line_dash='dashed',
              line_width=3,
