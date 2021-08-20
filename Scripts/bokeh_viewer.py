@@ -58,7 +58,12 @@ plot = figure(height=450, width=725, title="im curves",
               tools="crosshair,pan,reset,save,wheel_zoom",
               x_range=[0, 10], y_range=[0, 0.6])
 
-plot.line('x', 'y', source=im_source, line_width=3, line_alpha=0.6)
+plot.line('x', 'y', source=im_source,
+          color='black',
+          line_dash='dashed',
+          line_width=3,
+          line_alpha=0.6,
+          legend_label='graded Cvt=c')
 
 # Set up widgets
 text = TextInput(title="title", value='my sine wave')
