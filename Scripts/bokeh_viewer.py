@@ -33,12 +33,23 @@ class Slurry():
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         self.rhos = 2.65
         self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
-        self.Rsd = (self.rhos - self.rhol) / self.rhol
+        self.rhoi = 1.92
         self.Cv = 0.175
-        self.rhom = self.Cv * self.Rsd
         self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
         self.generate_GSD()
         self.generate_curves()
+
+    @property
+    def Rsd(self):
+        return (self.rhos - self.rhol) / self.rhol
+
+    @property
+    def Cvi(self):
+        return (self.rhom - self.rhol)/(self.rhoi - self.rhol)
+
+    @property
+    def rhom(self):
+        return self.Cv * self.Rsd
 
     def generate_GSD(self, d15_ratio=2.72, d85_ratio=2.72):
         self.GSD = {0.15: self.d / d15_ratio,
