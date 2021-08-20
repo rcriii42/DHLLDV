@@ -45,11 +45,11 @@ class Slurry():
 
     @property
     def Cvi(self):
-        return (self.rhom - self.rhol)/(self.rhoi - self.rhol)
+        return (self.rhom - self.rhol) / (self.rhoi - self.rhol)
 
     @property
     def rhom(self):
-        return self.Cv * self.Rsd
+        return self.Cv * (self.rhos - self.rhol) + self.rhol
 
     def generate_GSD(self, d15_ratio=2.72, d85_ratio=2.72):
         self.GSD = {0.15: self.d / d15_ratio,
@@ -166,6 +166,8 @@ Erhg_plot.legend.location = "top_left"
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 d_input = TextInput(title="d (mm)", value=f"{slurry.d*1000:0.3f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
+Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
+rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}")
 
 
 # Button to stop the server
@@ -225,7 +227,7 @@ for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-inputs = column(Dp_input, d_input, Cv_input, button)
+inputs = column(Dp_input, d_input, Cv_input, Cvi_input, rhom_input, button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
