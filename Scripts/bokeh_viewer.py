@@ -65,6 +65,8 @@ plot.line('x', 'y', source=im_source,
           line_alpha=0.6,
           legend_label='graded Cvt=c')
 
+plot.legend.location = "top_left"
+
 # Set up widgets
 text = TextInput(title="title", value='my sine wave')
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
