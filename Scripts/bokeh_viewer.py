@@ -76,7 +76,6 @@ plot.line('x', 'y', source=uCvs_source,
 plot.legend.location = "top_left"
 
 # Set up widgets
-text = TextInput(title="title", value='my sine wave')
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 d_input = TextInput(title="d (mm)", value=f"{slurry.d*1000:0.3f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
