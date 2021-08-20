@@ -55,6 +55,7 @@ slurry = Slurry()
 
 im_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im']))
 uCvs_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im']))
+LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im']))
 
 # Set up plot
 plot = figure(height=450, width=725, title="im curves",
@@ -74,6 +75,13 @@ plot.line('x', 'y', source=uCvs_source,
           line_width=3,
           line_alpha=0.6,
           legend_label='uniform Sand Cvs=c')
+
+plot.line('x', 'y', source=LDV50_source,
+          color='magenta',
+          line_dash='solid',
+          line_width=3,
+          line_alpha=0.6,
+          legend_label='LDV D50')
 
 plot.legend.location = "top_left"
 
@@ -124,6 +132,7 @@ def update_data(attrname, old, new):
 
     im_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im'])
     uCvs_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im'])
+    LDV50_source.data = dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im'])
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
