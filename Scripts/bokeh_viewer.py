@@ -67,8 +67,8 @@ LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
 TOOLTIPS = [
     ('name', "$name"),
     ('index', "$index"),
-    ("H (m/m)", "$x"),
-    ("vls (m/sec)", "$y"),
+    ("H (m/m)", "$y"),
+    ("vls (m/sec)", "$x"),
     ("Regime", "@regime")
 ]
 plot = figure(height=450, width=725, title="im curves",
