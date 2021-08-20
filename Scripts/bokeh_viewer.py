@@ -1,17 +1,11 @@
 '''
 bokeh_viewer: a program to view the curves in a bokeh interactive session
 
+Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab in your browser
+
 Added by R. Ramsdell 19 August, 2021
 '''
 
-''' Present an interactive function explorer with slider widgets.
-
-Use the ``bokeh serve`` command to run the example by executing:
-    bokeh serve sliders.py
-at your command prompt. Then navigate to the URL
-    http://localhost:5006/sliders
-in your browser.
-'''
 import sys
 
 from bokeh.io import curdoc
