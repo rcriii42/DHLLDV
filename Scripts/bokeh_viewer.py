@@ -222,6 +222,9 @@ def update_data(attrname, old, new):
                             graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
+    Cvi_input.value = f"{slurry.Cvi:0.3f}"
+    rhom_input.value = f"{slurry.rhom:0.3f}"
+
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
