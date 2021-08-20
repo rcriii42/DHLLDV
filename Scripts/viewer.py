@@ -44,15 +44,16 @@ def generate_im_curves(Erhg_curves, Rsd, Cv, rhom):
     """Generate the im curves, given the Erhg curves"""
     c = Erhg_curves
     il_list = c['il']
-    return {'Cvs_im': [c['Cvs_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'FB': [c['FB'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'SB': [c['SB'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'He': [c['He'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'ELM': [il_list[i]*rhom for i in range(200)],
-            'Ho': [c['Ho'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'Cvt_im': [c['Cvt_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(200)],
-            'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)],
-            'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(200)]
+    max_index = len(il_list)
+    return {'Cvs_im': [c['Cvs_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'FB': [c['FB'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'SB': [c['SB'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'He': [c['He'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'ELM': [il_list[i]*rhom for i in range(max_index)],
+            'Ho': [c['Ho'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'Cvt_im': [c['Cvt_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+            'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
+            'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)]
             }
 
 def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
@@ -70,7 +71,7 @@ def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
             'im': LDV_im_list}
 
 if __name__ == '__main__':
-    Dp = 0.1524  #Pipe diameter
+    Dp = 0.750  #Pipe diameter
     d = 0.2/1000.
     GSD = {0.15: d / 2.72,
            0.50: d,
@@ -80,7 +81,7 @@ if __name__ == '__main__':
     rhos = 2.65
     rhol = 1.0248103  # DHLLDV_constants.water_density[20]
     Rsd = (rhos - rhol)/rhol
-    Cv = 0.175
+    Cv = 0.24
     rhom = Cv*(rhos-rhol)+rhol
     vls_list = [(i+1)/10. for i in range(200)]
 
