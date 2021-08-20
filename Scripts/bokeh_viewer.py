@@ -14,13 +14,10 @@ in your browser.
 '''
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, Slider, TextInput
+from bokeh.models import ColumnDataSource, TextInput
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
-from DHLLDV import DHLLDV_framework
-from DHLLDV import homogeneous
-
 import viewer
 
 
@@ -45,7 +42,6 @@ LDV_curves = viewer.generate_LDV_curves(Dp, GSD[0.5], epsilon, nu, rhol, rhos)
 
 im_source = ColumnDataSource(data=dict(x=vls_list, y=im_curves['graded_Cvt_im']))
 
-
 # Set up plot
 plot = figure(height=400, width=400, title="im curves",
               tools="crosshair,pan,reset,save,wheel_zoom",
@@ -53,14 +49,11 @@ plot = figure(height=400, width=400, title="im curves",
 
 plot.line('x', 'y', source=im_source, line_width=3, line_alpha=0.6)
 
-
 # Set up widgets
 text = TextInput(title="title", value='my sine wave')
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(Dp*1000):0.0f}")
 d_input = TextInput(title="d (mm)", value=f"{d*1000:0.3f}")
 Cv_input = TextInput(title="Cv", value=f"{Cv:0.3f}")
-#freq = Slider(title="frequency", value=1.0, start=0.1, end=5.1, step=0.1)
-
 
 # Set up callbacks
 def update_title(attrname, old, new):
@@ -81,7 +74,6 @@ def update_data(attrname, old, new):
            0.50: d,
            0.85: d * 2.72}
     Cv = float(Cv_input.value)
-    # k = freq.value
 
     # Generate the new curve
     Erhg_curves = viewer.generate_Erhg_curves(vls_list, Dp, GSD[0.5], epsilon, nu, rhol, rhos, Cv, GSD)
@@ -92,7 +84,6 @@ def update_data(attrname, old, new):
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
-
 
 # Set up layouts and add to document
 inputs = column(text, Dp_input, d_input, Cv_input)
