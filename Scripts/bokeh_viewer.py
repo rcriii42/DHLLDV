@@ -71,35 +71,35 @@ TOOLTIPS = [
     ("vls (m/sec)", "$x"),
     ("Regime", "@regime")
 ]
-plot = figure(height=450, width=725, title="im curves",
-              tools="crosshair,pan,reset,save,wheel_zoom",
-              x_range=[0, 10], y_range=[0, 0.6],
-              tooltips=TOOLTIPS)
+HQ_plot = figure(height=450, width=725, title="im curves",
+                 tools="crosshair,pan,reset,save,wheel_zoom",
+                 x_range=[0, 10], y_range=[0, 0.6],
+                 tooltips=TOOLTIPS)
 
-plot.line('x', 'y', source=im_source,
-          color='black',
-          line_dash='dashed',
-          line_width=3,
-          line_alpha=0.6,
-          legend_label='graded Sand Cvt=c')
+HQ_plot.line('x', 'y', source=im_source,
+             color='black',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='graded Sand Cvt=c')
 
-plot.line('x', 'y', source=uCvs_source,
-          color='red',
-          line_dash='solid',
-          line_width=3,
-          line_alpha=0.6,
-          legend_label='uniform Sand Cvs=c')
+HQ_plot.line('x', 'y', source=uCvs_source,
+             color='red',
+             line_dash='solid',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvs=c')
 
-plot.line('x', 'y', source=LDV50_source,
-          color='magenta',
-          line_dash='solid',
-          line_width=3,
-          line_alpha=0.6,
-          legend_label='LDV D50')
+HQ_plot.line('x', 'y', source=LDV50_source,
+             color='magenta',
+             line_dash='solid',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='LDV D50')
 
-plot.xaxis[0].axis_label = 'Velocity (m/sec)'
-plot.yaxis[0].axis_label = 'Head (m/m)'
-plot.legend.location = "top_left"
+HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
+HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
+HQ_plot.legend.location = "top_left"
 
 # Set up widgets
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
@@ -159,5 +159,5 @@ for w in [Dp_input, d_input, Cv_input]:
 # Set up layouts and add to document
 inputs = column(Dp_input, d_input, Cv_input, button)
 
-curdoc().add_root(row(inputs, plot, width=800))
+curdoc().add_root(row(inputs, HQ_plot, width=800))
 curdoc().title = "im_Curves"
