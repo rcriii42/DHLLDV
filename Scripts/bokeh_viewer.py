@@ -53,14 +53,28 @@ class Slurry():
                                                      self.nu, self.rhol, self.rhos)
 slurry = Slurry()
 
-im_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im']))
-uCvs_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im']))
-LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im']))
+im_source = ColumnDataSource(data=dict(x=slurry.vls_list,
+                                       y=slurry.im_curves['graded_Cvt_im'],
+                                       regime=slurry.Erhg_curves['Cvs_regime']))
+uCvs_source = ColumnDataSource(data=dict(x=slurry.vls_list,
+                                         y=slurry.im_curves['Cvs_im'],
+                                         regime=slurry.Erhg_curves['Cvs_regime']))
+LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
+                                          y=slurry.LDV_curves['im'],
+                                          regime=slurry.LDV_curves['regime']))
 
 # Set up plot
+TOOLTIPS = [
+    ('name', "$name"),
+    ('index', "$index"),
+    ("H (m/m)", "$x"),
+    ("vls (m/sec)", "$y"),
+    ("Regime", "@regime")
+]
 plot = figure(height=450, width=725, title="im curves",
               tools="crosshair,pan,reset,save,wheel_zoom",
-              x_range=[0, 10], y_range=[0, 0.6])
+              x_range=[0, 10], y_range=[0, 0.6],
+              tooltips=TOOLTIPS)
 
 plot.line('x', 'y', source=im_source,
           color='black',
@@ -130,9 +144,12 @@ def update_data(attrname, old, new):
     # Generate the new curve
     slurry.generate_curves()
 
-    im_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im'])
-    uCvs_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im'])
-    LDV50_source.data = dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im'])
+    im_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im'],
+                          regime=slurry.Erhg_curves['Cvs_regime'])
+    uCvs_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im'],
+                            regime=slurry.Erhg_curves['Cvs_regime'])
+    LDV50_source.data = dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im'],
+                             regime=slurry.LDV_curves['regime'])
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
