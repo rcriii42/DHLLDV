@@ -54,7 +54,7 @@ slurry = Slurry()
 im_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im']))
 
 # Set up plot
-plot = figure(height=400, width=400, title="im curves",
+plot = figure(height=450, width=725, title="im curves",
               tools="crosshair,pan,reset,save,wheel_zoom",
               x_range=[0, 10], y_range=[0, 0.6])
 
