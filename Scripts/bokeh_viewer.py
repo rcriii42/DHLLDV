@@ -64,9 +64,8 @@ LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
 # Set up HQ plot
 HQ_TOOLTIPS = [
     ('name', "$name"),
-    ('index', "$index"),
-    ("H (m/m)", "$y"),
     ("vls (m/sec)", "$x"),
+    ("H (m/m)", "$y"),
     ("Regime", "@regime")
 ]
 HQ_plot = figure(height=450, width=725, title="im curves",
@@ -79,21 +78,24 @@ HQ_plot.line('v', 'graded_Cvt_im', source=im_source,
              line_dash='dashed',
              line_width=3,
              line_alpha=0.6,
-             legend_label='graded Sand Cvt=c')
+             legend_label='graded Sand Cvt=c',
+             name='graded Sand Cvt=c')
 
 HQ_plot.line('v', 'Cvs_im', source=im_source,
              color='red',
              line_dash='solid',
              line_width=3,
              line_alpha=0.6,
-             legend_label='uniform Sand Cvs=c')
+             legend_label='uniform Sand Cvs=c',
+             name='uniform Sand Cvs=c')
 
 HQ_plot.line('x', 'y', source=LDV50_source,
              color='magenta',
              line_dash='solid',
              line_width=3,
              line_alpha=0.6,
-             legend_label='LDV D50')
+             legend_label='LDV D50',
+             name='LDV D50')
 
 HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
