@@ -97,6 +97,8 @@ plot.line('x', 'y', source=LDV50_source,
           line_alpha=0.6,
           legend_label='LDV D50')
 
+plot.xaxis[0].axis_label = 'Velocity (m/sec)'
+plot.yaxis[0].axis_label = 'Head (m/m)'
 plot.legend.location = "top_left"
 
 # Set up widgets
