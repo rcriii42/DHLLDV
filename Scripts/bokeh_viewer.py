@@ -53,12 +53,10 @@ class Slurry():
                                                      self.nu, self.rhol, self.rhos)
 slurry = Slurry()
 
-im_source = ColumnDataSource(data=dict(x=slurry.vls_list,
-                                       y=slurry.im_curves['graded_Cvt_im'],
+im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
+                                       graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
+                                       Cvs_im=slurry.im_curves['Cvs_im'],
                                        regime=slurry.Erhg_curves['Cvs_regime']))
-uCvs_source = ColumnDataSource(data=dict(x=slurry.vls_list,
-                                         y=slurry.im_curves['Cvs_im'],
-                                         regime=slurry.Erhg_curves['Cvs_regime']))
 LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
                                           y=slurry.LDV_curves['im'],
                                           regime=slurry.LDV_curves['regime']))
@@ -83,7 +81,7 @@ HQ_plot.line('x', 'y', source=im_source,
              line_alpha=0.6,
              legend_label='graded Sand Cvt=c')
 
-HQ_plot.line('x', 'y', source=uCvs_source,
+HQ_plot.line('v', 'Cvs_im', source=im_source,
              color='red',
              line_dash='solid',
              line_width=3,
@@ -100,6 +98,12 @@ HQ_plot.line('x', 'y', source=LDV50_source,
 HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
 HQ_plot.legend.location = "top_left"
+
+######
+# Set up Erhg Plot
+
+
+
 
 # Set up widgets
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
@@ -146,10 +150,11 @@ def update_data(attrname, old, new):
     # Generate the new curve
     slurry.generate_curves()
 
-    im_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im'],
-                          regime=slurry.Erhg_curves['Cvs_regime'])
-    uCvs_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['Cvs_im'],
-                            regime=slurry.Erhg_curves['Cvs_regime'])
+    im_source.data = data=dict(v=slurry.vls_list,
+                               graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
+                               Cvs_im=slurry.im_curves['Cvs_im'],
+                               regime=slurry.Erhg_curves['Cvs_regime'])
+
     LDV50_source.data = dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im'],
                              regime=slurry.LDV_curves['regime'])
 
