@@ -207,7 +207,7 @@ def update_data(attrname, old, new):
                              regime=slurry.LDV_curves['regime'])
     Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
                             graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
-                            Cvs=slurry.im_curves['Cvs_Erhg'],
+                            Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
 
 for w in [Dp_input, d_input, Cv_input]:
