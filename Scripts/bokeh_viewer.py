@@ -57,9 +57,15 @@ im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
                                        graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                        Cvs_im=slurry.im_curves['Cvs_im'],
                                        regime=slurry.Erhg_curves['Cvs_regime']))
-LDV50_source = ColumnDataSource(data=dict(x=slurry.LDV_curves['vls'],
-                                          y=slurry.LDV_curves['im'],
+LDV50_source = ColumnDataSource(data=dict(v=slurry.LDV_curves['vls'],
+                                          im=slurry.LDV_curves['im'],
+                                          il=slurry.LDV_curves['il'],
+                                          Erhg=slurry.LDV_curves['Erhg'],
                                           regime=slurry.LDV_curves['regime']))
+Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
+                                         graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
+                                         Cvs=slurry.Erhg_curves['Cvs_Erhg'],
+                                         regime=slurry.Erhg_curves['Cvs_regime']))
 ################
 # Set up HQ plot
 HQ_TOOLTIPS = [
@@ -89,7 +95,7 @@ HQ_plot.line('v', 'Cvs_im', source=im_source,
              legend_label='uniform Sand Cvs=c',
              name='uniform Sand Cvs=c')
 
-HQ_plot.line('x', 'y', source=LDV50_source,
+HQ_plot.line('v', 'im', source=LDV50_source,
              color='magenta',
              line_dash='solid',
              line_width=3,
@@ -103,7 +109,45 @@ HQ_plot.legend.location = "top_left"
 
 ######
 # Set up Erhg Plot
+Erhg_TOOLTIPS = [
+    ('name', "$name"),
+    ("il (m/m", "$x"),
+    ("Erhg (-)", "$y"),
+    ("Regime", "@regime")
+]
+Erhg_plot = figure(height=450, width=725, title="Erhg Curves",
+                 tools="crosshair,pan,reset,save,wheel_zoom",
+                 x_range=[0.001, 1.0], y_range=[0.001, 1.2],
+                 x_axis_type='log', y_axis_type='log',
+                 tooltips=Erhg_TOOLTIPS)
 
+Erhg_plot.line('il', 'graded_Cvt', source=Erhg_source,
+             color='black',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='graded Sand Cvt=c',
+             name='graded Sand Cvt=c')
+
+Erhg_plot.line('il', 'Cvs', source=Erhg_source,
+             color='red',
+             line_dash='solid',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvs=c',
+             name='uniform Sand Cvs=c')
+
+Erhg_plot.line('il', 'Erhg', source=LDV50_source,
+             color='magenta',
+             line_dash='solid',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='LDV D50',
+             name='LDV D50')
+
+Erhg_plot.xaxis[0].axis_label = 'Hydraulic Gradient il (m/m)'
+Erhg_plot.yaxis[0].axis_label = 'Relative Excess Hydraulic Gradient Erhg (-)'
+Erhg_plot.legend.location = "top_left"
 
 
 
@@ -156,15 +200,22 @@ def update_data(attrname, old, new):
                                graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                Cvs_im=slurry.im_curves['Cvs_im'],
                                regime=slurry.Erhg_curves['Cvs_regime'])
-
-    LDV50_source.data = dict(x=slurry.LDV_curves['vls'], y=slurry.LDV_curves['im'],
+    LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
+                             im=slurry.LDV_curves['im'],
+                             il=slurry.LDV_curves['il'],
+                             Erhg=slurry.LDV_curves['Erhg'],
                              regime=slurry.LDV_curves['regime'])
+    Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
+                            graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
+                            Cvs=slurry.im_curves['Cvs_Erhg'],
+                            regime=slurry.Erhg_curves['Cvs_regime'])
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
 inputs = column(Dp_input, d_input, Cv_input, button)
+plots = column(HQ_plot, Erhg_plot)
 
-curdoc().add_root(row(inputs, HQ_plot, width=800))
+curdoc().add_root(row(inputs, plots, width=800))
 curdoc().title = "im_Curves"
