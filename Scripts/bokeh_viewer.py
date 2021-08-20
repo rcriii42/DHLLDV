@@ -22,25 +22,36 @@ import viewer
 
 
 # Set up data
-max_index = 100
-Dp = 0.1524  # Pipe diameter
-d = 0.2 / 1000.
-GSD = {0.15: d / 2.72,
-       0.50: d,
-       0.85: d * 2.72}
-epsilon = DHLLDV_constants.steel_roughness
-nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
-rhos = 2.65
-rhol = 1.0248103  # DHLLDV_constants.water_density[20]
-Rsd = (rhos - rhol) / rhol
-Cv = 0.175
-rhom = Cv * (rhos - rhol) + rhol
-vls_list = [(i + 1) / 10. for i in range(max_index)]
-Erhg_curves = viewer.generate_Erhg_curves(vls_list, Dp, GSD[0.5], epsilon, nu, rhol, rhos, Cv, GSD)
-im_curves = viewer.generate_im_curves(Erhg_curves, Rsd, Cv, rhom)
-LDV_curves = viewer.generate_LDV_curves(Dp, GSD[0.5], epsilon, nu, rhol, rhos)
+class Slurry():
+    def __init__(self):
+        self.max_index = 100
+        self.Dp = 0.1524  # Pipe diameter
+        self.d = 0.2 / 1000.
+        self.epsilon = DHLLDV_constants.steel_roughness
+        self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
+        self.rhos = 2.65
+        self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
+        self.Rsd = (self.rhos - self.rhol) / self.rhol
+        self.Cv = 0.175
+        self.rhom = self.Cv * self.Rsd
+        self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
+        self.generate_GSD()
+        self.generate_curves()
 
-im_source = ColumnDataSource(data=dict(x=vls_list, y=im_curves['graded_Cvt_im']))
+    def generate_GSD(self, d15_ratio=2.72, d85_ratio=2.72):
+        self.GSD = {0.15: self.d / d15_ratio,
+                    0.50: self.d,
+                    0.85: self.d * d85_ratio}
+
+    def generate_curves(self):
+        self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.GSD[0.5], self.epsilon,
+                                                       self.nu, self.rhol, self.rhos, self.Cv, self.GSD)
+        self.im_curves = viewer.generate_im_curves(self.Erhg_curves, self.Rsd, self.Cv, self.rhom)
+        self.LDV_curves = viewer.generate_LDV_curves(self.Dp, self.GSD[0.5], self.epsilon,
+                                                     self.nu, self.rhol, self.rhos)
+slurry = Slurry()
+
+im_source = ColumnDataSource(data=dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im']))
 
 # Set up plot
 plot = figure(height=400, width=400, title="im curves",
@@ -51,9 +62,9 @@ plot.line('x', 'y', source=im_source, line_width=3, line_alpha=0.6)
 
 # Set up widgets
 text = TextInput(title="title", value='my sine wave')
-Dp_input = TextInput(title="Dp (mm)", value=f"{int(Dp*1000):0.0f}")
-d_input = TextInput(title="d (mm)", value=f"{d*1000:0.3f}")
-Cv_input = TextInput(title="Cv", value=f"{Cv:0.3f}")
+Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
+d_input = TextInput(title="d (mm)", value=f"{slurry.d*1000:0.3f}")
+Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 
 # Set up callbacks
 def update_title(attrname, old, new):
@@ -61,26 +72,40 @@ def update_title(attrname, old, new):
 
 text.on_change('value', update_title)
 
-def check_value(min, max, prev):
-    """Check and update or reset the value"""
-    pass
+def check_value(widget, min, max, prev, fmt):
+    """Check and update or reset the value
+
+    widget: The widget whose value to check
+    min, max: minimum and maximum values of the input
+    prev: The previous value (to reset of out of bounds)
+    fmt: The format of the value in the widget (for resetting)"""
+    print(f"{widget.title}: New: {float(widget.value):{fmt}}, Bounds:{min} - {max}, Was:{prev:{fmt}}")
+    try:
+        new = float(widget.value)
+    except ValueError:
+        print(f"{widget.title}: non numeric input")
+        widget.value = f"{prev:{fmt}}"
+        return prev
+    if min <= new <= max:
+        return new
+    else:
+        print(f"{widget.title}: value out of range")
+        widget.value = f"{prev:{fmt}}"
+        return prev
 
 def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
-    Dp = float(Dp_input.value)/1000
-    d = float(d_input.value)/1000
-    GSD = {0.15: d / 2.72,
-           0.50: d,
-           0.85: d * 2.72}
-    Cv = float(Cv_input.value)
+    Dp1 = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
+    slurry.Dp = Dp1
+    slurry.d = float(d_input.value)/1000
+    slurry.generate_GSD()
+    slurry.Cv = float(Cv_input.value)
 
     # Generate the new curve
-    Erhg_curves = viewer.generate_Erhg_curves(vls_list, Dp, GSD[0.5], epsilon, nu, rhol, rhos, Cv, GSD)
-    im_curves = viewer.generate_im_curves(Erhg_curves, Rsd, Cv, rhom)
-    LDV_curves = viewer.generate_LDV_curves(Dp, GSD[0.5], epsilon, nu, rhol, rhos)
+    slurry.generate_curves()
 
-    im_source.data = dict(x=vls_list, y=im_curves['graded_Cvt_im'])
+    im_source.data = dict(x=slurry.vls_list, y=slurry.im_curves['graded_Cvt_im'])
 
 for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
