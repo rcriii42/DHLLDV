@@ -12,9 +12,11 @@ at your command prompt. Then navigate to the URL
     http://localhost:5006/sliders
 in your browser.
 '''
+import sys
+
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput
+from bokeh.models import ColumnDataSource, TextInput, Button
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
@@ -80,11 +82,13 @@ Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 d_input = TextInput(title="d (mm)", value=f"{slurry.d*1000:0.3f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 
-# Set up callbacks
-def update_title(attrname, old, new):
-    plot.title.text = text.value
 
-text.on_change('value', update_title)
+# Button to stop the server
+def button_callback():
+    sys.exit()  # Stop the server
+button = Button(label="Stop", button_type="success")
+button.on_click(button_callback)
+
 
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
@@ -125,7 +129,7 @@ for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-inputs = column(text, Dp_input, d_input, Cv_input)
+inputs = column(Dp_input, d_input, Cv_input, button)
 
 curdoc().add_root(row(inputs, plot, width=800))
 curdoc().title = "im_Curves"
