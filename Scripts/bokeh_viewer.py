@@ -79,7 +79,7 @@ def check_value(widget, min, max, prev, fmt):
     min, max: minimum and maximum values of the input
     prev: The previous value (to reset of out of bounds)
     fmt: The format of the value in the widget (for resetting)"""
-    print(f"{widget.title}: New: {float(widget.value):{fmt}}, Bounds:{min} - {max}, Was:{prev:{fmt}}")
+    print(f"{widget.title}: New: {widget.value}, Bounds:{min} - {max}, Was:{prev:{fmt}}")
     try:
         new = float(widget.value)
     except ValueError:
@@ -96,11 +96,10 @@ def check_value(widget, min, max, prev, fmt):
 def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
-    Dp1 = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
-    slurry.Dp = Dp1
-    slurry.d = float(d_input.value)/1000
+    slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
+    slurry.d = check_value(d_input, 0.08, slurry.Dp*1000*0.25, slurry.d*1000, '0.3f')/1000
     slurry.generate_GSD()
-    slurry.Cv = float(Cv_input.value)
+    slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
     # Generate the new curve
     slurry.generate_curves()
