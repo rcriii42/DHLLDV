@@ -100,6 +100,7 @@ slurry = Slurry()
 im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
                                        graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                        Cvs_im=slurry.im_curves['Cvs_im'],
+                                       Cvt_im=slurry.im_curves['Cvt_im'],
                                        regime=slurry.Erhg_curves['Cvs_regime']))
 LDV50_source = ColumnDataSource(data=dict(v=slurry.LDV_curves['vls'],
                                           im=slurry.LDV_curves['im'],
@@ -109,6 +110,7 @@ LDV50_source = ColumnDataSource(data=dict(v=slurry.LDV_curves['vls'],
 Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                                          Cvs=slurry.Erhg_curves['Cvs_Erhg'],
+                                         Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 ################
 # Set up HQ plot
@@ -138,6 +140,14 @@ HQ_plot.line('v', 'Cvs_im', source=im_source,
              line_alpha=0.6,
              legend_label='uniform Sand Cvs=c',
              name='uniform Sand Cvs=c')
+
+HQ_plot.line('v', 'Cvt_im', source=im_source,
+             color='green',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvt=c',
+             name='uniform Sand Cvt=c')
 
 HQ_plot.line('v', 'im', source=LDV50_source,
              color='magenta',
@@ -183,6 +193,14 @@ Erhg_plot.line('il', 'Cvs', source=Erhg_source,
              line_alpha=0.6,
              legend_label='uniform Sand Cvs=c',
              name='uniform Sand Cvs=c')
+
+Erhg_plot.line('il', 'Cvt', source=Erhg_source,
+             color='green',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvt=c',
+             name='uniform Sand Cvt=c')
 
 Erhg_plot.line('il', 'Erhg', source=LDV50_source,
              color='magenta',
@@ -284,6 +302,7 @@ def update_data(attrname, old, new):
     im_source.data = data=dict(v=slurry.vls_list,
                                graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                Cvs_im=slurry.im_curves['Cvs_im'],
+                               Cvt_im=slurry.im_curves['Cvt_im'],
                                regime=slurry.Erhg_curves['Cvs_regime'])
     LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
                              im=slurry.LDV_curves['im'],
@@ -293,6 +312,7 @@ def update_data(attrname, old, new):
     Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
                             graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
+                            Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
@@ -301,7 +321,6 @@ def update_data(attrname, old, new):
     silt_input.value = f"{slurry.silt * 1000:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
-
 
 for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
