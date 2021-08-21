@@ -201,7 +201,6 @@ Erhg_plot.legend.location = "top_left"
 
 ######
 # Set up GSD Plot
-print(slurry.GSD)
 percents = sorted(list(slurry.GSD.keys()))
 GSD_source = ColumnDataSource(data=dict(p=percents,
                                         dia=[slurry.GSD[pct]*1000 for pct in percents]))
@@ -294,6 +293,11 @@ def update_data(attrname, old, new):
                             regime=slurry.Erhg_curves['Cvs_regime'])
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
+    D85_input.value = f"{slurry.GSD[0.85] * 1000:0.3f}"
+    D15_input.value = f"{slurry.GSD[0.15] * 1000:0.3f}"
+    silt_input.value = f"{slurry.silt * 1000:0.3f}"
+    percents = sorted(list(slurry.GSD.keys()))
+    GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
 
 
 for w in [Dp_input, D50_input, Cv_input]:
