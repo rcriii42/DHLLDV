@@ -293,6 +293,7 @@ def update_fluid(index):
                                  graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                  Cvs_im=slurry.im_curves['Cvs_im'],
                                  Cvt_im=slurry.im_curves['Cvt_im'],
+                                 il=slurry.im_curves['il'],
                                  regime=slurry.Erhg_curves['Cvs_regime'])
     LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
                              im=slurry.LDV_curves['im'],
@@ -364,6 +365,7 @@ def update_data(attrname, old, new):
                                graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                Cvs_im=slurry.im_curves['Cvs_im'],
                                Cvt_im=slurry.im_curves['Cvt_im'],
+                               il=slurry.im_curves['il'],
                                regime=slurry.Erhg_curves['Cvs_regime'])
     LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
                              im=slurry.LDV_curves['im'],
