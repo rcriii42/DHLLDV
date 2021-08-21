@@ -11,7 +11,7 @@ from math import log10
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Label
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Spacer
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
@@ -419,7 +419,17 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(fluid_radio, fluid_properties, GSD_inputs, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
+inputs = column(fluid_radio,
+                fluid_properties,           # A row of text boxes
+                Spacer(background='lightblue', height=5),
+                GSD_inputs,                 # A row of text boxes
+                GSD_plot,
+                Spacer(background='lightblue', height=5),
+                Dp_input,
+                Cv_input,
+                Cvi_input,
+                rhom_input,
+                button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
