@@ -398,6 +398,11 @@ def update_data(attrname, old, new):
                              il=slurry.LDV_curves['il'],
                              Erhg=slurry.LDV_curves['Erhg'],
                              regime=slurry.LDV_curves['regime'])
+    LDV85_source.data = dict(v=slurry.LDV85_curves['vls'],
+                                              im=slurry.LDV85_curves['im'],
+                                              il=slurry.LDV85_curves['il'],
+                                              Erhg=slurry.LDV85_curves['Erhg'],
+                                              regime=slurry.LDV85_curves['regime'])
     Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
                             graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
