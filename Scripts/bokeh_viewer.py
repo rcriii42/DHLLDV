@@ -11,7 +11,7 @@ from math import log10
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Spinner
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Label
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
@@ -158,6 +158,8 @@ def update_source_data():
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
+    viscosity_label.value=f"{slurry.nu:0.4e}"
+    density_label.value=f"{slurry.rhol:0.4f}"
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
@@ -341,6 +343,9 @@ def update_fluid(index):
 
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
 fluid_radio.on_click(update_fluid)
+viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}", width=100)
+density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}", width=100)
+fluid_properties = row(viscosity_label, density_label)
 
 # Button to stop the server
 def button_callback():
@@ -414,7 +419,7 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(fluid_radio, GSD_inputs, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
+inputs = column(fluid_radio, fluid_properties, GSD_inputs, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
