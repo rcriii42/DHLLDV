@@ -24,7 +24,7 @@ class Slurry():
     def __init__(self):
         self.max_index = 100
         self.Dp = 0.1524  # Pipe diameter
-        self.d = 0.2 / 1000.
+        self.D50 = 0.2 / 1000.
         self.epsilon = DHLLDV_constants.steel_roughness
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         self.rhos = 2.65
@@ -48,9 +48,9 @@ class Slurry():
         return self.Cv * (self.rhos - self.rhol) + self.rhol
 
     def generate_GSD(self, d15_ratio=2.72, d85_ratio=2.72):
-        self.GSD = {0.15: self.d / d15_ratio,
-                    0.50: self.d,
-                    0.85: self.d * d85_ratio}
+        self.GSD = {0.15: self.D50 / d15_ratio,
+                    0.50: self.D50,
+                    0.85: self.D50 * d85_ratio}
         # The limiting diameter for pseudoliquid and it's fraction X
         dmin = pseudo_dlim(self.Dp, self.nu, self.rhol, self.rhos)
         fracs = iter(sorted(self.GSD, key=lambda key: self.GSD[key]))
@@ -215,7 +215,7 @@ GSD_plot.xgrid.minor_grid_line_alpha=0.1
 # Set up widgets
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 
-D50_input = TextInput(title="d (mm)", value=f"{slurry.d * 1000:0.3f}")
+D50_input = TextInput(title="d (mm)", value=f"{slurry.D50 * 1000:0.3f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
 rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}")
@@ -253,7 +253,7 @@ def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
-    slurry.d = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.d * 1000, '0.3f') / 1000
+    slurry.D50 = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.D50 * 1000, '0.3f') / 1000
     slurry.generate_GSD()
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
