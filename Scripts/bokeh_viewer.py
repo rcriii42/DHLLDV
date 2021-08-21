@@ -109,6 +109,8 @@ class Slurry():
         self.im_curves = viewer.generate_im_curves(self.Erhg_curves, self.Rsd, self.Cv, self.rhom)
         self.LDV_curves = viewer.generate_LDV_curves(self.Dp, self.GSD[0.5], self.epsilon,
                                                      self.nu, self.rhol, self.rhos)
+        self.LDV85_curves = viewer.generate_LDV_curves(self.Dp, self.GSD[0.85], self.epsilon,
+                                                       self.nu, self.rhol, self.rhos)
 slurry = Slurry()
 
 im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
@@ -122,6 +124,11 @@ LDV50_source = ColumnDataSource(data=dict(v=slurry.LDV_curves['vls'],
                                           il=slurry.LDV_curves['il'],
                                           Erhg=slurry.LDV_curves['Erhg'],
                                           regime=slurry.LDV_curves['regime']))
+LDV85_source = ColumnDataSource(data=dict(v=slurry.LDV85_curves['vls'],
+                                          im=slurry.LDV85_curves['im'],
+                                          il=slurry.LDV85_curves['il'],
+                                          Erhg=slurry.LDV85_curves['Erhg'],
+                                          regime=slurry.LDV85_curves['regime']))
 Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                                          Cvs=slurry.Erhg_curves['Cvs_Erhg'],
@@ -179,6 +186,13 @@ HQ_plot.line('v', 'im', source=LDV50_source,
              line_alpha=0.6,
              legend_label='LDV D50',
              name='LDV D50')
+HQ_plot.line('v', 'im', source=LDV85_source,
+             color='magenta',
+             line_dash='dashed',
+             line_width=1,
+             line_alpha=0.6,
+             legend_label='LDV D85',
+             name='LDV D85')
 
 HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
@@ -240,6 +254,13 @@ Erhg_plot.line('il', 'Erhg', source=LDV50_source,
              line_alpha=0.6,
              legend_label='LDV D50',
              name='LDV D50')
+Erhg_plot.line('il', 'Erhg', source=LDV85_source,
+             color='magenta',
+             line_dash='dashed',
+             line_width=1,
+             line_alpha=0.6,
+             legend_label='LDV D85',
+             name='LDV D85')
 
 Erhg_plot.xaxis[0].axis_label = 'Hydraulic Gradient il (m/m)'
 Erhg_plot.yaxis[0].axis_label = 'Relative Excess Hydraulic Gradient Erhg (-)'
@@ -300,6 +321,11 @@ def update_fluid(index):
                              il=slurry.LDV_curves['il'],
                              Erhg=slurry.LDV_curves['Erhg'],
                              regime=slurry.LDV_curves['regime'])
+    LDV85_source.data = dict(v=slurry.LDV85_curves['vls'],
+                             im=slurry.LDV85_curves['im'],
+                             il=slurry.LDV85_curves['il'],
+                             Erhg=slurry.LDV85_curves['Erhg'],
+                             regime=slurry.LDV85_curves['regime'])
     Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
                             graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
