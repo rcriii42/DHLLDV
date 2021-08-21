@@ -289,7 +289,7 @@ def update_fluid(index):
         slurry.fluid = 'salt'
 
     slurry.generate_curves()
-    im_source.data = data = dict(v=slurry.vls_list,
+    im_source.data = dict(v=slurry.vls_list,
                                  graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                  Cvs_im=slurry.im_curves['Cvs_im'],
                                  Cvt_im=slurry.im_curves['Cvt_im'],
@@ -361,7 +361,7 @@ def update_data(attrname, old, new):
     # Generate the new curve
     slurry.generate_curves()
 
-    im_source.data = data=dict(v=slurry.vls_list,
+    im_source.data =dict(v=slurry.vls_list,
                                graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                Cvs_im=slurry.im_curves['Cvs_im'],
                                Cvt_im=slurry.im_curves['Cvt_im'],
