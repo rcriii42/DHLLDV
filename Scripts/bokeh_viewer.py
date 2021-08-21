@@ -217,9 +217,9 @@ GSD_plot = figure(height=280, width=450, title="Grain Size Distribution",
                  tooltips=GSD_TOOLTIPS)
 
 GSD_plot.line('dia', 'p', source=GSD_source,
-             color='black',
-             line_dash='dashed',
-             line_width=3,
+             color='blue',
+             line_dash='solid',
+             line_width=1,
              line_alpha=0.6,
              #legend_label='Grain Size Distribution',
              name='GSD')
