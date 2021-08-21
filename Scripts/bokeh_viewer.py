@@ -134,6 +134,35 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
+
+def update_source_data():
+    slurry.generate_curves()
+    im_source.data = dict(v=slurry.vls_list,
+                          graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
+                          Cvs_im=slurry.im_curves['Cvs_im'],
+                          Cvt_im=slurry.im_curves['Cvt_im'],
+                          il=slurry.im_curves['il'],
+                          regime=slurry.Erhg_curves['Cvs_regime'])
+    LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
+                             im=slurry.LDV_curves['im'],
+                             il=slurry.LDV_curves['il'],
+                             Erhg=slurry.LDV_curves['Erhg'],
+                             regime=slurry.LDV_curves['regime'])
+    LDV85_source.data = dict(v=slurry.LDV85_curves['vls'],
+                             im=slurry.LDV85_curves['im'],
+                             il=slurry.LDV85_curves['il'],
+                             Erhg=slurry.LDV85_curves['Erhg'],
+                             regime=slurry.LDV85_curves['regime'])
+    Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
+                            graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
+                            Cvs=slurry.Erhg_curves['Cvs_Erhg'],
+                            Cvt=slurry.Erhg_curves['Cvt_Erhg'],
+                            regime=slurry.Erhg_curves['Cvs_regime'])
+    Cvi_input.value = f"{slurry.Cvi:0.3f}"
+    rhom_input.value = f"{slurry.rhom:0.3f}"
+    percents = sorted(list(slurry.GSD.keys()))
+    GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
+
 ################
 # Set up HQ plot
 HQ_TOOLTIPS = [
@@ -308,31 +337,7 @@ def update_fluid(index):
         slurry.fluid = 'fresh'
     else:
         slurry.fluid = 'salt'
-
-    slurry.generate_curves()
-    im_source.data = dict(v=slurry.vls_list,
-                                 graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
-                                 Cvs_im=slurry.im_curves['Cvs_im'],
-                                 Cvt_im=slurry.im_curves['Cvt_im'],
-                                 il=slurry.im_curves['il'],
-                                 regime=slurry.Erhg_curves['Cvs_regime'])
-    LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
-                             im=slurry.LDV_curves['im'],
-                             il=slurry.LDV_curves['il'],
-                             Erhg=slurry.LDV_curves['Erhg'],
-                             regime=slurry.LDV_curves['regime'])
-    LDV85_source.data = dict(v=slurry.LDV85_curves['vls'],
-                             im=slurry.LDV85_curves['im'],
-                             il=slurry.LDV85_curves['il'],
-                             Erhg=slurry.LDV85_curves['Erhg'],
-                             regime=slurry.LDV85_curves['regime'])
-    Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
-                            graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
-                            Cvs=slurry.Erhg_curves['Cvs_Erhg'],
-                            Cvt=slurry.Erhg_curves['Cvt_Erhg'],
-                            regime=slurry.Erhg_curves['Cvs_regime'])
-    Cvi_input.value = f"{slurry.Cvi:0.3f}"
-    rhom_input.value = f"{slurry.rhom:0.3f}"
+    update_source_data()
 
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
 fluid_radio.on_click(update_fluid)
@@ -384,34 +389,8 @@ def update_data(attrname, old, new):
     slurry.generate_GSD(d15_ratio=None, d85_ratio=None)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
-    # Generate the new curve
-    slurry.generate_curves()
+    update_source_data()
 
-    im_source.data =dict(v=slurry.vls_list,
-                               graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
-                               Cvs_im=slurry.im_curves['Cvs_im'],
-                               Cvt_im=slurry.im_curves['Cvt_im'],
-                               il=slurry.im_curves['il'],
-                               regime=slurry.Erhg_curves['Cvs_regime'])
-    LDV50_source.data = dict(v=slurry.LDV_curves['vls'],
-                             im=slurry.LDV_curves['im'],
-                             il=slurry.LDV_curves['il'],
-                             Erhg=slurry.LDV_curves['Erhg'],
-                             regime=slurry.LDV_curves['regime'])
-    LDV85_source.data = dict(v=slurry.LDV85_curves['vls'],
-                                              im=slurry.LDV85_curves['im'],
-                                              il=slurry.LDV85_curves['il'],
-                                              Erhg=slurry.LDV85_curves['Erhg'],
-                                              regime=slurry.LDV85_curves['regime'])
-    Erhg_source.data = dict(il=slurry.Erhg_curves['il'],
-                            graded_Cvt=slurry.Erhg_curves['graded_Cvt_Erhg'],
-                            Cvs=slurry.Erhg_curves['Cvs_Erhg'],
-                            Cvt=slurry.Erhg_curves['Cvt_Erhg'],
-                            regime=slurry.Erhg_curves['Cvs_regime'])
-    Cvi_input.value = f"{slurry.Cvi:0.3f}"
-    rhom_input.value = f"{slurry.rhom:0.3f}"
-    percents = sorted(list(slurry.GSD.keys()))
-    GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
 
 for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
