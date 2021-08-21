@@ -253,7 +253,7 @@ Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}")
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}")
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}")
-silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 1000:0.3f}")
+silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
 rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}")
@@ -292,7 +292,7 @@ def update_data(attrname, old, new):
     slurry.GSD[0.85] = check_value(D85_input, slurry.D50*1000, slurry.Dp * 1000 * 0.50, slurry.GSD[0.85]*1000, '0.3f') / 1000
     slurry.D50 = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.D50 * 1000, '0.3f') / 1000
     slurry.GSD[0.15] = check_value(D15_input, 0.06, slurry.D50 * 1000, slurry.GSD[0.15]*1000, '0.3f') / 1000
-    slurry.silt = check_value(silt_input, 0.0, 0.499, slurry.silt, '0.3f')
+    slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f')/100
     slurry.generate_GSD(d15_ratio=None, d85_ratio=None)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
