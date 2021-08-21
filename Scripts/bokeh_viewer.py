@@ -7,6 +7,7 @@ Added by R. Ramsdell 19 August, 2021
 '''
 
 import sys
+from math import log10
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -14,6 +15,7 @@ from bokeh.models import ColumnDataSource, TextInput, Button
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
+from DHLLDV.DHLLDV_framework import pseudo_dlim
 import viewer
 
 
@@ -49,6 +51,24 @@ class Slurry():
         self.GSD = {0.15: self.d / d15_ratio,
                     0.50: self.d,
                     0.85: self.d * d85_ratio}
+        # The limiting diameter for pseudoliquid and it's fraction X
+        dmin = pseudo_dlim(self.Dp, self.nu, self.rhol, self.rhos)
+        fracs = iter(sorted(self.GSD, key=lambda key: self.GSD[key]))
+        flow = next(fracs)
+        dlow = self.GSD[flow]
+        fnext = next(fracs)
+        dnext = self.GSD[fnext]
+        while dmin > dnext:
+            ftemp = next(fracs, None)
+            if ftemp:
+                dlow = dnext
+                flow = fnext
+                fnext = ftemp
+                dnext = self.GSD[fnext]
+            else:
+                break
+        X = fnext - (log10(dnext) - log10(dmin)) * (fnext - flow) / (log10(dnext) - log10(dlow))
+        self.GSD[X] = dmin
 
     def generate_curves(self):
         self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.GSD[0.5], self.epsilon,
