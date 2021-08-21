@@ -11,7 +11,7 @@ from math import log10
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Spinner
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
@@ -348,10 +348,11 @@ def button_callback():
 button = Button(label="Stop", button_type="success")
 button.on_click(button_callback)
 
-D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}")
-D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}")
-D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}")
-silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}")
+D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
+D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
+D50_spinner = Spinner(title="", low=1, high=40, step=0.5, value=4, width=1)
+D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
+silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
@@ -396,7 +397,8 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-inputs = column(fluid_radio, D85_input, D50_input, D15_input, silt_input, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
+GSD_inputs = row(D85_input, D50_input, D15_input, silt_input)
+inputs = column(fluid_radio, GSD_inputs, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
