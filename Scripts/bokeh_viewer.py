@@ -271,8 +271,11 @@ def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
+    slurry.GSD[0.85] = check_value(D85_input, slurry.D50*1000, slurry.Dp * 1000 * 0.50, slurry.GSD[0.85]*1000, '0.3f') / 1000
     slurry.D50 = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.D50 * 1000, '0.3f') / 1000
-    slurry.generate_GSD()
+    slurry.GSD[0.15] = check_value(D15_input, 0.06, slurry.D50 * 1000, slurry.GSD[0.15]*1000, '0.3f') / 1000
+    slurry.silt = check_value(silt_input, 0.0, 0.499, slurry.silt, '0.3f')
+    slurry.generate_GSD(d15_ratio=None, d85_ratio=None)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
     # Generate the new curve
@@ -300,7 +303,7 @@ def update_data(attrname, old, new):
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
 
 
-for w in [Dp_input, D50_input, Cv_input]:
+for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
