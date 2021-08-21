@@ -130,6 +130,9 @@ HQ_plot.line('v', 'im', source=LDV50_source,
 
 HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
+HQ_plot.axis.major_tick_in = 10
+HQ_plot.axis.minor_tick_in = 7
+HQ_plot.axis.minor_tick_out = 0
 HQ_plot.legend.location = "top_left"
 
 ######
@@ -172,6 +175,9 @@ Erhg_plot.line('il', 'Erhg', source=LDV50_source,
 
 Erhg_plot.xaxis[0].axis_label = 'Hydraulic Gradient il (m/m)'
 Erhg_plot.yaxis[0].axis_label = 'Relative Excess Hydraulic Gradient Erhg (-)'
+Erhg_plot.axis.major_tick_in = 10
+Erhg_plot.axis.minor_tick_in = 7
+Erhg_plot.axis.minor_tick_out = 0
 Erhg_plot.legend.location = "top_left"
 
 ######
