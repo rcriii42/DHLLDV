@@ -46,7 +46,8 @@ def generate_im_curves(Erhg_curves, Rsd, Cv, rhom):
     c = Erhg_curves
     il_list = c['il']
     max_index = len(il_list)
-    return {'Cvs_im': [c['Cvs_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
+    return {'il': il_list,
+            'Cvs_im': [c['Cvs_Erhg'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
             'FB': [c['FB'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
             'SB': [c['SB'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],
             'He': [c['He'][i]*Rsd*Cv+il_list[i] for i in range(max_index)],

@@ -23,8 +23,8 @@ import viewer
 class Slurry():
     def __init__(self):
         self.max_index = 100
-        self.Dp = 0.1524  # Pipe diameter
-        self.D50 = 0.2 / 1000.
+        self.Dp = 0.762  # Pipe diameter
+        self.D50 = 1.0 / 1000.
         self._silt = 0
         self.epsilon = DHLLDV_constants.steel_roughness
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
@@ -101,6 +101,7 @@ im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
                                        graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                                        Cvs_im=slurry.im_curves['Cvs_im'],
                                        Cvt_im=slurry.im_curves['Cvt_im'],
+                                       il=slurry.im_curves['il'],
                                        regime=slurry.Erhg_curves['Cvs_regime']))
 LDV50_source = ColumnDataSource(data=dict(v=slurry.LDV_curves['vls'],
                                           im=slurry.LDV_curves['im'],
@@ -148,6 +149,14 @@ HQ_plot.line('v', 'Cvt_im', source=im_source,
              line_alpha=0.6,
              legend_label='uniform Sand Cvt=c',
              name='uniform Sand Cvt=c')
+
+HQ_plot.line('v', 'il', source=im_source,
+             color='blue',
+             line_dash='dashed',
+             line_width=2,
+             line_alpha=0.3,
+             legend_label='il',
+             name='il')
 
 HQ_plot.line('v', 'im', source=LDV50_source,
              color='magenta',
@@ -202,6 +211,14 @@ Erhg_plot.line('il', 'Cvt', source=Erhg_source,
              legend_label='uniform Sand Cvt=c',
              name='uniform Sand Cvt=c')
 
+Erhg_plot.line('il', 'il', source=Erhg_source,
+             color='blue',
+             line_dash='dashed',
+             line_width=2,
+             line_alpha=0.3,
+             legend_label='il',
+             name='il')
+
 Erhg_plot.line('il', 'Erhg', source=LDV50_source,
              color='magenta',
              line_dash='solid',
@@ -240,6 +257,8 @@ GSD_plot.line('dia', 'p', source=GSD_source,
              line_alpha=0.6,
              #legend_label='Grain Size Distribution',
              name='GSD')
+
+GSD_plot.circle_dot('dia', 'p', source=GSD_source, name='GSD')
 GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
 GSD_plot.yaxis[0].axis_label = '% passing'
 GSD_plot.axis.major_tick_in = 10
