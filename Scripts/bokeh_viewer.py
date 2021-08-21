@@ -27,14 +27,28 @@ class Slurry():
         self.D50 = 1.0 / 1000.
         self._silt = 0
         self.epsilon = DHLLDV_constants.steel_roughness
+        self._fluid = 'salt'
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
-        self.rhos = 2.65
         self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
+        self.rhos = 2.65
         self.rhoi = 1.92
         self.Cv = 0.175
         self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
         self.generate_GSD()
         self.generate_curves()
+
+    @property
+    def fluid(self):
+        return self._fluid
+
+    @fluid.setter
+    def fluid(self, fluid):
+        if fluid == 'salt':
+            self.nu = 1.0508e-6
+            self.rhol = 1.0248103
+        else:
+            self.nu = DHLLDV_constants.water_viscosity[20]
+            self.rhol = DHLLDV_constants.water_density[20]
 
     @property
     def silt(self):
