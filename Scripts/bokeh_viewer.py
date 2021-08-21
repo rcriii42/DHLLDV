@@ -25,6 +25,7 @@ class Slurry():
         self.max_index = 100
         self.Dp = 0.1524  # Pipe diameter
         self.D50 = 0.2 / 1000.
+        self._silt = 0
         self.epsilon = DHLLDV_constants.steel_roughness
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         self.rhos = 2.65
@@ -34,6 +35,19 @@ class Slurry():
         self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
         self.generate_GSD()
         self.generate_curves()
+
+    @property
+    def silt(self):
+        return self._silt
+
+    @silt.setter
+    def silt(self, X):
+        if X < 0:
+            X = 0.0
+        if X > 1:   #In this case D85 is < 0.075 and the ELM will be invoked
+            X = 0.999
+        self._silt = X
+        self.generate_GSD(d15_ratio=None, d85_ratio=None)
 
     @property
     def Rsd(self):
@@ -47,10 +61,15 @@ class Slurry():
     def rhom(self):
         return self.Cv * (self.rhos - self.rhol) + self.rhol
 
-    def generate_GSD(self, d15_ratio=2.72, d85_ratio=2.72):
+    def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
+        if not d15_ratio:
+            d15_ratio = self.GSD[0.5] / self.GSD[0.15]
+        if not d85_ratio:
+            d85_ratio = self.GSD[0.85] / self.GSD[0.5]
         self.GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
-                    0.85: self.D50 * d85_ratio}
+                    0.85: self.D50 * d85_ratio,
+                    self._silt: 0.075/1000}
         # The limiting diameter for pseudoliquid and it's fraction X
         dmin = pseudo_dlim(self.Dp, self.nu, self.rhol, self.rhos)
         fracs = iter(sorted(self.GSD, key=lambda key: self.GSD[key]))
@@ -220,13 +239,11 @@ Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
 rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}")
 
-
 # Button to stop the server
 def button_callback():
     sys.exit()  # Stop the server
 button = Button(label="Stop", button_type="success")
 button.on_click(button_callback)
-
 
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
