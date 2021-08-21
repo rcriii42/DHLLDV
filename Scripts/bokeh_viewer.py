@@ -174,6 +174,37 @@ Erhg_plot.xaxis[0].axis_label = 'Hydraulic Gradient il (m/m)'
 Erhg_plot.yaxis[0].axis_label = 'Relative Excess Hydraulic Gradient Erhg (-)'
 Erhg_plot.legend.location = "top_left"
 
+######
+# Set up GSD Plot
+print(slurry.GSD)
+percents = sorted(list(slurry.GSD.keys()))
+GSD_source = ColumnDataSource(data=dict(p=percents,
+                                        dia=[slurry.GSD[pct]*1000 for pct in percents]))
+
+GSD_TOOLTIPS = [
+    ("Dia", "$x"),
+    ("%", "$y"),
+]
+GSD_plot = figure(height=280, width=450, title="Grain Size Distribution",
+                 tools="crosshair,pan,reset,save,wheel_zoom",
+                 x_range=[0.0001, 1000], y_range=[0, 1.0],
+                 x_axis_type='log', y_axis_type='auto',
+                 tooltips=GSD_TOOLTIPS)
+
+GSD_plot.line('dia', 'p', source=GSD_source,
+             color='black',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             #legend_label='Grain Size Distribution',
+             name='GSD')
+GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
+GSD_plot.yaxis[0].axis_label = '% passing'
+GSD_plot.axis.major_tick_in = 10
+GSD_plot.axis.minor_tick_in = 7
+GSD_plot.axis.minor_tick_out = 0
+GSD_plot.xgrid.minor_grid_line_color='navy'
+GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
 
 # Set up widgets
@@ -244,7 +275,7 @@ for w in [Dp_input, d_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-inputs = column(Dp_input, d_input, Cv_input, Cvi_input, rhom_input, button)
+inputs = column(Dp_input, d_input, GSD_plot, Cv_input, Cvi_input, rhom_input, button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
