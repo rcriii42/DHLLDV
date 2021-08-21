@@ -137,7 +137,7 @@ HQ_TOOLTIPS = [
 ]
 HQ_plot = figure(height=450, width=725, title="im curves",
                  tools="crosshair,pan,reset,save,wheel_zoom",
-                 x_range=[0, 10], y_range=[0, 0.6],
+                 #x_range=[0, 10], y_range=[0, 0.6],
                  tooltips=HQ_TOOLTIPS)
 
 HQ_plot.line('v', 'graded_Cvt_im', source=im_source,
@@ -197,7 +197,7 @@ Erhg_TOOLTIPS = [
 ]
 Erhg_plot = figure(height=450, width=725, title="Erhg Curves",
                  tools="crosshair,pan,reset,save,wheel_zoom",
-                 x_range=[0.001, 1.0], y_range=[0.001, 1.2],
+                 #x_range=[0.001, 1.0], y_range=[0.001, 1.2],
                  x_axis_type='log', y_axis_type='log',
                  tooltips=Erhg_TOOLTIPS)
 
