@@ -348,9 +348,24 @@ def button_callback():
 button = Button(label="Stop", button_type="success")
 button.on_click(button_callback)
 
+def D50_adjust_proportionate(delta):
+    new_D50 = slurry.D50 + delta / 1000
+    new_D85 = new_D50 * slurry.GSD[0.85] / slurry.GSD[0.5]
+    new_D15 = new_D50 * slurry.GSD[0.15] / slurry.GSD[0.5]
+    D50_input.value = f"{new_D50 * 1000:0.3f}"
+    D85_input.value = f"{new_D85 * 1000:0.3f}"
+    D15_input.value = f"{new_D15 * 1000:0.3f}"
+def D50_up_callback():
+    D50_adjust_proportionate(0.1)
+def D50_down_callback():
+    D50_adjust_proportionate(-0.1)
+
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
-D50_spinner = Spinner(title="", low=1, high=40, step=0.5, value=4, width=1)
+D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min") # , margin=(-5, -5, -5, -5))
+D50_up_button.on_click(D50_up_callback)
+D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
+D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
@@ -397,7 +412,8 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-GSD_inputs = row(D85_input, D50_input, D15_input, silt_input)
+updown = column(D50_up_button, D50_down_button)
+GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
 inputs = column(fluid_radio, GSD_inputs, GSD_plot, Dp_input, Cv_input, Cvi_input, rhom_input, button)
 plots = column(HQ_plot, Erhg_plot)
 
