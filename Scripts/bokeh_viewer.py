@@ -343,8 +343,10 @@ def update_fluid(index):
 
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
 fluid_radio.on_click(update_fluid)
-viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}", width=100)
-density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}", width=100)
+viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
+                            width=100, disabled=True)
+density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
+                          width=100, disabled=True)
 fluid_properties = row(viscosity_label, density_label)
 
 # Button to stop the server
@@ -375,8 +377,8 @@ D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}",
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
-Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}")
-rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}")
+Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True)
+rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}", disabled=True)
 
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
