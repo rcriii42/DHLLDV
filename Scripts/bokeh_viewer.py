@@ -11,7 +11,8 @@ from math import log10
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Spacer
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import Spacer, Div
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
@@ -437,14 +438,18 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(Dp_row,             # A row of text boxes
+inputs = column(Div(text="""<B>Pipe</B>"""),
+                Dp_row,             # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Div(text="""<B>Fluid</B>"""),
                 fluid_radio,
                 fluid_properties,   # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Div(text="""<B>Grain Size Distribution</B>"""),
                 GSD_inputs,         # A row of text boxes
                 GSD_plot,
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Div(text="""<B>Concentrations</B>"""),
                 conc_row,           # A row of text boxes
                 stop_button)
 plots = column(HQ_plot, Erhg_plot)
