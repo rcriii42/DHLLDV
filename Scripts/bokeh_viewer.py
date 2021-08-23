@@ -334,6 +334,11 @@ GSD_plot.xgrid.minor_grid_line_color='navy'
 GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
 # Set up widgets
+Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}", width=95)
+roughness_label = TextInput(title="Roughness (m)", value=f"{int(slurry.epsilon):0.3e}",
+                            width=95, disabled=True)
+Dp_row = row(Dp_input, roughness_label)
+
 def update_fluid(index):
     if index == 0:
         slurry.fluid = 'fresh'
@@ -367,6 +372,7 @@ def D50_up_callback():
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
 
+
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
 D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min") # , margin=(-5, -5, -5, -5))
@@ -375,10 +381,9 @@ D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min
 D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
-Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}")
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True)
-rhom_input = TextInput(title='Rhom', value=f"{slurry.rhom:0.3f}", disabled=True)
+rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", disabled=True)
 
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
@@ -421,7 +426,7 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(Dp_input,
+inputs = column(Dp_row,
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 fluid_radio,
                 fluid_properties,           # A row of text boxes
