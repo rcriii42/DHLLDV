@@ -175,8 +175,11 @@ def update_source_data():
 # Set up HQ plot
 HQ_TOOLTIPS = [
     ('name', "$name"),
-    ("vls (m/sec)", "$x"),
-    ("H (m/m)", "$y"),
+    ("vls (m/sec)", "@v"),
+    ("Graded Cvt=c (m/m)", "@graded_Cvt_im"),
+    ("Uniform Cvt=c", "@Cvt_im"),
+    ("Uniform Cvs=c", "@Cvs_im"),
+    ("Fluid", "@il"),
     ("Regime", "@regime")
 ]
 HQ_plot = figure(height=450, width=725, title="im curves",
