@@ -86,6 +86,22 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(Erhg, 0.13631182, places=6)
         self.assertAlmostEqual(Erhg_regime,'fixed bed')
 
+    def testFractions(self):
+        """Test the scheme for dividing the GSD into fractions"""
+        Dp = 0.5
+        d = 1.0/1000
+        GSD = {0.85: d*2.71,
+               0.5: d,
+               0.15: d/2,
+               0.075: 0.075/1000}
+        nu = 0.001005 / (0.9982 * 1000)
+        rhos = 2.65
+        rhol = DHLLDV_constants.water_density[20]
+        new_GSD = DHLLDV_framework.create_fracs(GSD, Dp,nu, rhol, rhos)
+        fracs = sorted(new_GSD.keys())
+        ds = [new_GSD[f] for f in fracs]
+        self.assertEqual(len(fracs), 12)
+
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
