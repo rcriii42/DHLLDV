@@ -163,7 +163,7 @@ def update_source_data():
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
-    roughness_label.value = f"{int(slurry.epsilon):0.3e}"
+    roughness_label.value = f"{slurry.epsilon:0.3e}"
     fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
     fluid_density_label.value = f"{slurry.rhol:0.4f}"
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
@@ -341,7 +341,7 @@ GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
 # Set up widgets
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}", width=95)
-roughness_label = TextInput(title="Roughness (m)", value=f"{int(slurry.epsilon):0.3e}",
+roughness_label = TextInput(title="Roughness (m)", value=f"{slurry.epsilon:0.3e}",
                             width=95, disabled=True)
 Dp_row = row(Dp_input, roughness_label)
 
