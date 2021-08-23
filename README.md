@@ -42,7 +42,8 @@ There is an interactive viewer that runs in a bokeh server:
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-Will open a tab in your browser that allows you to vary model parameters.
+Will open a tab in your browser that allows you to vary model parameters and see the resulting curves.
 
-![image](https://user-images.githubusercontent.com/9353408/130454281-c373ece4-48f7-4ca3-9270-0ad046153bad.png)
+![image](https://user-images.githubusercontent.com/9353408/130458076-f8eabc47-da5d-40bd-bf02-f603c24471ef.png)
+
 
