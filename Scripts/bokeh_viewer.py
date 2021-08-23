@@ -421,13 +421,14 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(fluid_radio,
+inputs = column(Dp_input,
+                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                fluid_radio,
                 fluid_properties,           # A row of text boxes
-                Spacer(background='lightblue', height=5),
+                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 GSD_inputs,                 # A row of text boxes
                 GSD_plot,
-                Spacer(background='lightblue', height=5),
-                Dp_input,
+                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 Cv_input,
                 Cvi_input,
                 rhom_input,
