@@ -163,8 +163,8 @@ def update_source_data():
                             Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
     roughness_label.value = f"{int(slurry.epsilon):0.3e}"
-    viscosity_label.value = f"{slurry.nu:0.4e}"
-    density_label.value = f"{slurry.rhol:0.4f}"
+    fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
+    fluid_density_label.value = f"{slurry.rhol:0.4f}"
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
@@ -353,11 +353,11 @@ def update_fluid(index):
 
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
 fluid_radio.on_click(update_fluid)
-viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
-                            width=100, disabled=True)
-density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
-                          width=100, disabled=True)
-fluid_properties = row(viscosity_label, density_label)
+fluid_viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
+                                  width=100, disabled=True)
+fluid_density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
+                                width=100, disabled=True)
+fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
     new_D50 = slurry.D50 + delta / 1000
@@ -424,7 +424,6 @@ def update_data(attrname, old, new):
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
     update_source_data()
-
 
 for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
