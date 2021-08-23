@@ -374,12 +374,14 @@ def D50_down_callback():
 
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
-D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min") # , margin=(-5, -5, -5, -5))
+D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
 D50_up_button.on_click(D50_up_callback)
 D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
 D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
+D50_updown = column(D50_up_button, D50_down_button)
+GSD_inputs = row(D85_input, D50_input, D50_updown, D15_input, silt_input)
 
 def update_rhom(attrname, old, new):
     """Update the Cv based on rhom input"""
@@ -436,8 +438,6 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
-updown = column(D50_up_button, D50_down_button)
-GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
 inputs = column(Div(text="""<B>Pipe</B>"""),
                 Dp_row,             # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
