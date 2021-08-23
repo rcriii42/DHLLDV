@@ -385,6 +385,12 @@ Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True)
 rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", disabled=True)
 
+# Button to stop the server
+def stop_button_callback():
+    sys.exit()  # Stop the server
+stop_button = Button(label="Stop", button_type="success")
+stop_button.on_click(stop_button_callback)
+
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
 
@@ -437,7 +443,7 @@ inputs = column(Dp_row,  # A row of text boxes
                 Cv_input,
                 Cvi_input,
                 rhom_input,
-                button)
+                stop_button)
 plots = column(HQ_plot, Erhg_plot)
 
 curdoc().add_root(row(inputs, plots, width=800))
