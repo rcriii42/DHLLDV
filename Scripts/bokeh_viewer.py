@@ -388,11 +388,20 @@ def update_rhom(attrname, old, new):
     max_rhom = 0.5 * (slurry.rhos - slurry.rhol) + slurry.rhol
     slurry.rhom = check_value(rhom_input, 1.05, max_rhom, slurry.rhom, "0.3f")
     Cv_input.value=f"{slurry.Cv:0.3f}"
+def Cv_up_callback():
+    Cv_input.value=f"{slurry.Cv+0.005:0.3f}"
+def Cv_down_callback():
+    Cv_input.value=f"{slurry.Cv-0.005:0.3f}"
+Cv_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
+Cv_up_button.on_click(Cv_up_callback)
+Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
+Cv_down_button.on_click(Cv_down_callback)
+Cv_updown = column(Cv_up_button, Cv_down_button)
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}", width=95)
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
 rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=95)
 rhom_input.on_change('value', update_rhom)
-conc_row = row(rhom_input, Cv_input, Cvi_input)
+conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
 
 # Button to stop the server
 def stop_button_callback():
