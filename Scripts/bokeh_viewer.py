@@ -162,8 +162,9 @@ def update_source_data():
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
-    viscosity_label.value=f"{slurry.nu:0.4e}"
-    density_label.value=f"{slurry.rhol:0.4f}"
+    roughness_label.value = f"{int(slurry.epsilon):0.3e}"
+    viscosity_label.value = f"{slurry.nu:0.4e}"
+    density_label.value = f"{slurry.rhol:0.4f}"
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
@@ -358,12 +359,6 @@ density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0
                           width=100, disabled=True)
 fluid_properties = row(viscosity_label, density_label)
 
-# Button to stop the server
-def button_callback():
-    sys.exit()  # Stop the server
-button = Button(label="Stop", button_type="success")
-button.on_click(button_callback)
-
 def D50_adjust_proportionate(delta):
     new_D50 = slurry.D50 + delta / 1000
     new_D85 = new_D50 * slurry.GSD[0.85] / slurry.GSD[0.5]
@@ -384,6 +379,8 @@ D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min
 D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
+
+
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
 Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True)
 rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", disabled=True)
@@ -429,12 +426,12 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(Dp_row,
+inputs = column(Dp_row,  # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 fluid_radio,
-                fluid_properties,           # A row of text boxes
+                fluid_properties,  # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
-                GSD_inputs,                 # A row of text boxes
+                GSD_inputs,  # A row of text boxes
                 GSD_plot,
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 Cv_input,
