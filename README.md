@@ -38,12 +38,18 @@ tests\test_utils.py .....                                                       
 ```
 
 ## Interactive Viewer
-There is an interactive viewer that runs in a bokeh server:
+There is an interactive viewer that runs in a bokeh server, the following command will open a tab in your browser:
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-Will open a tab in your browser that allows you to vary model parameters and see the resulting curves.
-
 ![image](https://user-images.githubusercontent.com/9353408/130458076-f8eabc47-da5d-40bd-bf02-f603c24471ef.png)
+
+The viewer allows you to adjust certain properties of the system:
+
+* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way
+* **Fluid**: Allows selection of fresh or salt water at 20&deg;C (68&deg;F)
+* **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075mm). The up and down arrows vary the D50 by 0.1mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction. The resulting GSD curve is shown with an added point representing the particle diameter that forms part of the carrier liquid.
+* **Concentrations**: Allows adjusting the concentration of the slurry by adjusting either the Cv or the rhom. The up and down arrows adjust the Cv by 0.005 each way.
+* **Stop**: The Stop button stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
 
