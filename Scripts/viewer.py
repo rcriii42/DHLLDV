@@ -72,7 +72,7 @@ def generate_LDV_curves(Dp, d, epsilon, nu, rhol, rhos):
             'il': LDV_il_list,
             'Erhg': LDV_Ergh_list,
             'im': LDV_im_list,
-            'regime': [f'LDV for {d*1000:0.3f} mm particle at {Cv_list[i]}' for i in range(cv_points)]
+            'regime': [f'LDV for {d*1000:0.3f} mm particle at Cvs={Cv_list[i]}' for i in range(cv_points)]
             }
 
 if __name__ == '__main__':
