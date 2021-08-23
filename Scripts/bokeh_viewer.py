@@ -75,6 +75,10 @@ class Slurry():
     def rhom(self):
         return self.Cv * (self.rhos - self.rhol) + self.rhol
 
+    @rhom.setter
+    def rhom(self, Sm):
+        self.Cv = (Sm - self.rhol) / (self.rhos - self.rhol)
+
     def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
         if not d15_ratio:
             d15_ratio = self.GSD[0.5] / self.GSD[0.15]
@@ -371,7 +375,6 @@ def D50_up_callback():
     D50_adjust_proportionate(0.1)
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
-
 
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
