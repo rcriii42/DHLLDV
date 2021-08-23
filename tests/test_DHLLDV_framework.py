@@ -105,10 +105,15 @@ class Test(unittest.TestCase):
         nu = 0.001005 / (0.9982 * 1000)
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
-        new_GSD = DHLLDV_framework.create_fracs(GSD, Dp,nu, rhol, rhos)
+        new_GSD = DHLLDV_framework.create_fracs(GSD, Dp, nu, rhol, rhos)
         fracs = sorted(new_GSD.keys())
         ds = [new_GSD[f] for f in fracs]
-        self.assertEqual(len(fracs), 12)
+        with self.subTest(msg="Test the fraction of the pseudoliquid"):
+            self.assertAlmostEqual(fracs[0]*100, 1.8613909)
+        with self.subTest(msg="Test the diameter of the pseudoliquid"):
+            self.assertAlmostEqual(ds[0]*10**5, 9.4907896)
+        with self.subTest(msg="Test the number of points"):
+            self.assertEqual(len(fracs), 12)
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
