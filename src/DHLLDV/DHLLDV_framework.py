@@ -325,6 +325,62 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5 # Eqn 8.15-2
     return dlim
 
+def create_fracs(GSD, Dpo, nu, rhol, rhos, num_fracs=10):
+    """Divide the GSD into at least num_fracs fractions
+
+    Start by determining the dlim
+    Add the points for dia greater than the dlim (points less than dlim are discarded)
+    interpolate points between the given points until at least at num_fracs-1
+    Extrapolate one point above the maximum fraction"""
+    new_GSD = {}
+    fracs = iter(sorted(GSD, key=lambda key: GSD[key]))
+    flow = next(fracs)
+    dlow = GSD[flow]
+    fnext = next(fracs)
+    dnext = GSD[fnext]
+    points_left = len(fracs)
+
+    Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
+
+    # The limiting diameter for pseudoliquid and it's fraction X
+    dmin = pseudo_dlim(Dp, nu, rhol, rhos)
+    while dmin > dnext:
+        ftemp = next(fracs, None)
+        if ftemp:
+            dlow = dnext
+            flow = fnext
+            fnext = ftemp
+            dnext = GSD[fnext]
+            points_left -= 1
+        else:
+            break
+    X = fnext - (log10(dnext) - log10(dmin)) * (fnext - flow) / (log10(dnext) - log10(dlow))
+    if X < 0:
+        X = 0
+    new_GSD[X] = dmin
+    num_divs = num_fracs - points_left - 1
+    between_points = int(num_divs/points_left + 0.5)
+
+    flow = X
+    dlow = dmin
+    while fnext:
+        frac_size = (fnext - flow) / (between_points + 1)
+        dnext = GSD[fnext]
+        fthis = flow
+        for i in range(1, between_points+1):
+            flow += frac_size
+            logdlast = log10(dast)
+            logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
+            new_GSD[fthis] = dlow = 10**logdthis
+        flow = fnext
+        dlow = GSD[flow]
+        fnext = next(fracs, None)
+    fnext = max(new_GSD.keys())
+    dnext = new_GSD[fnext]
+    fthis = min(fnext + frac_size, 0.999)
+    logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
+    new_GSD[fthis] = 10 ** logdthis
+    return new_GSD
 
 def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num_fracs=10, get_dict=False):
     """
