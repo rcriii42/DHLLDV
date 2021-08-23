@@ -380,10 +380,16 @@ D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
 silt_input = TextInput(title="Silt (% of 0.075 mm)", value=f"{slurry.silt * 100:0.1f}", width=95)
 
-
-Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}")
-Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True)
-rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", disabled=True)
+def update_rhom(attrname, old, new):
+    """Update the Cv based on rhom input"""
+    max_rhom = 0.5 * (slurry.rhos - slurry.rhol) + slurry.rhol
+    slurry.rhom = check_value(rhom_input, 1.05, max_rhom, slurry.rhom, "0.3f")
+    Cv_input.value=f"{slurry.Cv:0.3f}"
+Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}", width=95)
+Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
+rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=95)
+rhom_input.on_change('value', update_rhom)
+conc_row = row(rhom_input, Cv_input, Cvi_input)
 
 # Button to stop the server
 def stop_button_callback():
@@ -431,17 +437,15 @@ for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
 # Set up layouts and add to document
 updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, updown, D15_input, silt_input)
-inputs = column(Dp_row,  # A row of text boxes
+inputs = column(Dp_row,             # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 fluid_radio,
-                fluid_properties,  # A row of text boxes
+                fluid_properties,   # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
-                GSD_inputs,  # A row of text boxes
+                GSD_inputs,         # A row of text boxes
                 GSD_plot,
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
-                Cv_input,
-                Cvi_input,
-                rhom_input,
+                conc_row,           # A row of text boxes
                 stop_button)
 plots = column(HQ_plot, Erhg_plot)
 
