@@ -340,10 +340,19 @@ GSD_plot.xgrid.minor_grid_line_color='navy'
 GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
 # Set up widgets
-Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000):0.0f}", width=95)
+def Dp_up_callback():
+    Dp_input.value=f"{int(slurry.Dp*1000)+25}"
+def Dp_down_callback():
+    Dp_input.value=f"{int(slurry.Dp*1000)-25}"
+Dp_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
+Dp_up_button.on_click(Dp_up_callback)
+Dp_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
+Dp_down_button.on_click(Dp_down_callback)
+Dp_updown = column(Dp_up_button, Dp_down_button)
+Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000)}", width=95)
 roughness_label = TextInput(title="Roughness (m)", value=f"{slurry.epsilon:0.3e}",
                             width=95, disabled=True)
-Dp_row = row(Dp_input, roughness_label)
+Dp_row = row(Dp_input, Dp_updown, Spacer(width=10), roughness_label)
 
 def update_fluid(index):
     if index == 0:
