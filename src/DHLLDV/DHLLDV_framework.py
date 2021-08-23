@@ -325,7 +325,7 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5 # Eqn 8.15-2
     return dlim
 
-def create_fracs(GSD, Dpo, nu, rhol, rhos, num_fracs=10):
+def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
     """Divide the GSD into at least num_fracs fractions
 
     Start by determining the dlim
@@ -338,7 +338,7 @@ def create_fracs(GSD, Dpo, nu, rhol, rhos, num_fracs=10):
     dlow = GSD[flow]
     fnext = next(fracs)
     dnext = GSD[fnext]
-    points_left = len(fracs)
+    points_left = len(GSD)
 
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
 
@@ -369,7 +369,7 @@ def create_fracs(GSD, Dpo, nu, rhol, rhos, num_fracs=10):
         fthis = flow
         for i in range(1, between_points+1):
             flow += frac_size
-            logdlast = log10(dast)
+            logdlast = log10(dlow)
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
             new_GSD[fthis] = dlow = 10**logdthis
         flow = fnext
