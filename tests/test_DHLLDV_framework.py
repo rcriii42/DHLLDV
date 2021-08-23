@@ -101,7 +101,7 @@ class Test(unittest.TestCase):
         GSD = {0.85: d*2.71,
                0.5: d,
                0.15: d/2,
-               0.075: 0.075/1000}
+               0: 0.075/1000}
         nu = 0.001005 / (0.9982 * 1000)
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
