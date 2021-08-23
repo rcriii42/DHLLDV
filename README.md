@@ -44,5 +44,5 @@ There is an interactive viewer that runs in a bokeh server:
 
 Will open a tab in your browser that allows you to vary model parameters.
 
-![image](https://user-images.githubusercontent.com/9353408/130335804-85d9e7e6-b3df-4200-bdac-5c1e4508f16c.png)
+![image](https://user-images.githubusercontent.com/9353408/130454281-c373ece4-48f7-4ca3-9270-0ad046153bad.png)
 
