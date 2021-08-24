@@ -328,6 +328,7 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
 def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
     """Divide the GSD into at least num_fracs fractions
 
+    GSD must have at least two points that are greater than the psuedoliquid point
     Start by determining the dlim
     Add the points for dia greater than the dlim (points less than dlim are discarded)
     interpolate points between the given points until at least at num_fracs-1
@@ -397,8 +398,9 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
     Cv = insitu volume concentration
-    num_fracs = The number of fractions to divide the GSD
-    get_dict: Does nothing for now
+    num_fracs = The number of fractions to divide the GSD, if not >0, use the GSD as is,
+                assuming that the bottom fraction is the peudoliquid
+    get_dict: Whether to return a dict, or a single number
     """
     fracs = iter(sorted(GSD, key=lambda key: GSD[key]))
     flow = next(fracs)
