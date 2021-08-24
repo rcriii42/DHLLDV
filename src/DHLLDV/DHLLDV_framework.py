@@ -402,28 +402,12 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
                 assuming that the bottom fraction is the peudoliquid
     get_dict: Whether to return a dict, or a single number
     """
-    fracs = iter(sorted(GSD, key=lambda key: GSD[key]))
-    flow = next(fracs)
-    dlow = GSD[flow]
-    fnext = next(fracs)
-    dnext = GSD[fnext]
-
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
+    if num_fracs:
+        GSD = create_fracs(GSD, Dp, nu, rhol, rhos)
+    fracs = sorted(GSD.keys())
 
-    # The limiting diameter for pseudoliquid and it's fraction X
-    dmin = pseudo_dlim(Dp, nu, rhol, rhos)
-    while dmin > dnext:
-        ftemp = next(fracs, None)
-        if ftemp:
-            dlow = dnext
-            flow = fnext
-            fnext = ftemp
-            dnext = GSD[fnext]
-        else:
-            break
-    X = fnext - (log10(dnext)-log10(dmin))*(fnext-flow)/(log10(dnext)-log10(dlow))
-    if X < 0:
-        X = 0
+    X = fracs[0]
     rhox = rhol + rhol*(X*Cv*Rsd)/(1-Cv+Cv*X)    # Eqn 8.15-3
     Cv_x = (X*Cv)/(1-Cv+Cv*X)
     Cv_r = (1 - X) * Cv                           # Eqn 8.15-5
@@ -432,28 +416,21 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     nu_x = mu_x / rhox                              # Eqn 8.15-7
     Rsd_x = (rhos - rhox)/rhox
 
-    frac_size = (1.0 - X)/(num_fracs)
-    ims = []  # This will be a list of the fi, i_mxi
-    fthis = X
-    logdlast = log10(dmin)
-    frac_list = [fthis]
-    ds = [10**logdlast]                 #These are the boundaries of the fractions
-    dxs = []                            #These are the central diameter of the fractions
-    while fthis <= (1.0 - frac_size):
-        fthis += frac_size
-        while fthis > fnext:
-            ftemp = next(fracs, None)
-            if ftemp:
-                dlow = dnext
-                flow = fnext
-                fnext = ftemp
-                dnext = GSD[fnext]
-            else:
-                break
-        logdthis = log10(dnext) - (log10(dnext)-log10(dlow))*(fnext-fthis)/(fnext-flow)
-        logdx = (logdthis + logdlast)/2.0
-        logdlast = logdthis
+    fiter = iter(fracs)
+    flow = next(fiter)
+    dlow = GSD[flow]
+    fnext = next(fiter, None)
+    dnext = GSD[fnext]
+
+    ds = [dlow]         #These are the boundaries of the fractions
+    dxs = []            #These are the central diameter of the fractions
+    ims = []            # This will be a list of the fi, i_mxi
+    frac_list = []
+    while fnext:
+        dnext = GSD[fnext]
+        logdx = (log10(dlow) + log10(dnext))/2.0
         dx = 10**logdx
+        fracx = fnext - flow
         if Cvt_eq_Cvs:
             Erhg_x = Cvt_Erhg(vls, Dp, dx, epsilon, nu_x, rhox, rhos, Cv_r, get_dict=True)
         else:
@@ -461,20 +438,25 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
         regime = Erhg_x['regime']
         il_x = Erhg_x['il']
         i_mxi = Erhg_x[regime] * Rsd_x * Cv_r + il_x
-        frac_list.append(fthis)
-        ds.append(10.0**logdthis)
+        frac_list.append(fracx)
+        ds.append(dnext)
         dxs.append(dx)
         ims.append(i_mxi)
-    im_x = sum(frac_size*imxi for imxi in ims)/ (1-X)
+        flow = fnext
+        dlow = GSD[flow]
+        fnext = next(fiter, None)
+
+    im_x = sum(f*imxi for f, imxi in zip(frac_list, ims))/ (1-X)
     il_x = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_x, rhox)
     im = rhox*im_x/rhol
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Erhg = (im - il)/(Rsd*Cv)
     if get_dict:
-        return {'ims': ims, 'im_x': im_x, 'Erhg_x': (im_x - il_x)/(Rsd_x*Cv_r),
-                'Erhg': Erhg, 'il': il,
-                'dmin': dmin, 'X': X, 'fracs': frac_list, 'ds': ds, 'dxs': dxs,
-                'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, 'Rsd_x': Rsd_x, 'Cv_x': Cv_x, 'Cv_r': Cv_r,
+        return {'ims': ims, 'im_x': im_x, 'ds': ds, 'dxs': dxs, 'fracs': frac_list, # lists
+                'dmin': ds[0], 'X': X, 'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, # Pseudoliquid properties
+                'Rsd_x': Rsd_x, 'Cv_x': Cv_x, 'Cv_r': Cv_r, # Slurry properties based on pseudoliquid
+                'Erhg_x': (im_x - il_x)/(Rsd_x*Cv_r),
+                'Erhg': Erhg, 'il': il, # Final slurry properties
                 }
     else:
         return Erhg
