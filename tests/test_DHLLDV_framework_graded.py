@@ -128,3 +128,7 @@ class Test(unittest.TestCase):
     def test_if_Cvt_triggered(self):
         """Just test that the Cvt Erhg is properly triggered"""
         self.assertGreater(self.Cvt_Erhg_obj['Erhg'], self.Cvs_Erhg_obj['Erhg'])
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
