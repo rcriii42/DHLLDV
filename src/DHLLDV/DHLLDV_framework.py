@@ -333,12 +333,12 @@ def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
     interpolate points between the given points until at least at num_fracs-1
     Extrapolate one point above the maximum fraction"""
     new_GSD = {}
-    fracs = iter(sorted(GSD, key=lambda key: GSD[key]))
+    fracs = iter(sorted(GSD.keys()))
     flow = next(fracs)
     dlow = GSD[flow]
     fnext = next(fracs)
     dnext = GSD[fnext]
-    points_left = len(GSD)
+    points_left = len(GSD) - 1
 
     Rsd = (rhos - rhol) / rhol  # Eqn 8.2-1
 
@@ -368,14 +368,18 @@ def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
         dnext = GSD[fnext]
         fthis = flow
         for i in range(1, between_points+1):
-            flow += frac_size
+            fthis += frac_size
             logdlast = log10(dlow)
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
-            new_GSD[fthis] = dlow = 10**logdthis
+            new_GSD[fthis] = 10**logdthis
+        new_GSD[fnext] = dnext
         flow = fnext
         dlow = GSD[flow]
         fnext = next(fracs, None)
-    fnext = max(new_GSD.keys())
+    fracs = sorted(new_GSD.keys())
+    flow = fracs[-2]
+    dlow = new_GSD[flow]
+    fnext = fracs[-1]
     dnext = new_GSD[fnext]
     fthis = min(fnext + frac_size, 0.999)
     logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
