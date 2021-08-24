@@ -16,7 +16,7 @@ from bokeh.models import Spacer, Div
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_constants
-from DHLLDV.DHLLDV_framework import pseudo_dlim
+from DHLLDV import DHLLDV_framework
 import viewer
 
 
@@ -85,28 +85,12 @@ class Slurry():
             d15_ratio = self.GSD[0.5] / self.GSD[0.15]
         if not d85_ratio:
             d85_ratio = self.GSD[0.85] / self.GSD[0.5]
-        self.GSD = {0.15: self.D50 / d15_ratio,
+        temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,
                     self._silt: 0.075/1000}
-        # The limiting diameter for pseudoliquid and it's fraction X
-        dmin = pseudo_dlim(self.Dp, self.nu, self.rhol, self.rhos)
-        fracs = iter(sorted(self.GSD, key=lambda key: self.GSD[key]))
-        flow = next(fracs)
-        dlow = self.GSD[flow]
-        fnext = next(fracs)
-        dnext = self.GSD[fnext]
-        while dmin > dnext:
-            ftemp = next(fracs, None)
-            if ftemp:
-                dlow = dnext
-                flow = fnext
-                fnext = ftemp
-                dnext = self.GSD[fnext]
-            else:
-                break
-        X = fnext - (log10(dnext) - log10(dmin)) * (fnext - flow) / (log10(dnext) - log10(dlow))
-        self.GSD[X] = dmin
+        self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
+
 
     def generate_curves(self):
         self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.GSD[0.5], self.epsilon,

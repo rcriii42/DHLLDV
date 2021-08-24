@@ -20,7 +20,9 @@ except:
 
 
 def generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
-    """Generate a dict with the Erhg curves"""
+    """Generate a dict with the Erhg curves
+
+    Note assumes the GSD is already generated"""
     Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in
                      vls_list]
     il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
@@ -35,9 +37,9 @@ def generate_Erhg_curves(vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
             'Cvs_regime': [Erhg_obj['regime'] for Erhg_obj in Erhg_obj_list],
             'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list],
             'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list],
-            'graded_Cvs_Erhg': [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False)
+            'graded_Cvs_Erhg': [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num_fracs=None)
                                 for vls in vls_list],
-            'graded_Cvt_Erhg': [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=True)
+            'graded_Cvt_Erhg': [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=True, num_fracs=None)
                                 for vls in vls_list],
             }
 
