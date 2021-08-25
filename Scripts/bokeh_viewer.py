@@ -201,14 +201,6 @@ HQ_plot.line('v', 'graded_Cvt_im', source=im_source,
              legend_label='graded Sand Cvt=c',
              name='graded Sand Cvt=c')
 
-HQ_plot.line('v', 'Cvs_im', source=im_source,
-             color='red',
-             line_dash='solid',
-             line_width=2,
-             line_alpha=0.6,
-             legend_label='uniform Sand Cvs=c',
-             name='uniform Sand Cvs=c')
-
 HQ_plot.line('v', 'Cvt_im', source=im_source,
              color='green',
              line_dash='dashed',
@@ -216,6 +208,14 @@ HQ_plot.line('v', 'Cvt_im', source=im_source,
              line_alpha=0.6,
              legend_label='uniform Sand Cvt=c',
              name='uniform Sand Cvt=c')
+
+HQ_plot.line('v', 'Cvs_im', source=im_source,
+             color='red',
+             line_dash='solid',
+             line_width=2,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvs=c',
+             name='uniform Sand Cvs=c')
 
 HQ_plot.line('v', 'il', source=im_source,
              color='blue',
@@ -269,14 +269,6 @@ Erhg_plot.line('il', 'graded_Cvt', source=Erhg_source,
              legend_label='graded Sand Cvt=c',
              name='graded Sand Cvt=c')
 
-Erhg_plot.line('il', 'Cvs', source=Erhg_source,
-             color='red',
-             line_dash='solid',
-             line_width=2,
-             line_alpha=0.6,
-             legend_label='uniform Sand Cvs=c',
-             name='uniform Sand Cvs=c')
-
 Erhg_plot.line('il', 'Cvt', source=Erhg_source,
              color='green',
              line_dash='dashed',
@@ -284,6 +276,14 @@ Erhg_plot.line('il', 'Cvt', source=Erhg_source,
              line_alpha=0.6,
              legend_label='uniform Sand Cvt=c',
              name='uniform Sand Cvt=c')
+
+Erhg_plot.line('il', 'Cvs', source=Erhg_source,
+             color='red',
+             line_dash='solid',
+             line_width=2,
+             line_alpha=0.6,
+             legend_label='uniform Sand Cvs=c',
+             name='uniform Sand Cvs=c')
 
 Erhg_plot.line('il', 'il', source=Erhg_source,
              color='blue',
@@ -391,9 +391,7 @@ def D50_adjust_proportionate(delta):
         if slurry.D50 / D15_ratio < 0.08/1000:
             D15_ratio = slurry.D50 / (0.08/1000)
         D85_ratio = slurry.get_dx(0.85) / slurry.get_dx(0.50)
-        print(f"D50_adjust_proportionate d15 ratio {D15_ratio}, d85 ratio {D85_ratio}")
         slurry.generate_GSD(D15_ratio, D85_ratio)
-        print(slurry.GSD)
         update_source_data()
         D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
         D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
@@ -468,7 +466,6 @@ def check_value(widget, min, max, prev, fmt):
         return prev
 
 def update_data(attrname, old, new):
-    print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
     d85 = check_value(D85_input,
