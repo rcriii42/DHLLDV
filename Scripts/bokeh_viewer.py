@@ -85,17 +85,7 @@ class Slurry():
         if not d85_ratio:
             d85_ratio = self.get_dx(0.85) / self.get_dx(0.5)
         if not d15_ratio:
-            if 0.15 in self.GSD:
-                d15_ratio = self.get_dx(0.5) / self.get_dx(0.15)
-            else:
-                fracs = sorted(self.GSD.keys())
-                flow = fracs[0]
-                dlow = self.GSD[flow]
-                fnext = fracs[1]
-                dnext = self.GSD[fnext]
-                logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
-                d15 = 10 ** logdthis
-                d15_ratio = self.get_dx(0.5)/d15
+            d15_ratio = self.get_dx(0.5) / self.get_dx(0.15)
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,
@@ -105,7 +95,7 @@ class Slurry():
     def get_dx(self, frac):
         """Get the grain size associated with the given frac
 
-        TODO: To be fancy, could overrride self.GSD.__getitem__"""
+        TODO: To be fancy, could override self.GSD.__getitem__"""
         if frac in self.GSD:
             return self.GSD[frac]
         else:
@@ -389,16 +379,25 @@ fluid_density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.
 fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
-    new_D50 = slurry.D50 + delta / 1000
-    new_D85 = new_D50 * slurry.get_dx(0.85) / slurry.get_dx(0.5)
-    new_D15 = new_D50 * slurry.get_dx(0.15) / slurry.get_dx(0.5)
-    D85_input.remove_on_change('value', update_data)
-    D85_input.value = f"{new_D85 * 1000:0.3f}"
-    D15_input.remove_on_change('value', update_data)
-    D15_input.value = f"{new_D15 * 1000:0.3f}"
-    D50_input.value = f"{new_D50 * 1000:0.3f}"
-    D15_input.on_change('value', update_data)
-    D85_input.on_change('value', update_data)
+    print(f"D50_adjust_proportionate D50 was {slurry.D50*1000:0.4f} / {slurry.get_dx(0.5)*1000:0.4f}: will be {slurry.D50*1000+delta:0.4f}")
+    if 0.08 <= slurry.D50*1000 + delta <= slurry.Dp * 1000 * 0.25:
+        D85_input.remove_on_change('value', update_data)
+        D50_input.remove_on_change('value', update_data)
+        D15_input.remove_on_change('value', update_data)
+        old_D50 = slurry.D50
+        slurry.D50 += delta / 1000
+        D15_ratio = old_D50 / slurry.get_dx(0.15)
+        D85_ratio = old_D50 / slurry.get_dx(0.50)
+        print(f"D50_adjust_proportionate d15 ratio {D15_ratio}, d85 ratio {D85_ratio}")
+        slurry.generate_GSD(D15_ratio, D85_ratio)
+        print(slurry.GSD)
+        update_source_data()
+        D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
+        D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
+        D15_input.value = f"{slurry.get_dx(0.15) * 1000:0.3f}"
+        D15_input.on_change('value', update_data)
+        D50_input.on_change('value', update_data)
+        D85_input.on_change('value', update_data)
 
 def D50_up_callback():
     D50_adjust_proportionate(0.1)
@@ -448,7 +447,9 @@ def check_value(widget, min, max, prev, fmt):
     widget: The widget whose value to check
     min, max: minimum and maximum values of the input
     prev: The previous value (to reset of out of bounds)
-    fmt: The format of the value in the widget (for resetting)"""
+    fmt: The format of the value in the widget (for resetting)
+
+    Returns the final value of the widget after error check"""
     print(f"{widget.title}: New: {widget.value}, Bounds:{min} - {max}, Was:{prev:{fmt}}")
     try:
         new = float(widget.value)
