@@ -380,14 +380,17 @@ fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
     print(f"D50_adjust_proportionate D50 was {slurry.D50*1000:0.4f} / {slurry.get_dx(0.5)*1000:0.4f}: will be {slurry.D50*1000+delta:0.4f}")
-    if 0.08 <= slurry.D50*1000 + delta <= slurry.Dp * 1000 * 0.25:
+    if DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000 <\
+            slurry.D50*1000 + delta <=\
+            slurry.Dp * 1000 * 0.25:
         D85_input.remove_on_change('value', update_data)
         D50_input.remove_on_change('value', update_data)
         D15_input.remove_on_change('value', update_data)
-        old_D50 = slurry.D50
         slurry.D50 += delta / 1000
-        D15_ratio = old_D50 / slurry.get_dx(0.15)
-        D85_ratio = old_D50 / slurry.get_dx(0.50)
+        D15_ratio = slurry.get_dx(0.50) / slurry.get_dx(0.15)
+        if slurry.D50 / D15_ratio < 0.08/1000:
+            D15_ratio = slurry.D50 / (0.08/1000)
+        D85_ratio = slurry.get_dx(0.85) / slurry.get_dx(0.50)
         print(f"D50_adjust_proportionate d15 ratio {D15_ratio}, d85 ratio {D85_ratio}")
         slurry.generate_GSD(D15_ratio, D85_ratio)
         print(slurry.GSD)
@@ -468,9 +471,17 @@ def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
-    d85 = check_value(D85_input, slurry.D50*1000, slurry.Dp * 1000 * 0.50, slurry.get_dx(.85)*1000, '0.3f') / 1000
-    slurry.D50 = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.D50 * 1000, '0.3f') / 1000
-    d15 = check_value(D15_input, 0.06, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
+    d85 = check_value(D85_input,
+                      slurry.D50*1000+0.01,
+                      slurry.Dp * 1000 * 0.50,
+                      slurry.get_dx(.85)*1000, '0.3f') / 1000
+    slurry.D50 = check_value(D50_input,
+                             max(slurry.get_dx(0.15)*1000+0.01,
+                                 DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000),
+                             min(slurry.get_dx(0.85)*1000-0.01,
+                                 slurry.Dp * 1000 * 0.25),
+                             slurry.D50 * 1000, '0.3f') / 1000
+    d15 = check_value(D15_input, 0.08, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
     slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f')/100
     slurry.generate_GSD(d15_ratio=slurry.D50/d15, d85_ratio=d85/slurry.D50)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
