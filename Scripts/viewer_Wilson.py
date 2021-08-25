@@ -34,8 +34,9 @@ if __name__ == '__main__':
     Rsd = (rhos - rhol)/rhol
     Cv = 0.10
     rhom = Cv*(rhos-rhol)+rhol
-    
-    vls_list = [(i+1)/10. for i in range(200)]
+
+    num_points = 100
+    vls_list = [(i+1)/10. for i in range(num_points)]
 
     #The DHLLDV model for the given material
     Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in vls_list]
@@ -94,7 +95,7 @@ if __name__ == '__main__':
 
 
     #The im curves
-    im_list = [graded_Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(200)]
+    im_list = [graded_Cvt_Erhg_list[i]*Rsd*Cv+il_list[i] for i in range(num_points)]
     Wilson_Stratified_im_list_50 = [Wilson_Stratified.stratified_head_loss(Vls, Dp, GSD[0.5], epsilon, nu, rhol, rhos, musf, Cv)
                                     for Vls in vls_list]
     Wilson_Stratified_im_list_85 = [Wilson_Stratified.stratified_head_loss(Vls, Dp, GSD[0.85], epsilon, nu, rhol, rhos, musf, Cv)
