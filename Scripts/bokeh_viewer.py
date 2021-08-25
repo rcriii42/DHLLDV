@@ -8,6 +8,7 @@ Added by R. Ramsdell 19 August, 2021
 
 import sys
 from math import log10
+import bisect
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -81,24 +82,55 @@ class Slurry():
         self.Cv = (Sm - self.rhol) / (self.rhos - self.rhol)
 
     def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
-        if not d15_ratio:
-            d15_ratio = self.GSD[0.5] / self.GSD[0.15]
         if not d85_ratio:
-            d85_ratio = self.GSD[0.85] / self.GSD[0.5]
+            d85_ratio = self.get_dx(0.85) / self.get_dx(0.5)
+        if not d15_ratio:
+            if 0.15 in self.GSD:
+                d15_ratio = self.get_dx(0.5) / self.get_dx(0.15)
+            else:
+                fracs = sorted(self.GSD.keys())
+                flow = fracs[0]
+                dlow = self.GSD[flow]
+                fnext = fracs[1]
+                dnext = self.GSD[fnext]
+                logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
+                d15 = 10 ** logdthis
+                d15_ratio = self.get_dx(0.5)/d15
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,
                     self._silt: 0.075/1000}
         self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
+    def get_dx(self, frac):
+        """Get the grain size associated with the given frac
+
+        TODO: To be fancy, could overrride self.GSD.__getitem__"""
+        if frac in self.GSD:
+            return self.GSD[frac]
+        else:
+            fracs = sorted(slurry.GSD.keys())
+            logds = [log10(self.GSD[f]) for f in self.GSD]
+            index = bisect.bisect(fracs, frac)
+            if index >= len(fracs)-1:
+                flow = fracs[-2]
+                fnext = fracs[-1]
+            else:
+                flow = fracs[index]
+                fnext = fracs[index+1]
+            dlow = slurry.GSD[flow]
+            dnext = slurry.GSD[fnext]
+            logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
+        return 10 ** logdthis
+
 
     def generate_curves(self):
-        self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.GSD[0.5], self.epsilon,
+        self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.get_dx(0.5), self.epsilon,
                                                        self.nu, self.rhol, self.rhos, self.Cv, self.GSD)
         self.im_curves = viewer.generate_im_curves(self.Erhg_curves, self.Rsd, self.Cv, self.rhom)
-        self.LDV_curves = viewer.generate_LDV_curves(self.Dp, self.GSD[0.5], self.epsilon,
+        self.LDV_curves = viewer.generate_LDV_curves(self.Dp, self.get_dx(0.5), self.epsilon,
                                                      self.nu, self.rhol, self.rhos)
-        self.LDV85_curves = viewer.generate_LDV_curves(self.Dp, self.GSD[0.85], self.epsilon,
+        self.LDV85_curves = viewer.generate_LDV_curves(self.Dp, self.get_dx(0.85), self.epsilon,
                                                        self.nu, self.rhol, self.rhos)
 slurry = Slurry()
 
@@ -358,23 +390,28 @@ fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
     new_D50 = slurry.D50 + delta / 1000
-    new_D85 = new_D50 * slurry.GSD[0.85] / slurry.GSD[0.5]
-    new_D15 = new_D50 * slurry.GSD[0.15] / slurry.GSD[0.5]
-    D50_input.value = f"{new_D50 * 1000:0.3f}"
+    new_D85 = new_D50 * slurry.get_dx(0.85) / slurry.get_dx(0.5)
+    new_D15 = new_D50 * slurry.get_dx(0.15) / slurry.get_dx(0.5)
+    D85_input.remove_on_change('value', update_data)
     D85_input.value = f"{new_D85 * 1000:0.3f}"
+    D15_input.remove_on_change('value', update_data)
     D15_input.value = f"{new_D15 * 1000:0.3f}"
+    D50_input.value = f"{new_D50 * 1000:0.3f}"
+    D15_input.on_change('value', update_data)
+    D85_input.on_change('value', update_data)
+
 def D50_up_callback():
     D50_adjust_proportionate(0.1)
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
 
-D85_input = TextInput(title="D85 (mm)", value=f"{slurry.GSD[0.85] * 1000:0.3f}", width=95)
+D85_input = TextInput(title="D85 (mm)", value=f"{slurry.get_dx(0.85) * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
 D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
 D50_up_button.on_click(D50_up_callback)
 D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
 D50_down_button.on_click(D50_down_callback)
-D15_input = TextInput(title="D15 (mm)", value=f"{slurry.GSD[0.15] * 1000:0.3f}", width=95)
+D15_input = TextInput(title="D15 (mm)", value=f"{slurry.get_dx(0.15) * 1000:0.3f}", width=95)
 silt_input = TextInput(title="% of 0.075 mm", value=f"{slurry.silt * 100:0.1f}", width=95)
 D50_updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input, silt_input)
@@ -430,11 +467,11 @@ def update_data(attrname, old, new):
     print(f"Update_Data: {attrname}, {old}, {new}")
     # Get the current slider values
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
-    slurry.GSD[0.85] = check_value(D85_input, slurry.D50*1000, slurry.Dp * 1000 * 0.50, slurry.GSD[0.85]*1000, '0.3f') / 1000
+    d85 = check_value(D85_input, slurry.D50*1000, slurry.Dp * 1000 * 0.50, slurry.get_dx(.85)*1000, '0.3f') / 1000
     slurry.D50 = check_value(D50_input, 0.08, slurry.Dp * 1000 * 0.25, slurry.D50 * 1000, '0.3f') / 1000
-    slurry.GSD[0.15] = check_value(D15_input, 0.06, slurry.D50 * 1000, slurry.GSD[0.15]*1000, '0.3f') / 1000
+    d15 = check_value(D15_input, 0.06, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
     slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f')/100
-    slurry.generate_GSD(d15_ratio=None, d85_ratio=None)
+    slurry.generate_GSD(d15_ratio=slurry.D50/d15, d85_ratio=d85/slurry.D50)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
 
     update_source_data()
