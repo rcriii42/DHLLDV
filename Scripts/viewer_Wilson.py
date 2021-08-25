@@ -41,8 +41,6 @@ if __name__ == '__main__':
     #The DHLLDV model for the given material
     Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in vls_list]
     il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
-    Cvt = Cv
-    Cvs_from_Cvt_list = [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt) for vls in vls_list]
     Cvt_Erhg_list = [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list]
     graded_Cvt_Erhg_list = [DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=True)
                             for vls in vls_list]
