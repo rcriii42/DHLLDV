@@ -379,10 +379,10 @@ def update_fluid(index):
 
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
 fluid_radio.on_click(update_fluid)
-fluid_viscosity_label = TextInput(title=f"Viscosity (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
-                                  width=100, disabled=True)
-fluid_density_label = TextInput(title=f"Density (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
-                                width=100, disabled=True)
+fluid_viscosity_label = TextInput(title=f"Viscosity \u03BD\u2097 (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
+                                  width=125, disabled=True)
+fluid_density_label = TextInput(title=f"Density \u03C1\u2097 (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
+                                width=125, disabled=True)
 fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
@@ -440,9 +440,9 @@ def update_rhos(attrname, old, new):
     slurry.rhoi = Cvi *(slurry.rhos - slurry.rhol) + slurry.rhol
     update_source_data()
 
-rhos_input = TextInput(title="Rhos (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}")
+rhos_input = TextInput(title="Solids Density \u03C1\u209B (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}", width=150)
 rhos_input.on_change('value', update_rhos)
-Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True)
+Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True, width=95)
 rhos_row = row(rhos_input, Rsd_input)
 
 def update_rhom(attrname, old, new):
@@ -459,9 +459,9 @@ Cv_up_button.on_click(Cv_up_callback)
 Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
 Cv_down_button.on_click(Cv_down_callback)
 Cv_updown = column(Cv_up_button, Cv_down_button)
-Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}", width=95)
+Cv_input = TextInput(title="Cv (-)", value=f"{slurry.Cv:0.3f}", width=95)
 Cvi_input = TextInput(title=f'Cvi (@{slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
-rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=95)
+rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=150)
 rhom_input.on_change('value', update_rhom)
 conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
 
