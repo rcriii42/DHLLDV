@@ -172,7 +172,9 @@ def update_source_data():
     roughness_label.value = f"{slurry.epsilon:0.3e}"
     fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
     fluid_density_label.value = f"{slurry.rhol:0.4f}"
+    Cvi_input.title = f'Cvi (@{slurry.rhoi:0.3f})'
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
+    Rsd_input.value=f"{slurry.Rsd:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
@@ -416,6 +418,17 @@ silt_input = TextInput(title="% of 0.075 mm", value=f"{slurry.silt * 100:0.1f}",
 D50_updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input, silt_input)
 
+def rhos_callback(attrname, old, new):
+    Cvi = (slurry.rhoi - slurry.rhol) / (slurry.rhos - slurry.rhol)
+    slurry.rhos = check_value(rhos_input, 1.5, 7.0, slurry.rhos, "0.3f")
+    slurry.rhoi = Cvi *(slurry.rhos - slurry.rhol) + slurry.rhol
+    update_source_data()
+
+rhos_input = TextInput(title="Rhos (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}")
+rhos_input.on_change('value', rhos_callback)
+Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True)
+rhos_row = row(rhos_input, Rsd_input)
+
 def update_rhom(attrname, old, new):
     """Update the Cv based on rhom input"""
     max_rhom = 0.5 * (slurry.rhos - slurry.rhol) + slurry.rhol
@@ -431,7 +444,7 @@ Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min"
 Cv_down_button.on_click(Cv_down_callback)
 Cv_updown = column(Cv_up_button, Cv_down_button)
 Cv_input = TextInput(title="Cv", value=f"{slurry.Cv:0.3f}", width=95)
-Cvi_input = TextInput(title='Cvi (@1.92)', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
+Cvi_input = TextInput(title=f'Cvi (@{slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
 rhom_input = TextInput(title='Rhom (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=95)
 rhom_input.on_change('value', update_rhom)
 conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
@@ -499,6 +512,7 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
                 Div(text="""<B>Grain Size Distribution</B>"""),
                 GSD_inputs,         # A row of text boxes
                 GSD_plot,
+                rhos_row,
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 Div(text="""<B>Concentrations</B>"""),
                 conc_row,           # A row of text boxes
