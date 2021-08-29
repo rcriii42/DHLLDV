@@ -42,7 +42,7 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-![image](https://user-images.githubusercontent.com/9353408/131258045-0e03565b-1bf9-4fad-802e-67ac1b06baeb.png)
+![image](https://user-images.githubusercontent.com/9353408/131259001-3ce1bc1b-8a22-4ac8-9351-26d4481c97d8.png)
 
 The viewer allows you to adjust certain properties of the system:
 
