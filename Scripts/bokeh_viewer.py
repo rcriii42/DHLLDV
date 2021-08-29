@@ -58,9 +58,11 @@ class Slurry():
 
     @silt.setter
     def silt(self, X):
-        if X < 0:
+        if X is None:
+            X = -1
+        elif X < 0:
             X = 0.0
-        if X > 1:   #In this case D85 is < 0.075 and the ELM will be invoked
+        elif X > 1:   #In this case D85 is < 0.075 and the ELM will be invoked
             X = 0.999
         self._silt = X
         self.generate_GSD(d15_ratio=None, d85_ratio=None)
@@ -82,14 +84,17 @@ class Slurry():
         self.Cv = (Sm - self.rhol) / (self.rhos - self.rhol)
 
     def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
+
         if not d85_ratio:
             d85_ratio = self.get_dx(0.85) / self.get_dx(0.5)
         if not d15_ratio:
             d15_ratio = self.get_dx(0.5) / self.get_dx(0.15)
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
-                    0.85: self.D50 * d85_ratio,
-                    self._silt: 0.075/1000}
+                    0.85: self.D50 * d85_ratio,}
+        if self._silt >= 0:
+            temp_GSD[self._silt] = 0.075/1000
+        print(temp_GSD)
         self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
     def get_dx(self, frac):
@@ -407,6 +412,15 @@ def D50_up_callback():
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
 
+def update_silt(attrname, old, new):
+    if silt_input.value == '':
+        slurry.silt = None
+    else:
+        slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f') / 100
+    slurry.generate_GSD(d15_ratio=slurry.D50 / slurry.get_dx(0.15), d85_ratio=slurry.get_dx(0.85) / slurry.D50)
+    update_source_data()
+
+
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.get_dx(0.85) * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
 D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
@@ -415,17 +429,19 @@ D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min
 D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.get_dx(0.15) * 1000:0.3f}", width=95)
 silt_input = TextInput(title="% of 0.075 mm", value=f"{slurry.silt * 100:0.1f}", width=95)
+silt_input.on_change('value', update_silt)
+
 D50_updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input, silt_input)
 
-def rhos_callback(attrname, old, new):
+def update_rhos(attrname, old, new):
     Cvi = (slurry.rhoi - slurry.rhol) / (slurry.rhos - slurry.rhol)
     slurry.rhos = check_value(rhos_input, 1.5, 7.0, slurry.rhos, "0.3f")
     slurry.rhoi = Cvi *(slurry.rhos - slurry.rhol) + slurry.rhol
     update_source_data()
 
 rhos_input = TextInput(title="Rhos (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}")
-rhos_input.on_change('value', rhos_callback)
+rhos_input.on_change('value', update_rhos)
 Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True)
 rhos_row = row(rhos_input, Rsd_input)
 
@@ -492,13 +508,11 @@ def update_data(attrname, old, new):
                                  slurry.Dp * 1000 * 0.25),
                              slurry.D50 * 1000, '0.3f') / 1000
     d15 = check_value(D15_input, 0.08, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
-    slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f')/100
     slurry.generate_GSD(d15_ratio=slurry.D50/d15, d85_ratio=d85/slurry.D50)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
-
     update_source_data()
 
-for w in [Dp_input, D15_input, D50_input, D85_input, silt_input, Cv_input]:
+for w in [Dp_input, D15_input, D50_input, D85_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
