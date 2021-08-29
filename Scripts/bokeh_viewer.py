@@ -177,7 +177,7 @@ def update_source_data():
     roughness_label.value = f"{slurry.epsilon:0.3e}"
     fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
     fluid_density_label.value = f"{slurry.rhol:0.4f}"
-    Cvi_input.title = f'Cvi (@{slurry.rhoi:0.3f})'
+    Cvi_input.title = f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})'
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     Rsd_input.value=f"{slurry.Rsd:0.3f}"
     rhom_input.value = f"{slurry.rhom:0.3f}"
@@ -460,7 +460,7 @@ Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min"
 Cv_down_button.on_click(Cv_down_callback)
 Cv_updown = column(Cv_up_button, Cv_down_button)
 Cv_input = TextInput(title="Cv (-)", value=f"{slurry.Cv:0.3f}", width=95)
-Cvi_input = TextInput(title=f'Cvi (@{slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
+Cvi_input = TextInput(title=f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
 rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=150)
 rhom_input.on_change('value', update_rhom)
 conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
