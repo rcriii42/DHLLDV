@@ -3,7 +3,9 @@ SlurryObj - Holds the Slurry object that manages the inoyts and curves for a slu
 
 Added by R. Ramsdell 30 August, 2021
 '''
-import DHLLDV_framework
+from . import DHLLDV_framework
+from . import DHLLDV_constants
+from . import homogeneous
 
 class Slurry():
     def __init__(self):
@@ -101,12 +103,12 @@ class Slurry():
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
         return 10 ** logdthis
 
-    def generate_Erhg_curves(self, vls_list, Dp, d, epsilon, nu, rhol, rhos, Cv, GSD):
+    def generate_Erhg_curves(self):
         """Generate a dict with the Erhg curves
 
         Note assumes the GSD is already generated"""
-        Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv, get_dict=True) for vls in
-                         vls_list]
+        Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv, get_dict=True) for vls in
+                         self.vls_list]
         il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
         # Erhg for the ELM is just the il
         return {'Erhg_objects': Erhg_obj_list,
@@ -117,45 +119,44 @@ class Slurry():
                 'He': [Erhg_obj['He'] for Erhg_obj in Erhg_obj_list],
                 'Ho': [Erhg_obj['Ho'] for Erhg_obj in Erhg_obj_list],
                 'Cvs_regime': [Erhg_obj['regime'] for Erhg_obj in Erhg_obj_list],
-                'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in
-                                 vls_list],
-                'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cv) for vls in vls_list],
+                'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv) for vls in
+                                 self.vls_list],
+                'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv) for vls in self.vls_list],
                 'graded_Cvs_Erhg': [
-                    DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False,
+                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv, Cvt_eq_Cvs=False,
                                                  num_fracs=None)
-                    for vls in vls_list],
+                    for vls in self.vls_list],
                 'graded_Cvt_Erhg': [
-                    DHLLDV_framework.Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=True,
-                                                 num_fracs=None)
-                    for vls in vls_list],
+                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon,
+                                                 self.nu, self.rhol, self.rhos, self.Cv,
+                                                 Cvt_eq_Cvs=True, num_fracs=None)
+                    for vls in self.vls_list],
                 }
 
-    def generate_im_curves(self, Erhg_curves, Rsd, Cv, rhom):
+    def generate_im_curves(self):
         """Generate the im curves, given the Erhg curves"""
-        c = Erhg_curves
+        c = self.Erhg_curves
         il_list = c['il']
-        max_index = len(il_list)
         return {'il': il_list,
-                'Cvs_im': [c['Cvs_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'FB': [c['FB'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'SB': [c['SB'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'He': [c['He'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'ELM': [il_list[i] * rhom for i in range(max_index)],
-                'Ho': [c['Ho'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'Cvt_im': [c['Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)],
-                'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * Rsd * Cv + il_list[i] for i in range(max_index)]
+                'Cvs_im': [c['Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'FB': [c['FB'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'SB': [c['SB'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'He': [c['He'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'ELM': [il_list[i] * self.rhom for i in range(self.max_index)],
+                'Ho': [c['Ho'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'Cvt_im': [c['Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)]
                 }
 
-    def generate_LDV_curves(self, Dp, d, epsilon, nu, rhol, rhos):
+    def generate_LDV_curves(self, d):
         cv_points = 50
-        Rsd = (rhos - rhol) / rhol
         Cv_list = [(i + 1) / 100. for i in range(cv_points)]
-        LDV_vls_list = [DHLLDV_framework.LDV(1, Dp, d, epsilon, nu, rhol, rhos, Cv) for Cv in Cv_list]
-        LDV_il_list = [homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol) for vls in LDV_vls_list]
-        LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], Dp, d, epsilon, nu, rhol, rhos, Cv_list[i]) for i in
+        LDV_vls_list = [DHLLDV_framework.LDV(1, self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv) for Cv in Cv_list]
+        LDV_il_list = [homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol) for vls in LDV_vls_list]
+        LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv_list[i]) for i in
                          range(cv_points)]
-        LDV_im_list = [LDV_Ergh_list[i] * Rsd * Cv_list[i] + LDV_il_list[i] for i in range(cv_points)]
+        LDV_im_list = [LDV_Ergh_list[i] * self.Rsd * Cv_list[i] + LDV_il_list[i] for i in range(cv_points)]
         return {'Cv': Cv_list,
                 'vls': LDV_vls_list,
                 'il': LDV_il_list,
@@ -164,10 +165,7 @@ class Slurry():
                 'regime': [f'LDV for {d * 1000:0.3f} mm particle at Cvs={Cv_list[i]}' for i in range(cv_points)]
                 }
     def generate_curves(self):
-        self.Erhg_curves = viewer.generate_Erhg_curves(self.vls_list, self.Dp, self.get_dx(0.5), self.epsilon,
-                                                       self.nu, self.rhol, self.rhos, self.Cv, self.GSD)
-        self.im_curves = viewer.generate_im_curves(self.Erhg_curves, self.Rsd, self.Cv, self.rhom)
-        self.LDV_curves = viewer.generate_LDV_curves(self.Dp, self.get_dx(0.5), self.epsilon,
-                                                     self.nu, self.rhol, self.rhos)
-        self.LDV85_curves = viewer.generate_LDV_curves(self.Dp, self.get_dx(0.85), self.epsilon,
-                                                       self.nu, self.rhol, self.rhos)
+        self.Erhg_curves = self.generate_Erhg_curves()
+        self.im_curves = self.generate_im_curves()
+        self.LDV_curves = self.generate_LDV_curves(self.get_dx(0.5))
+        self.LDV85_curves = self.generate_LDV_curves(self.get_dx(0.85))
