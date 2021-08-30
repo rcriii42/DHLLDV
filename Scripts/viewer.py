@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     S.Cv = 0.24
 
-    vls_list = [(i+1)/10. for i in range(200)]
+    vls_list = S.vls_list
 
     Erhg_curves = S.generate_Erhg_curves()
     im_curves = S.generate_im_curves()
