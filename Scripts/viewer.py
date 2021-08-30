@@ -9,10 +9,7 @@ import csv
 
 from DHLLDV import DHLLDV_constants
 from DHLLDV import SlurryObj
-from DHLLDV import DHLLDV_framework
-from DHLLDV import homogeneous
 
-#import numpy as np
 try:
     import matplotlib.pyplot as plt
 except:
