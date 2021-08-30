@@ -16,14 +16,14 @@ from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
 from bokeh.models import Spacer, Div
 from bokeh.plotting import figure
 
-from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
+from DHLLDV import SlurryObj
 import viewer
 
 
 # Set up data
 
-slurry = Slurry()
+slurry = SlurryObj.Slurry()
 
 im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
                                        graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
