@@ -3,6 +3,9 @@ SlurryObj - Holds the Slurry object that manages the inoyts and curves for a slu
 
 Added by R. Ramsdell 30 August, 2021
 '''
+import bisect
+from math import log10
+
 from . import DHLLDV_framework
 from . import DHLLDV_constants
 from . import homogeneous
@@ -89,7 +92,7 @@ class Slurry():
         if frac in self.GSD:
             return self.GSD[frac]
         else:
-            fracs = sorted(slurry.GSD.keys())
+            fracs = sorted(self.GSD.keys())
             logds = [log10(self.GSD[f]) for f in self.GSD]
             index = bisect.bisect(fracs, frac)
             if index >= len(fracs)-1:
@@ -98,8 +101,8 @@ class Slurry():
             else:
                 flow = fracs[index]
                 fnext = fracs[index+1]
-            dlow = slurry.GSD[flow]
-            dnext = slurry.GSD[fnext]
+            dlow = self.GSD[flow]
+            dnext = self.GSD[fnext]
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
         return 10 ** logdthis
 
