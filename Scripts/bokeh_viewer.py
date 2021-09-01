@@ -1,14 +1,12 @@
-'''
+"""
 bokeh_viewer: a program to view the curves in a bokeh interactive session
 
 Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab in your browser
 
 Added by R. Ramsdell 19 August, 2021
-'''
+"""
 
 import sys
-from math import log10
-import bisect
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -18,8 +16,6 @@ from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
 from DHLLDV import SlurryObj
-import viewer
-
 
 # Set up data
 
