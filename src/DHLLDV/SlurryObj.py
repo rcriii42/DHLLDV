@@ -6,23 +6,27 @@ Added by R. Ramsdell 30 August, 2021
 import bisect
 from math import log10
 
+
 from . import DHLLDV_framework
 from . import DHLLDV_constants
 from . import homogeneous
 
 class Slurry():
-    def __init__(self):
-        self.max_index = 100
-        self.Dp = 0.762  # Pipe diameter
-        self.D50 = 1.0 / 1000.
-        self._silt = 0
+    def __init__(self, Dp=0.762, D50=1.0/1000., silt=None, fluid='fresh', Cv=0.175, max_index=100):
+        self.max_index = max_index
+        self.Dp = Dp
+        self.D50 = D50
+        if silt == None:
+            self._silt = -1
+        else:
+            self._silt = silt
         self.epsilon = DHLLDV_constants.steel_roughness
-        self._fluid = 'salt'
+        self._fluid = fluid
+        self.Cv = Cv
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
         self.rhos = 2.65
         self.rhoi = 1.92
-        self.Cv = 0.175
         self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
         self.generate_GSD()
         self.generate_curves()
