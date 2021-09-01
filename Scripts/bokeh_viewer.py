@@ -13,7 +13,7 @@ import bisect
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div
+from bokeh.models import Spacer, Div, Panel, Tabs
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
@@ -428,6 +428,8 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
                 conc_row,           # A row of text boxes
                 stop_button)
 plots = column(HQ_plot, Erhg_plot)
+slurry_panel = Panel(child= row(inputs, plots), title="Slurry")
 
-curdoc().add_root(row(inputs, plots, width=800))
-curdoc().title = "im_Curves"
+
+curdoc().add_root(Tabs(tabs=[slurry_panel]))
+curdoc().title = "Visualizing DHLLDV"
