@@ -5,6 +5,7 @@ Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab 
 
 Added by R. Ramsdell 19 August, 2021
 """
+import sys
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
