@@ -30,11 +30,11 @@ def update_all():
 
 def pipe_panel(pipe):
     """Create a Bokeh row with information about the pipe"""
-    return row(TextInput(title="Name", value=pipe.name),
-               TextInput(title="Dp (mm)", value=f"{int(pipe.diameter*1000)}"),
-               TextInput(title="Length (m)", value=f"{pipe.length:0.1f}"),
-               TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}"),
-               TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}"),)
+    return row(TextInput(title="Name", value=pipe.name, width=76),
+               TextInput(title="Dp (mm)", value=f"{int(pipe.diameter*1000)}", width=76),
+               TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
+               TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
+               TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
