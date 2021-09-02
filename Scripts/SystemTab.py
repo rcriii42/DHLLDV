@@ -29,15 +29,15 @@ def update_all():
     pass
 
 def pipe_panel(pipe):
-    """Create a Bokeh panel with information about the pipe"""
+    """Create a Bokeh row with information about the pipe"""
     name_input = TextInput(title="Name", value=pipe.name)
     Dp_input =  TextInput(title="Dp (mm)", value=f"{int(pipe.diameter*1000)}")
     L_input = TextInput(title="Length (m)", value=f"{pipe.length:0.1f}")
-    return Panel(title=pipe.name, child=row(name_input, Dp_input, L_input))
+    return row(name_input, Dp_input, L_input)
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    return Panel(title="Pipline", child = column(pipe_panel(p) for p in PL))
+    return Panel(title="Pipline", child = column([pipe_panel(p) for p in PL]))
 
 
 
