@@ -358,12 +358,6 @@ rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=
 rhom_input.on_change('value', update_rhom)
 conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
 
-# Button to stop the server
-def stop_button_callback():
-    sys.exit()  # Stop the server
-stop_button = Button(label="Stop", button_type="success")
-stop_button.on_click(stop_button_callback)
-
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
 
@@ -423,11 +417,18 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
                 Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
                 Div(text="""<B>Concentrations</B>"""),
                 conc_row,           # A row of text boxes
-                stop_button)
+                )
 plots = column(HQ_plot, Erhg_plot)
 slurry_panel = Panel(child= row(inputs, plots), title="Slurry")
 
+# Button to stop the server
+def stop_button_callback():
+    sys.exit()  # Stop the server
+stop_button = Button(label="Stop", button_type="success", width=75)
+stop_button.on_click(stop_button_callback)
 
-curdoc().add_root(Tabs(tabs=[slurry_panel,
-                             SystemTab.system_panel(SystemTab.pipeline)]))
+
+curdoc().add_root(column(Tabs(tabs=[slurry_panel,
+                                    SystemTab.system_panel(SystemTab.pipeline)]),
+                         stop_button))
 curdoc().title = "Visualizing DHLLDV"
