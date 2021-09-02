@@ -38,7 +38,7 @@ def pipe_panel(pipe):
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    return Panel(title="Pipline", child = column([pipe_panel(p) for p in PL]))
+    return Panel(title="Pipeline", child = column([pipe_panel(p) for p in PL]))
 
 
 
