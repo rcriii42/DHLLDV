@@ -16,6 +16,8 @@ from bokeh.plotting import figure
 from DHLLDV import DHLLDV_framework
 from DHLLDV import SlurryObj
 
+import SystemTab
+
 # Set up data
 
 slurry = SlurryObj.Slurry()
@@ -426,5 +428,6 @@ plots = column(HQ_plot, Erhg_plot)
 slurry_panel = Panel(child= row(inputs, plots), title="Slurry")
 
 
-curdoc().add_root(Tabs(tabs=[slurry_panel]))
+curdoc().add_root(Tabs(tabs=[slurry_panel,
+                             SystemTab.system_panel(SystemTab.pipeline)]))
 curdoc().title = "Visualizing DHLLDV"
