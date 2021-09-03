@@ -124,10 +124,13 @@ HQ_plot.axis.minor_tick_in = 7
 HQ_plot.axis.minor_tick_out = 0
 HQ_plot.legend.location = "top_left"
 
-def update_all():
+def update_all(pipeline):
     """Placeholder for an update function"""
-
-
+    vls_list = pipeline.slurry.vls_list
+    im_source.data=dict(v=vls_list,
+                        im=[pipeline.calc_system_head(v)[0] for v in vls_list],
+                        il=[pipeline.calc_system_head(v)[1] for v in vls_list],
+                        )
 
 def pipe_panel(pipe):
     """Create a Bokeh row with information about the pipe"""
