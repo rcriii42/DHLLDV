@@ -252,6 +252,17 @@ GSD_plot.xgrid.minor_grid_line_color='navy'
 GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
 # Set up widgets
+def update_Dp(attrname, old, new):
+    """Update the pipe diameter"""
+    old_Dp = slurry.Dp
+    slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp * 1000, '0.0f') / 1000
+    for p in pipeline.pipesections:
+        if p.diameter == old_Dp:
+            p.diameter = slurry.Dp
+    pipeline.slurry = slurry
+    update_source_data()
+
+
 def Dp_up_callback():
     Dp_input.value=f"{int(slurry.Dp*1000)+25}"
 def Dp_down_callback():
@@ -262,6 +273,7 @@ Dp_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min"
 Dp_down_button.on_click(Dp_down_callback)
 Dp_updown = column(Dp_up_button, Dp_down_button)
 Dp_input = TextInput(title="Dp (mm)", value=f"{int(slurry.Dp*1000)}", width=95)
+Dp_input.on_change('value', update_Dp)
 roughness_label = TextInput(title="Roughness (m)", value=f"{slurry.epsilon:0.3e}",
                             width=95, disabled=True)
 Dp_row = row(Dp_input, Dp_updown, Spacer(width=10), roughness_label)
@@ -386,7 +398,7 @@ def check_value(widget, min, max, prev, fmt):
 
 def update_data(attrname, old, new):
     # Get the current slider values
-    slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp*1000, '0.0f')/1000
+
     d85 = check_value(D85_input,
                       slurry.D50*1000+0.01,
                       slurry.Dp * 1000 * 0.50,
@@ -402,7 +414,7 @@ def update_data(attrname, old, new):
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
 
-for w in [Dp_input, D15_input, D50_input, D85_input, Cv_input]:
+for w in [D15_input, D50_input, D85_input, Cv_input]:
     w.on_change('value', update_data)
 
 # Set up layouts and add to document
