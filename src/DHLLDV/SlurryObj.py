@@ -1,8 +1,9 @@
-'''
+"""
 SlurryObj - Holds the Slurry object that manages the inoyts and curves for a slurry and pipe
 
 Added by R. Ramsdell 30 August, 2021
-'''
+"""
+
 import bisect
 from math import log10
 
