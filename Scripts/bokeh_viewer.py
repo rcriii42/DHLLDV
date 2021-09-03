@@ -294,6 +294,7 @@ fluid_density_label = TextInput(title=f"Density \u03C1\u2097 (ton/m\u00b3)", val
 fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
+    """Adjust the D15 and D85 proportionately when D50 up/down buttons used"""
     print(f"D50_adjust_proportionate D50 was {slurry.D50*1000:0.4f} / {slurry.get_dx(0.5)*1000:0.4f}: will be {slurry.D50*1000+delta:0.4f}")
     if DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000 <\
             slurry.D50*1000 + delta <=\
