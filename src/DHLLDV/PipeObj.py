@@ -6,15 +6,20 @@ Added by R. Ramsdell 03 September, 2021
 import bisect
 import collections
 from copy import copy
+from dataclasses import dataclass
 
 from DHLLDV import DHLLDV_framework
 from DHLLDV.SlurryObj import Slurry
 from DHLLDV.DHLLDV_constants import gravity
 
-
-Pipe = collections.namedtuple('pipe',
-                              ('name', 'diameter', 'length', 'total_K', 'elev_change'),
-                              )
+@dataclass
+class Pipe():
+    """Object to manage the data about a section of pipe"""
+    name: str = 'Pipe Section'
+    diameter: float = 0.762
+    length: float = 1.0
+    total_K: float = 0.0
+    elev_change: float = 0.0
 
 class Pipeline():
     """Object to manage the pipeline system"""
