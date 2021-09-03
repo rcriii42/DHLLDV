@@ -29,6 +29,13 @@ class Pipe():
         returns flow in m3/sec"""
         return v * (self.diameter/2)**2 * pi
 
+    def velocity(self, Q):
+        """Return the velocity for the associated flow
+
+                Q is the flow in m3/sec
+                returns velocity in m/sec"""
+        return Q / ((self.diameter / 2) ** 2 * pi)
+
 class Pipeline():
     """Object to manage the pipeline system"""
     def __init__(self, pipe_list=None, slurry=None):
