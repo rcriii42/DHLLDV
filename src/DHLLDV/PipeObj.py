@@ -7,6 +7,7 @@ import bisect
 import collections
 from copy import copy
 from dataclasses import dataclass
+from math import pi
 
 from DHLLDV import DHLLDV_framework
 from DHLLDV.SlurryObj import Slurry
@@ -20,6 +21,13 @@ class Pipe():
     length: float = 1.0
     total_K: float = 0.0
     elev_change: float = 0.0
+
+    def flow(self, v):
+        """Return the flow for the associated velocity
+
+        v is velocity in m/sec
+        returns flow in m3/sec"""
+        return v * (self.diameter/2)**2 * pi
 
 class Pipeline():
     """Object to manage the pipeline system"""
