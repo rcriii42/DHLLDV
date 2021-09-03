@@ -46,7 +46,7 @@ HQ_plot.line('v', 'il', source=im_source,
              line_alpha=0.3,
              legend_label='Water',
              name='Water')
-HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
+HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
 HQ_plot.axis.major_tick_in = 10
 HQ_plot.axis.minor_tick_in = 7
@@ -60,6 +60,7 @@ def update_all(pipeline):
                         im=[pipeline.calc_system_head(v)[0] for v in vls_list],
                         il=[pipeline.calc_system_head(v)[1] for v in vls_list],
                         )
+    HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
 
 def pipe_panel(pipe):
     """Create a Bokeh row with information about the pipe"""

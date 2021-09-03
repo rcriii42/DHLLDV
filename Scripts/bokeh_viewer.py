@@ -77,6 +77,7 @@ def update_source_data():
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
+    HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {slurry.Dp:0.3f}m pipe)'
     SystemTab.update_all(pipeline)
 
 ################
@@ -142,7 +143,7 @@ HQ_plot.line('v', 'im', source=LDV85_source,
              legend_label='LDV D85',
              name='LDV D85')
 
-HQ_plot.xaxis[0].axis_label = 'Velocity (m/sec)'
+HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {slurry.Dp:0.3f}m pipe)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
 HQ_plot.axis.major_tick_in = 10
 HQ_plot.axis.minor_tick_in = 7
