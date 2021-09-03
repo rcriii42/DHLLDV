@@ -61,19 +61,21 @@ def update_all(pipeline):
                         il=[pipeline.calc_system_head(v)[1] for v in vls_list],
                         )
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    for i, r in enumerate(pipecol.children):
+        r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
     return row(TextInput(title="#", value=f'{i:3d}', width=45),
                TextInput(title="Name", value=pipe.name, width=95),
-               TextInput(title="Dp (mm)", value=f"{int(pipe.diameter*1000)}", width=76),
+               TextInput(title="Dp (m)", value=f"{pipe.diameter:0.3f}", width=76),
                TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
                TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
                TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
+pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    pipecol = column([pipe_panel(i, p) for i, p in enumerate(PL.pipesections)])
     return Panel(title="Pipeline", child = row(pipecol, HQ_plot))
 
 
