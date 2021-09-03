@@ -44,6 +44,7 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 
+pipeline = SystemTab.Pipeline(slurry=slurry)
 def update_source_data():
     slurry.generate_curves()
     im_source.data = dict(v=slurry.vls_list,
@@ -76,6 +77,7 @@ def update_source_data():
     rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
+    SystemTab.update_all(pipeline)
 
 ################
 # Set up HQ plot
@@ -429,6 +431,6 @@ stop_button.on_click(stop_button_callback)
 
 
 curdoc().add_root(column(Tabs(tabs=[slurry_panel,
-                                    SystemTab.system_panel(SystemTab.pipeline)]),
+                                    SystemTab.system_panel(pipeline)]),
                          stop_button))
 curdoc().title = "Visualizing DHLLDV"
