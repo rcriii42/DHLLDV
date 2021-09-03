@@ -19,7 +19,7 @@ from DHLLDV import DHLLDV_framework
 from DHLLDV.SlurryObj import Slurry
 from DHLLDV.DHLLDV_constants import gravity
 
-pipe = collections.namedtuple('pipe',
+Pipe = collections.namedtuple('pipe',
                               ('name', 'diameter', 'length', 'total_K', 'elev_change'),
                               )
 
@@ -31,8 +31,8 @@ class Pipeline():
         if pipe_list:
             self.pipesections = pipe_list
         else:
-            self.pipesections = [pipe('Entrance', slurry.Dp, 0, 0.5, -10.0),
-                                 pipe('Discharge', slurry.Dp, 1000, 1.0, 1.5)]
+            self.pipesections = [Pipe('Entrance', slurry.Dp, 0, 0.5, -10.0),
+                                 Pipe('Discharge', slurry.Dp, 1000, 1.0, 1.5)]
         self.slurry = slurry
 
     @property
