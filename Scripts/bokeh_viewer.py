@@ -14,7 +14,7 @@ from bokeh.models import Spacer, Div, Panel, Tabs
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
-from DHLLDV import SlurryObj
+from DHLLDV import SlurryObj, PipeObj
 
 import SystemTab
 
@@ -44,7 +44,7 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 
-pipeline = SystemTab.Pipeline(slurry=slurry)
+pipeline = PipeObj.Pipeline(slurry=slurry)
 def update_source_data():
     slurry.generate_curves()
     im_source.data = dict(v=slurry.vls_list,
