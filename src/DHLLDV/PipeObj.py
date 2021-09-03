@@ -29,7 +29,7 @@ class Pipeline():
         if pipe_list:
             self.pipesections = pipe_list
         else:
-            self.pipesections = [Pipe('Entrance', slurry.Dp, 0, 0.5, -10.0),
+            self.pipesections = [Pipe('Entrance', slurry.Dp*34./30, 0, 0.5, -10.0),
                                  Pipe('Discharge', slurry.Dp, 1000, 1.0, 1.5)]
         self.slurry = slurry
 
