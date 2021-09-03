@@ -27,20 +27,13 @@ class Pipeline():
     """Object to manage the pipeline system"""
     def __init__(self, pipe_list=None, slurry=None):
         if not slurry:
-            self.slurry = Slurry()
-        else:
-            self.slurry = slurry
+            slurry = Slurry()
         if pipe_list:
             self.pipesections = pipe_list
         else:
-            self.pipesections = [pipe('Entrance', self.slurry.Dp, 0, 0.5, -10.0),
-                                 pipe('Discharge', self.slurry.Dp, 1000, 1.0, 1.5)]
-        self.slurries = {self.slurry.Dp: self.slurry}
-        for p in self.pipesections:
-            if p.diameter not in self.slurries:
-                self.slurries[p.diameter] = copy(self.slurry)
-                self.slurries[p.diameter].Dp = p.diameter
-                self.slurries[p.diameter].generate_curves()
+            self.pipesections = [pipe('Entrance', slurry.Dp, 0, 0.5, -10.0),
+                                 pipe('Discharge', slurry.Dp, 1000, 1.0, 1.5)]
+        self.slurry = slurry
 
     @property
     def Cv(self):
@@ -52,6 +45,20 @@ class Pipeline():
         for s in self.slurries.values():
             s.Cv = Cv
             s.generate_curves()
+
+    @property
+    def slurry(self):
+        return self._slurry
+
+    @slurry.setter
+    def slurry(self, s):
+        self._slurry = s
+        self.slurries = {self._slurry.Dp: self.slurry}
+        for p in self.pipesections:
+            if p.diameter not in self.slurries:
+                self.slurries[p.diameter] = copy(self._slurry)
+                self.slurries[p.diameter].Dp = p.diameter
+                self.slurries[p.diameter].generate_curves()
 
     def calc_system_head(self, v):
         """Calculate the system head for a pipeline
@@ -90,7 +97,7 @@ HQ_TOOLTIPS = [('name', "$name"),
                ("Slurry Graded Cvt=c (m/m)", "@im"),
                ("Fluid (m/m)", "@il"),
               ]
-HQ_plot = figure(height=450, width=725, title="im curves",
+HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                  tools="crosshair,pan,reset,save,wheel_zoom",
                  #x_range=[0, 10], y_range=[0, 0.6],
                  tooltips=HQ_TOOLTIPS)
