@@ -73,19 +73,21 @@ class Pipeline():
                 self.slurries[p.diameter].Dp = p.diameter
                 self.slurries[p.diameter].generate_curves()
 
-    def calc_system_head(self, v):
+    def calc_system_head(self, Q):
         """Calculate the system head for a pipeline
 
-        v is the velocity in m/sec
+        Q is the flow in m3/sec
 
         returns a tuple, im, il"""
         rhom = self.slurry.rhom
-        Hv = v**2/(2*gravity)
+
         delta_z = -1 * self.pipesections[0].elev_change
-        Hfit = Hv       # Includes exit loss
+        Hfit = 0
         Hfric_m = 0
         Hfric_l = 0
         for p in self.pipesections:
+            v = p.velocity(Q)
+            Hv = v ** 2 / (2 * gravity)
             Hfit += p.total_K*Hv
             delta_z += p.elev_change
             index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
@@ -94,5 +96,5 @@ class Pipeline():
             index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
             il = self.slurries[p.diameter].im_curves['il'][index]
             Hfric_l += il * p.length
-        return (Hfric_m + (Hfit +  + delta_z) * self.slurry.rhom,
-                Hfric_l + (Hfit + + delta_z) * self.slurry.rhol)
+        return (Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom,
+                Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol)
