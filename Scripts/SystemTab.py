@@ -15,14 +15,14 @@ from DHLLDV.PipeObj import Pipeline
 
 pipeline = Pipeline()
 
-vls_list = pipeline.slurry.vls_list
-im_source = ColumnDataSource(data=dict(v=vls_list,
-                                       im=[pipeline.calc_system_head(v)[0] for v in vls_list],
-                                       il=[pipeline.calc_system_head(v)[1] for v in vls_list],
+flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+im_source = ColumnDataSource(data=dict(Q=flow_list,
+                                       im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
+                                       il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
                                        ))
 
 HQ_TOOLTIPS = [('name', "$name"),
-               ("vls (m/sec)", "@v"),
+               ("Flow (m\u00b3/sec)", "@Q"),
                ("Slurry Graded Cvt=c (m/m)", "@im"),
                ("Fluid (m/m)", "@il"),
               ]
@@ -31,7 +31,7 @@ HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                  #x_range=[0, 10], y_range=[0, 0.6],
                  tooltips=HQ_TOOLTIPS)
 
-HQ_plot.line('v', 'im', source=im_source,
+HQ_plot.line('Q', 'im', source=im_source,
              color='black',
              line_dash='dashed',
              line_width=3,
@@ -39,14 +39,14 @@ HQ_plot.line('v', 'im', source=im_source,
              legend_label='Slurry Graded Cvt=c (m/m)',
              name='Slurry graded Sand Cvt=c')
 
-HQ_plot.line('v', 'il', source=im_source,
+HQ_plot.line('Q', 'il', source=im_source,
              color='blue',
              line_dash='dashed',
              line_width=2,
              line_alpha=0.3,
              legend_label='Water',
              name='Water')
-HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+HQ_plot.xaxis[0].axis_label = f'Flow (m\u00b3/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
 HQ_plot.axis.major_tick_in = 10
 HQ_plot.axis.minor_tick_in = 7
@@ -55,13 +55,13 @@ HQ_plot.legend.location = "top_left"
 
 def update_all(pipeline):
     """Placeholder for an update function"""
-    vls_list = pipeline.slurry.vls_list
-    im_source.data=dict(v=vls_list,
-                        im=[pipeline.calc_system_head(v)[0] for v in vls_list],
-                        il=[pipeline.calc_system_head(v)[1] for v in vls_list],
+    flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+    im_source.data=dict(Q=flow_list,
+                        im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
+                        il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
                         )
-    HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
-    for i, r in enumerate(pipecol.children):
+    # HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    for i, r in enumerate(pipecol.children):    # iterate over the rows of pipe
         r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
