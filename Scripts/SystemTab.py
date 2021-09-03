@@ -8,7 +8,7 @@ Added by R. Ramsdell 01 September, 2021
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div, Panel, Tabs
+from bokeh.models import Spacer, Div, Panel, Tabs, LinearAxis, Range1d
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline
@@ -46,11 +46,16 @@ HQ_plot.line('Q', 'il', source=im_source,
              line_alpha=0.3,
              legend_label='Water',
              name='Water')
+HQ_plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0], pipeline.slurry.vls_list[-1])}
+HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
+HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
 HQ_plot.xaxis[0].axis_label = f'Flow (m\u00b3/sec)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
 HQ_plot.axis.major_tick_in = 10
 HQ_plot.axis.minor_tick_in = 7
 HQ_plot.axis.minor_tick_out = 0
+
+
 HQ_plot.legend.location = "top_left"
 
 def update_all(pipeline):
@@ -60,7 +65,7 @@ def update_all(pipeline):
                         im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
                         il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
                         )
-    # HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
     for i, r in enumerate(pipecol.children):    # iterate over the rows of pipe
         r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
 
