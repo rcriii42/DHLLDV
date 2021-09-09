@@ -9,6 +9,12 @@ Each model has a test suite, based on 'hand' calculations contained in the inclu
 
 In addition, [DHLLDV Framework.xlsm](https://github.com/rcriii42/DHLLDV/blob/master/DHLLDV%20Framework.xlsm), a spreadsheet developed by Sape Miedema, implements the framework, a simple pump and slurry system model, historical models and more.
 
+## Licensing
+Unless noted in a particular sub-directory, this project is licenced under the [GNU Public License (GPL) 3.0](https://github.com/rcriii42/DHLLDV/blob/master/LICENSE). The current exceptions are as follows:
+
+* The file [DHLLDV Framework.xlsm](https://github.com/rcriii42/DHLLDV/blob/master/DHLLDV%20Framework.xlsm) is copyright Prof. Dr. ir. Sape A. Miedema. To my knowledge Professor Miedema makes the spreadsheet available free of charge with no restrictions.
+* The files in the [Scripts](https://github.com/rcriii42/DHLLDV/tree/master/Scripts) directory are licensed under the [MIT license](https://github.com/rcriii42/DHLLDV/blob/master/Scripts/LICENSE). This allows the creation of proprietary modifications and extensions to the viewer code. If you distribute derivative works, you must preserve the copyright notice and provide access to the source code opf the underlying DHLLDV library (a link to this repository is sufficient).
+
 ## Usage
 Once you have the code, navigate to the code directory and create a virtual environment (optional but recommended), install the requirements:
 
