@@ -62,8 +62,31 @@ class MyTestCase(unittest.TestCase):
 
     def test_head(self):
         """Test the head for the design speed on water"""
-        Q, H, P, N = self.pump.point(2.9574)
-        self.assertAlmostEqual(H, 26.67387*self.pump.slurry.rhol)
+        Q, H, P, N = self.pump.point(2.957377)
+        self.assertAlmostEqual(H, 26.82003*self.pump.slurry.rhom, places=2)
+
+    def test_Power(self):
+        """Test the power for the design speed on water"""
+        Q, H, P, N = self.pump.point(2.957377)
+        self.assertAlmostEqual(P, 989.9113*self.pump.slurry.rhom, places=0)
+
+    def test_head_slow(self):
+        """Test the head for the a lower speed on water"""
+        self.pump.current_speed = 3.377719
+        Q, H, P, N = self.pump.point(2.854054)
+        self.assertAlmostEqual(H, 24.97872*self.pump.slurry.rhom, places=3)
+
+    def test_power_slow(self):
+        """Test the power for the a lower speed on water"""
+        self.pump.current_speed = 3.377719
+        Q, H, P, N = self.pump.point(2.854054)
+        self.assertAlmostEqual(P, 889.7394*self.pump.slurry.rhom, places=0)
+
+    def test_flow_slow(self):
+        """Test the return flow for the a lower speed on water"""
+        self.pump.current_speed = 3.377719
+        Q, H, P, N = self.pump.point(2.854054)
+        self.assertAlmostEqual(Q, 2.854054, places=6)
 
 
 if __name__ == '__main__':
