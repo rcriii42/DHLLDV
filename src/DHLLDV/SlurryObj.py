@@ -87,7 +87,6 @@ class Slurry():
                     0.85: self.D50 * d85_ratio,}
         if self._silt >= 0:
             temp_GSD[self._silt] = 0.075/1000
-        print(temp_GSD)
         self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
     def get_dx(self, frac):
