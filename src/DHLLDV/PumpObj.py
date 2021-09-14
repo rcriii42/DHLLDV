@@ -62,7 +62,6 @@ class Pump():
 
         H = H0 * speed_ratio**2 * self.slurry.rhom
         P = P0 * speed_ratio**3 * self.slurry.rhom
-        ncur = self._current_speed
 
         if self.limited.lower() == 'torque':
             Pavail = self.avail_power * self._current_speed / self.design_speed
@@ -71,6 +70,7 @@ class Pump():
         if self.limited.lower() == 'none' or P <= Pavail:
             return (Q, H, P, self._current_speed)
         else:
+            n_new = self._current_speed
             while P*0.995 < Pavail or Pavail < P*1.005:       # Find reduced speed/head/power
                 n_new *= (Pavail / P) ** 0.5
                 speed_ratio = n_new / self.design_speed
