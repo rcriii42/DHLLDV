@@ -69,22 +69,22 @@ class Test(unittest.TestCase):
         ds = [new_GSD[f] for f in fracs]
         with self.subTest(msg="Test the number of points"):
             self.assertEqual(len(fracs), 11)
-            for i, f in enumerate([(1.86139090E-02, 9.4907896E-02),
-                                   (6.24092727E-02, 1.6514226E-01),
-                                   (1.06204636E-01, 2.8735193E-01),
-                                   (1.50000000E-01, 5.0000000E-01),
-                                   (2.66666667E-01, 6.2996052E-01),
-                                   (3.83333333E-01, 7.9370053E-01),
-                                   (5.00000000E-01, 1.0000000E+00),
-                                   (6.16666667E-01, 1.3941936E+00),
-                                   (7.33333333E-01, 1.9437759E+00),
-                                   (8.50000000E-01, 2.7100000E+00),
-                                   (9.66666667E-01, 3.7782648E+00),
-                                   ]):
-                with self.subTest(msg = f"Testing fraction {i}: {f[0]*100:0.2f}% : {f[1]:0.3}mm"):
-                    self.assertAlmostEqual(fracs[i], f[0])
-                with self.subTest(msg = f"Testing diameter {i}: {f[0]*100:0.2f}% : {f[1]:0.3}mm"):
-                    self.assertAlmostEqual(ds[i]*1000, f[1])
+        for i, f in enumerate([(1.86139090E-02, 9.4907896E-02),
+                               (6.24092727E-02, 1.6514226E-01),
+                               (1.06204636E-01, 2.8735193E-01),
+                               (1.50000000E-01, 5.0000000E-01),
+                               (2.66666667E-01, 6.2996052E-01),
+                               (3.83333333E-01, 7.9370053E-01),
+                               (5.00000000E-01, 1.0000000E+00),
+                               (6.16666667E-01, 1.3941936E+00),
+                               (7.33333333E-01, 1.9437759E+00),
+                               (8.50000000E-01, 2.7100000E+00),
+                               (9.66666667E-01, 3.7782648E+00),
+                               ]):
+            with self.subTest(msg = f"Testing fraction {i}: {f[0]*100:0.2f}% : {f[1]:0.3}mm"):
+                self.assertAlmostEqual(fracs[i], f[0])
+            with self.subTest(msg = f"Testing diameter {i}: {f[0]*100:0.2f}% : {f[1]:0.3}mm"):
+                self.assertAlmostEqual(ds[i]*1000, f[1])
 
 
     def test_Erhg_graded_ds(self):
