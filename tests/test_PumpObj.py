@@ -7,7 +7,6 @@ import unittest
 from DHLLDV.DHLLDV_Utils import interpDict
 from DHLLDV.PumpObj import Pump
 
-
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
         H = interpDict({0.357: 30.0930,
@@ -54,9 +53,17 @@ class MyTestCase(unittest.TestCase):
                          avail_power=895,
                          limited="none",
                          )
+        self.pump.slurry.fluid = 'fresh'
+        self.pump.slurry.rhom = self.pump.slurry.rhol
 
     def test_efficiency(self):
+        """Test the efficiency for the design speed on water"""
         self.assertAlmostEqual(self.pump.efficiency(2.9574), 0.78924, places=5)
+
+    def test_head(self):
+        """Test the head for the design speed on water"""
+        Q, H, P, N = self.pump.point(2.9574)
+        self.assertAlmostEqual(H, 26.67387*self.pump.slurry.rhol)
 
 
 if __name__ == '__main__':
