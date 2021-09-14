@@ -61,7 +61,7 @@ class Pump():
         P0 = self.design_QP_curve[Q0]
 
         H = H0 * speed_ratio**2 * self.slurry.rhom
-        P = P0 * speed_ratio**2 * self.slurry.rhom
+        P = P0 * speed_ratio**3 * self.slurry.rhom
         ncur = self._current_speed
 
         if self.limited.lower() == 'torque':
