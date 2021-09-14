@@ -58,7 +58,7 @@ class MyTestCase(unittest.TestCase):
 
     def test_efficiency(self):
         """Test the efficiency for the design speed on water"""
-        self.assertAlmostEqual(self.pump.efficiency(2.9574), 0.78924, places=5)
+        self.assertAlmostEqual(self.pump.efficiency(2.957377), 0.78603, places=3)
 
     def test_head(self):
         """Test the head for the design speed on water"""
