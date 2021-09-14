@@ -35,15 +35,15 @@ class Pump():
 
     @property
     def current_speed(self):
-        """Get the current speed in RPM"""
-        return self._current_speed * 60
+        """Get the current speed in Hz"""
+        return self._current_speed
 
     @current_speed.setter
     def current_speed(self, N):
         """Set the current speed
 
-        N: New speed in RPM"""
-        self._current_speed = N/60.
+        N: New speed in Hz"""
+        self._current_speed = N
 
     def point(self, Q):
         """Return the head and power
@@ -53,7 +53,7 @@ class Pump():
         returns a tuple: (Q: flow in m3/sec,
                           H: Head in m of water,
                           P: Power in kW,
-                          N: Speed in RPM (for the power/torque limited case)"""
+                          N: Speed in Hz (for the power/torque limited case)"""
 
         speed_ratio = self._current_speed / self.design_speed
         Q0 = Q /speed_ratio
@@ -69,7 +69,7 @@ class Pump():
         else:
             Pavail = self.avail_power
         if self.limited.lower() == 'none' or P <= Pavail:
-            return (Q, H, P, self._current_speed*60)
+            return (Q, H, P, self._current_speed)
         else:
             while P*0.995 < Pavail or Pavail < P*1.005:       # Find reduced speed/head/power
                 n_new *= (Pavail / P) ** 0.5
@@ -82,7 +82,7 @@ class Pump():
                     Pavail = self.avail_power * n_new / self.design_speed
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio ** 2 * self.slurry.rhom
-        return (Q, H, P, n_new * 60)
+        return (Q, H, P, n_new)
 
 
 
