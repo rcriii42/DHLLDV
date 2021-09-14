@@ -3,80 +3,89 @@ PumpObj: Object to simulate a pump and driver
 
 Added by R. Ramsdell 03 September, 2021
 """
+from dataclasses import dataclass
 
-# def generate_pump_curve(MaximumFlow As Double, MaxIndex As Integer, CarrierLiquidDensity As Double, MixtureDensity As Double, APump As Double, CPump As Double, SolidsEfficiency As Double, MaxPower As Double, Limited As String, Revolutions As Double, DesignFlow As Double, MaximumPumpEfficiency As Double, ModeIndex As Integer)
-#   Dim Storage() As Variant, StorageRange As String, Index As Integer, Flow As Double, PumpPower As Double, PumpPressure As Double, FirstTime1 As Boolean, FirstTime2 As Boolean, ActualRevolutions As Double
-#   Dim PumpEfficiency(501) As Double, MaxFlow As Double, X As Double, MinEfficiency As Double, MaxEfficiency As Double, PumpMaxTorque As Double, PumpOmega As Double, Alpha1 As Double, Alpha2 As Double
-#
-#   PumpOmega = 2 * Pi * Revolutions / 60
-#   PumpMaxTorque = MaxPower / PumpOmega
-#   ActualRevolutions = Revolutions
-#   MinEfficiency = MinimumPumpEfficiency
-#   MaxEfficiency = MaximumPumpEfficiency
-#   MaxFlow = (-APump / CPump) ^ 0.5
-#   For Index = 1 To MaxIndex + 1
-#     Flow = (Index - 1) / MaxIndex * MaximumFlow
-#     If Flow <= DesignFlow Then
-#       X = Flow / (2 * DesignFlow)
-#     Else
-#       X = 0.5 + 0.5 * (Flow - DesignFlow) / (MaxFlow - DesignFlow)
-#     End If
-#     If X > 1 Then X = 1
-#     PumpEfficiency(Index) = (MaxEfficiency - MinEfficiency) * (4 * X - 4 * X ^ 2) ^ 0.5 + MinEfficiency
-#   Next Index
-#
-#   StorageRange = "A4:CZ504"
-#   Sheets("Pumps").Select
-#   Storage() = Range(StorageRange)
-#   FirstTime1 = True
-#   FirstTime2 = True
-#   For Index = 1 To MaxIndex + 1
-#     'Flow
-#     Flow = (Index - 1) / MaxIndex * MaximumFlow
-#     Storage(Index, 1 + (ModeIndex - 1) * 6) = Flow
-#
-#     'Carrier liquid curve
-#     PumpPressure = CarrierLiquidDensity * (APump + CPump * Flow ^ 2)
-#     PumpPower = PumpPressure * Flow / PumpEfficiency(Index)
-#     If (PumpPower > MaxPower) And FirstTime1 Then
-#       Alpha1 = PumpPressure / Revolutions ^ 2 / PumpEfficiency(Index)
-#       FirstTime1 = False
-#     End If
-#     If (Limited = "TORQUE") And Not FirstTime1 Then
-#       'If PumpPressure > Alpha1 * (2 * Pi / 60 * PumpMaxTorque / (Alpha1 * Flow)) ^ 2 * PumpEfficiency(Index) Then
-#         PumpPressure = Alpha1 * (2 * Pi / 60 * PumpMaxTorque / (Alpha1 * Flow)) ^ 2 * PumpEfficiency(Index)
-#       'End If
-#     ElseIf Limited = "POWER" And (PumpPressure * Flow > MaxPower * PumpEfficiency(Index)) Then
-#       PumpPressure = MaxPower * PumpEfficiency(Index) / Flow
-#     Else
-#       PumpPressure = PumpPressure
-#     End If
-#     Storage(Index, 2 + (ModeIndex - 1) * 6) = PumpPressure
-#     PumpPower = PumpPressure * Flow / PumpEfficiency(Index)
-#     If Flow > MaxFlow Then PumpPower = 0
-#     Storage(Index, 3 + (ModeIndex - 1) * 6) = PumpPower
-#
-#     'Mixture curve
-#     PumpPressure = MixtureDensity * (APump + CPump * Flow ^ 2) * SolidsEfficiency
-#     PumpPower = PumpPressure * Flow / PumpEfficiency(Index) / SolidsEfficiency
-#     If (PumpPower > MaxPower) And FirstTime2 Then
-#       Alpha2 = PumpPressure / Revolutions ^ 2 / SolidsEfficiency / PumpEfficiency(Index)
-#       FirstTime2 = False
-#     End If
-#     If (Limited = "TORQUE") And Not FirstTime2 Then
-#       'If PumpPressure > Alpha2 * (2 * Pi / 60 * PumpMaxTorque / (Alpha2 * Flow)) ^ 2 * PumpEfficiency(Index) * SolidsEfficiency Then
-#         ActualRevolutions = (2 * Pi / 60 * PumpMaxTorque / (Alpha2 * Flow))
-#         PumpPressure = Alpha2 * (2 * Pi / 60 * PumpMaxTorque / (Alpha2 * Flow)) ^ 2 * PumpEfficiency(Index) * SolidsEfficiency
-#       'End If
-#     ElseIf Limited = "POWER" And (PumpPressure * Flow > MaxPower * PumpEfficiency(Index) * SolidsEfficiency) Then
-#       PumpPressure = MaxPower * PumpEfficiency(Index) * SolidsEfficiency / Flow
-#     Else
-#       PumpPressure = PumpPressure
-#     End If
-#     Storage(Index, 4 + (ModeIndex - 1) * 6) = PumpPressure
-#     PumpPower = PumpPressure * Flow / PumpEfficiency(Index) / SolidsEfficiency
-#     If Flow > MaxFlow Then PumpPower = 0
-#     Storage(Index, 5 + (ModeIndex - 1) * 6) = PumpPower
-#
-#   Next Index
-#   Range(Stor
+from DHLLDV.DHLLDV_constants import gravity
+from DHLLDV.DHLLDV_Utils import interpDict
+from DHLLDV.SlurryObj import Slurry
+
+@dataclass
+class Pump():
+    """Model a pump and driver"""
+    name: str
+    design_speed: float     # Hz
+    design_impeller: float  # m
+    suction_dia: float      # m
+    disch_dia: float        # m
+    design_QH_curve: interpDict    # dict {flow (m/sec): head (m)}
+    design_QP_curve: interpDict    # dict {flow (m/sec): power (kW}
+    avail_power: float            # kW
+    limited: str = 'torque'       # 'torque', 'power', 'None'
+    slurry: Slurry = None
+
+    def __post_init__(self):
+        if self.slurry == None:
+            self.slurry = Slurry()
+        self._current_speed = self.design_speed
+
+    def efficiency(self, q):
+        """Return the efficiency of the pump based on the current speed"""
+        Q, H, P, N = self.point(q)
+        return gravity * q * H / P
+
+    @property
+    def current_speed(self):
+        """Get the current speed in RPM"""
+        return self._current_speed * 60
+
+    @current_speed.setter
+    def current_speed(self, N):
+        """Set the current speed
+
+        N: New speed in RPM"""
+        self._current_speed = N/60.
+
+    def point(self, Q):
+        """Return the head and power
+
+        Q: flow in m3/sec
+
+        returns a tuple: (Q: flow in m3/sec,
+                          H: Head in m of water,
+                          P: Power in kW,
+                          N: Speed in RPM (for the power/torque limited case)"""
+
+        speed_ratio = self._current_speed / self.design_speed
+        Q0 = Q /speed_ratio
+        H0 = self.design_QH_curve[Q0]
+        P0 = self.design_QP_curve[Q0]
+
+        H = H0 * speed_ratio**2 * self.slurry.rhom
+        P = P0 * speed_ratio**2 * self.slurry.rhom
+        ncur = self._current_speed
+
+        if self.limited.lower() == 'torque':
+            Pavail = self.avail_power * self._current_speed / self.design_speed
+        else:
+            Pavail = self.avail_power
+        if self.limited.lower() == 'none' or P <= Pavail:
+            return (Q, H, P, self._current_speed*60)
+        else:
+            while P*0.995 < Pavail or Pavail < P*1.005:       # Find reduced speed/head/power
+                n_new *= (Pavail / P) ** 0.5
+                speed_ratio = n_new / self.design_speed
+                Q0 = Q / speed_ratio
+
+                P0 = self.design_QP_curve[Q0]
+                P = P0 * speed_ratio ** 3 * self.slurry.rhom
+                if self.limited.lower() == 'torque':
+                    Pavail = self.avail_power * n_new / self.design_speed
+        H0 = self.design_QH_curve[Q0]
+        H = H0 * speed_ratio ** 2 * self.slurry.rhom
+        return (Q, H, P, n_new * 60)
+
+
+
+
+
+
