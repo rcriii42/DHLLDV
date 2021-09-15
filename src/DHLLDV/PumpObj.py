@@ -71,7 +71,7 @@ class Pump():
             return (Q, H, P, self._current_speed)
         else:
             n_new = self._current_speed
-            while P*0.995 < Pavail or Pavail < P*1.005:       # Find reduced speed/head/power
+            while not (0.99995 < P/Pavail < 1.00005):       # Find reduced speed/head/power
                 n_new *= (Pavail / P) ** 0.5
                 speed_ratio = n_new / self.design_speed
                 Q0 = Q / speed_ratio
