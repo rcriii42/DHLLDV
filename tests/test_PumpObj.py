@@ -95,7 +95,7 @@ class MyTestCase(unittest.TestCase):
         with self.subTest(msg='Test the power limited flow'):
             self.assertAlmostEqual(Q, 2.854054, places=6)
         with self.subTest(msg='Test the power limited power'):
-            self.assertAlmostEqual(P, 894.84, places=2)
+            self.assertAlmostEqual(P, 894.84, places=0)
 
 
 
