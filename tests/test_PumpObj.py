@@ -96,6 +96,8 @@ class MyTestCase(unittest.TestCase):
             self.assertAlmostEqual(Q, 2.854054, places=6)
         with self.subTest(msg='Test the power limited power'):
             self.assertAlmostEqual(P, 894.97, places=2)
+        with self.subTest(msg='Test the power limited head'):
+            self.assertAlmostEqual(H, 25.131, places=3)
 
     def test_power_torque_limited(self):
         """Test the output point for the power limited case"""
@@ -105,6 +107,8 @@ class MyTestCase(unittest.TestCase):
             self.assertAlmostEqual(Q, 3.03243, places=6)
         with self.subTest(msg='Test the power limited power'):
             self.assertAlmostEqual(P, 805.03, places=2)
+        with self.subTest(msg='Test the power limited head'):
+            self.assertAlmostEqual(H, 20.926, places=3)
 
 if __name__ == '__main__':
     unittest.main()
