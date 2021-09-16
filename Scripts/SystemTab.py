@@ -5,6 +5,8 @@ Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab 
 
 Added by R. Ramsdell 01 September, 2021
 """
+import copy
+
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
@@ -12,14 +14,23 @@ from bokeh.models import Spacer, Div, Panel, Tabs, LinearAxis, Range1d
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
-from DHLLDV.PumpObj import Pump
+from ExamplePumps import Ladder_Pump, Main_Pump
 
-
-pipeline = Pipeline() #        Name             Dia     L    K      dZ
+uwp = copy.copy(Ladder_Pump)
+uwp.slurry.rhom = 1.309
+MP1 = copy.copy(Main_Pump)
+MP1.slurry = uwp.slurry
+MP2 = copy.copy(Main_Pump)
+MP2.slurry = uwp.slurry
+pipeline = Pipeline(slurry=uwp.slurry)
+#                              Name             Dia     L    K      dZ
 pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
                          Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
+                         uwp,
                          Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
+                         MP1,
                          Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
+                         MP2,
                          Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
                          Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
                          Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
