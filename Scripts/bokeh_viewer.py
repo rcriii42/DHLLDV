@@ -444,7 +444,7 @@ stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
 
-curdoc().add_root(column(stop_button,
+curdoc().add_root(column(row(Spacer(width=1100), stop_button),
                          Tabs(tabs=[slurry_panel,
                                     SystemTab.system_panel(pipeline)]),))
 curdoc().title = "Visualizing DHLLDV"
