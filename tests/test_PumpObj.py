@@ -95,7 +95,7 @@ class MyTestCase(unittest.TestCase):
         with self.subTest(msg='Test the power limited flow'):
             self.assertAlmostEqual(Q, 2.854054, places=6)
         with self.subTest(msg='Test the power limited power'):
-            self.assertAlmostEqual(P, 894.84, places=0)
+            self.assertAlmostEqual(P, 894.97, places=2)
 
     def test_power_torque_limited(self):
         """Test the output point for the power limited case"""
