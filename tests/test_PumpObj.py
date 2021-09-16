@@ -88,7 +88,7 @@ class MyTestCase(unittest.TestCase):
         Q, H, P, N = self.pump.point(2.854054)
         self.assertAlmostEqual(Q, 2.854054, places=6)
 
-    def test_power_power_limit(self):
+    def test_power_power_limited(self):
         """Test the output point for the power limited case"""
         self.pump.limited = 'power'
         Q, H, P, N = self.pump.point(2.854054)
