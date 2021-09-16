@@ -67,6 +67,9 @@ class Pipeline():
     @slurry.setter
     def slurry(self, s):
         self._slurry = s
+        self.update_slurries()
+
+    def update_slurries(self):
         self.slurries = {self._slurry.Dp: self.slurry}
         for p in self.pipesections:
             if p.diameter not in self.slurries:
