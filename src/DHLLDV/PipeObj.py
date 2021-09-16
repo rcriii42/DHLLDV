@@ -78,7 +78,7 @@ class Pipeline():
 
         Q is the flow in m3/sec
 
-        returns a tuple, im, il"""
+        returns a tuple: (head slurry, head water) in m water column"""
         rhom = self.slurry.rhom
 
         delta_z = -1 * self.pipesections[0].elev_change
