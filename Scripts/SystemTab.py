@@ -11,9 +11,21 @@ from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
 from bokeh.models import Spacer, Div, Panel, Tabs, LinearAxis, Range1d
 from bokeh.plotting import figure
 
-from DHLLDV.PipeObj import Pipeline
+from DHLLDV.PipeObj import Pipeline, Pipe
+from DHLLDV.PumpObj import Pump
 
-pipeline = Pipeline()
+
+pipeline = Pipeline() #        Name             Dia     L    K      dZ
+pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
+                         Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
+                         Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
+                         Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
+                         Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
+                         Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
+                         Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
+                         Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
+                         Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)]
+pipeline.update_slurries()
 
 flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
 im_source = ColumnDataSource(data=dict(Q=flow_list,
@@ -77,6 +89,7 @@ def pipe_panel(i, pipe):
                TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
                TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
                TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
+
 pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
 
 def system_panel(PL):
