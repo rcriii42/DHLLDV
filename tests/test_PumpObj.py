@@ -103,11 +103,11 @@ class MyTestCase(unittest.TestCase):
         """Test the output point for the power limited case"""
         self.pump.limited = 'torque'
         Q, H, P, N = self.pump.point(3.03243)
-        with self.subTest(msg='Test the power limited flow'):
+        with self.subTest(msg='Test the torque limited flow'):
             self.assertAlmostEqual(Q, 3.03243, places=6)
-        with self.subTest(msg='Test the power limited power'):
+        with self.subTest(msg='Test the torque limited power'):
             self.assertAlmostEqual(P, 805.03, places=2)
-        with self.subTest(msg='Test the power limited head'):
+        with self.subTest(msg='Test the torque limited head'):
             self.assertAlmostEqual(H, 20.926, places=3)
 
 if __name__ == '__main__':
