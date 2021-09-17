@@ -14,6 +14,7 @@ from bokeh.models import Spacer, Div, Panel, Tabs, LinearAxis, Range1d
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
+from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump
 
 uwp = copy.copy(Ladder_Pump)
@@ -94,12 +95,22 @@ def update_all(pipeline):
 
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
-    return row(TextInput(title="#", value=f'{i:3d}', width=45),
-               TextInput(title="Name", value=pipe.name, width=95),
-               TextInput(title="Dp (m)", value=f"{pipe.diameter:0.3f}", width=76),
-               TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
-               TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
-               TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
+    if isinstance(pipe, Pipe):
+        return row(TextInput(title="#", value=f'{i:3d}', width=45),
+                   TextInput(title="Name", value=pipe.name, width=95),
+                   TextInput(title="Dp (m)", value=f"{pipe.diameter:0.3f}", width=76),
+                   TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
+                   TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
+                   TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
+    elif isinstance(pipe, Pump):
+        return row(TextInput(title="#", value=f'{i:3d}', width=45),
+                   TextInput(title="Name", value=pipe.name, width=95),
+                   TextInput(title="Suction (m)", value=f"{pipe.suction_dia:0.3f}", width=76),
+                   TextInput(title="Discharge (m)", value=f"{pipe.disch_dia:0.3f}", width=76),
+                   TextInput(title="Impeller (m)", value=f"{pipe.design_impeller:0.3f}", width=76),
+                   TextInput(title="Speed (Hz)", value=f"{pipe.current_speed:0.3f}", width=76),)
+    else:
+        return row(TextInput(value="Unknown Item", width=76),)
 
 pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
 
