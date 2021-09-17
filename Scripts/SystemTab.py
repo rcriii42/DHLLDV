@@ -17,21 +17,14 @@ from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump
 
-uwp = copy.copy(Ladder_Pump)
-uwp.slurry.rhom = 1.309
-MP1 = copy.copy(Main_Pump)
-MP1.slurry = uwp.slurry
-MP2 = copy.copy(Main_Pump)
-MP2.slurry = uwp.slurry
-pipeline = Pipeline(slurry=uwp.slurry)
-#                              Name             Dia     L    K      dZ
+pipeline = Pipeline() #        Name             Dia     L    K      dZ
 pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
                          Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
-                         uwp,
+                         copy.copy(Ladder_Pump),
                          Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
-                         MP1,
+                         copy.copy(Main_Pump),
                          Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
-                         MP2,
+                         copy.copy(Main_Pump),
                          Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
                          Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
                          Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
@@ -40,9 +33,13 @@ pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
 pipeline.update_slurries()
 
 flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+print(pipeline.slurry.vls_list)
+print(flow_list)
 im_source = ColumnDataSource(data=dict(Q=flow_list,
                                        im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
                                        il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
+                                       Hpump_l = [pipeline.calc_system_head(Q)[2] for Q in flow_list],
+                                       Hpump_m = [pipeline.calc_system_head(Q)[3] for Q in flow_list]
                                        ))
 
 HQ_TOOLTIPS = [('name', "$name"),
@@ -70,6 +67,22 @@ HQ_plot.line('Q', 'il', source=im_source,
              line_alpha=0.3,
              legend_label='Water',
              name='Water')
+
+HQ_plot.line('Q', 'Hpump_m', source=im_source,
+             color='black',
+             line_dash='dashed',
+             line_width=3,
+             line_alpha=0.6,
+             legend_label='Pump Slurry',
+             name='Pump Slurry')
+
+HQ_plot.line('Q', 'Hpump_l', source=im_source,
+             color='blue',
+             line_dash='dashed',
+             line_width=2,
+             line_alpha=0.3,
+             legend_label='Pump Water',
+             name='Pump Water')
 HQ_plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0], pipeline.slurry.vls_list[-1])}
 HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
 HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
@@ -88,10 +101,12 @@ def update_all(pipeline):
     im_source.data=dict(Q=flow_list,
                         im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
                         il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
-                        )
+                        Hpump_l = [pipeline.calc_system_head(Q)[2] for Q in flow_list],
+                        Hpump_m = [pipeline.calc_system_head(Q)[3] for Q in flow_list])
     HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
     for i, r in enumerate(pipecol.children):    # iterate over the rows of pipe
-        r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
+        if isinstance(pipeline.pipesections[i], Pipe):
+            r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
