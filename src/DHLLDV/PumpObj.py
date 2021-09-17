@@ -27,6 +27,8 @@ class Pump():
         if self.slurry == None:
             self.slurry = Slurry()
         self._current_speed = self.design_speed
+        self.design_QH_curve.extrapolate_high = True
+        self.design_QP_curve.extrapolate_high = True
 
     def efficiency(self, q):
         """Return the efficiency of the pump based on the current speed"""
