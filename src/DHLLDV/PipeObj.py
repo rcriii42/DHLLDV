@@ -76,6 +76,8 @@ class Pipeline():
                 self.slurries[p.diameter] = copy(self._slurry)
                 self.slurries[p.diameter].Dp = p.diameter
                 self.slurries[p.diameter].generate_curves()
+            elif isinstance(p, Pump):
+                p.slurry = self.slurry
 
     def calc_system_head(self, Q):
         """Calculate the system head for a pipeline
