@@ -83,9 +83,3 @@ class Pump():
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio ** 2 * self.slurry.rhom
         return (Q, H, P, n_new)
-
-
-
-
-
-
