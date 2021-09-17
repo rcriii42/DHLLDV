@@ -72,7 +72,7 @@ class Pipeline():
     def update_slurries(self):
         self.slurries = {self._slurry.Dp: self.slurry}
         for p in self.pipesections:
-            if p.diameter not in self.slurries:
+            if isinstance(p, Pipe) and p.diameter not in self.slurries:
                 self.slurries[p.diameter] = copy(self._slurry)
                 self.slurries[p.diameter].Dp = p.diameter
                 self.slurries[p.diameter].generate_curves()
