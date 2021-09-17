@@ -35,7 +35,15 @@ class TestInterpDict(unittest.TestCase):
     def testReadOnly(self):
         t1 = DHLLDV_Utils.interpDict((1,20), (2,30), (3,50))
         self.assertRaises(KeyError, t1.__setitem__, 4, 75)
-        
+
+    def test_extrapolate_high(self):
+        t1 = DHLLDV_Utils.interpDict((1, 20), (2, 30), (3, 50), extrapolate_high=True)
+        self.assertEqual(t1[3.5], 60)
+
+    def test_extrapolate_low(self):
+        t1 = DHLLDV_Utils.interpDict((1, 20), (2, 30), (3, 50), extrapolate_high=True)
+        self.assertEqual(t1[0.5], 15)
+
 
 
 if __name__ == "__main__":
