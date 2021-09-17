@@ -31,7 +31,11 @@ class interpDict(dict):
                 y2 = dict.__getitem__(self, x2)
                 val = ((y2-y1)/(x2-x1))*(key-x1)+y1
             else:
-                raise IndexError("key out of range")
+                if key > max(keys):
+                    bound = f" max {max(keys)}"
+                else:
+                    bound = f" min {min(keys)}"
+                raise IndexError(f"Key {key} out of range ({bound})")
         return val
 
     def __setitem__(self, key, val):
