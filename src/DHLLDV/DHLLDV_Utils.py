@@ -11,12 +11,14 @@ class interpDict(dict):
     """
     interpDict: Dict of two-tuples that will interpolate values not found in the dict.
     """
-    def __init__(self, *args):
+    def __init__(self, *args, **kwargs):
         #print type(args[0]), args
         if type(args[0])==type(dict()):
             self.update(args[0])
         else:
             dict.__init__(self, args)
+        self.extrapolate_low = kwargs.setdefault('extrapolate_low', False)
+        self.extrapolate_high = kwargs.setdefault('extrapolate_high', False)
 
     def __getitem__(self, key):
         try:
@@ -30,12 +32,21 @@ class interpDict(dict):
                 y1 = dict.__getitem__(self, x1)
                 y2 = dict.__getitem__(self, x2)
                 val = ((y2-y1)/(x2-x1))*(key-x1)+y1
+            elif index == len(keys) and self.extrapolate_high:
+                x1 = keys[-2]
+                x2 = keys[-1]
+                y1 = dict.__getitem__(self, x1)
+                y2 = dict.__getitem__(self, x2)
+                val = ((y2 - y1) / (x2 - x1)) * (key - x1) + y1
+            elif index == 0 and self.extrapolate_high:
+                x1 = keys[0]
+                x2 = keys[1]
+                y1 = dict.__getitem__(self, x1)
+                y2 = dict.__getitem__(self, x2)
+                val = ((y2 - y1) / (x2 - x1)) * (key - x1) + y1
             else:
-                if key > max(keys):
-                    bound = f" max {max(keys)}"
-                else:
-                    bound = f" min {min(keys)}"
-                raise IndexError(f"Key {key} out of range ({bound})")
+                bounds = f"{min(keys)} - {max(keys)}"
+                raise IndexError(f"Key {key} out of range ({bounds})")
         return val
 
     def __setitem__(self, key, val):
