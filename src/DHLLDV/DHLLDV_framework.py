@@ -211,7 +211,7 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
 
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lambda_l = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
-    Xi_HeHo = 8.5*(1/lambda_l)*(vt/(gravity*d)**0.5)**5/3*((nu*gravity)**(1/3)/vls)*(vt/vls)  # Eqn 8.12-1
+    Xi_HeHo = 8.5*(1/lambda_l**0.5)*(vt/(gravity*d)**0.5)**(5./3)*((nu*gravity)**(1/3)/vls)*(vt/vls)  # Eqn 8.12-1
 
     alpha = 0.58*Cvr**-0.42
     ex1 = -(0.83 + stratified.musf/4 + (Cvr - 0.5 - 0.075*Dp)**2 + (0.025*Dp))
@@ -221,7 +221,7 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     vls_t = (5 * exp(ex1 * ex2)) ** 0.25 * vls_ldv  # Eqn 8.12-7
 
     Kldv = 1/(1 - Xi_ldv)       # Eqn 7.9-14
-    Xi_fb = 1-((Cvt*vls_ldv)/(Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv)  # Eqn 8.12-3
+    Xi_fb = 1-((Cvt*vls_ldv)/((Cvb-Kldv*Cvt)*(vls_ldv-vls)+Kldv*Cvt*vls_ldv))  # Eqn 8.12-3
 
     ex2 = Dp ** 0.025 * (vls / vls_lsdv) ** alpha * Cvr ** 0.65 * (Rsd / 1.585) ** 0.1
     Xi_3LM = (1 - Cvr) * exp(ex1 * ex2)  # Eqn 8.12-4
