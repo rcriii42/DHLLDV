@@ -47,7 +47,7 @@ Ladder_Pump = Pump(name="0.864x0.864x1.880m Pump at 225 RPM",
                                                     6.064866: 2613.520140,
                                                     }),
                          avail_power=1491.4,
-                         limited="power",
+                         limited="torque",
                          )
 Ladder_Pump.slurry.fluid = 'fresh'
 Ladder_Pump.slurry.rhom = Ladder_Pump.slurry.rhol
