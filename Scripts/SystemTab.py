@@ -33,8 +33,6 @@ pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
 pipeline.update_slurries()
 
 flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
-print(pipeline.slurry.vls_list)
-print(flow_list)
 im_source = ColumnDataSource(data=dict(Q=flow_list,
                                        im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
                                        il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
@@ -46,6 +44,8 @@ HQ_TOOLTIPS = [('name', "$name"),
                ("Flow (m\u00b3/sec)", "@Q"),
                ("Slurry Graded Cvt=c (m/m)", "@im"),
                ("Fluid (m/m)", "@il"),
+               ("Pump Head Slurry", "@Hpump_m",),
+               ("Pump Head Water", "@Hpump_l",),
               ]
 HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                  tools="crosshair,pan,reset,save,wheel_zoom",
