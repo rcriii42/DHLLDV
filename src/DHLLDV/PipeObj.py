@@ -113,4 +113,6 @@ class Pipeline():
                 Hpumps_m += Hp
 
         return (Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom,
-                Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol)
+                Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol,
+                Hpumps_l,
+                Hpumps_m)
