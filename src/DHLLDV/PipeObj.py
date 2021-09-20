@@ -71,6 +71,16 @@ class Pipeline():
                self.pipesections[0].elev_change
 
     @property
+    def num_pumps(self):
+        """The total length of pipesections"""
+        return len([p for p in self.pipesections if isinstance(p, Pump)])
+
+    @property
+    def total_power(self):
+        """The total power of the pumps"""
+        return sum([p.avail_power for p in self.pipesections if isinstance(p, Pump)])
+
+    @property
     def Cv(self):
         return self.slurry.Cv
 
@@ -131,7 +141,6 @@ class Pipeline():
                 p.slurry.rhom = p.slurry.rhol
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_l += Hp
-                p.slurry.rhom = temp_rhom
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_m += Hp
 
