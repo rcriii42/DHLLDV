@@ -123,7 +123,7 @@ def pipe_panel(i, pipe):
                    TextInput(title="Suction (m)", value=f"{pipe.suction_dia:0.3f}", width=76),
                    TextInput(title="Discharge (m)", value=f"{pipe.disch_dia:0.3f}", width=76),
                    TextInput(title="Impeller (m)", value=f"{pipe.design_impeller:0.3f}", width=76),
-                   TextInput(title="Speed (Hz)", value=f"{pipe.current_speed:0.3f}", width=76),)
+                   TextInput(title="Power (kW)", value=f"{pipe.avail_power:0.0f}", width=76),)
     else:
         return row(TextInput(value="Unknown Item", width=76),)
 
