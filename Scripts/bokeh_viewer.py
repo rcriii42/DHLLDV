@@ -44,7 +44,9 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 
-pipeline = PipeObj.Pipeline(slurry=slurry)
+pipeline = SystemTab.pipeline
+pipeline.slurry = slurry
+
 def update_source_data():
     slurry.generate_curves()
     im_source.data = dict(v=slurry.vls_list,
