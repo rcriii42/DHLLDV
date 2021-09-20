@@ -33,12 +33,12 @@ pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
 pipeline.update_slurries()
 
 flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
 im_source = ColumnDataSource(data=dict(Q=flow_list,
-                                       im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
-                                       il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
-                                       Hpump_l = [pipeline.calc_system_head(Q)[2] for Q in flow_list],
-                                       Hpump_m = [pipeline.calc_system_head(Q)[3] for Q in flow_list]
-                                       ))
+                                       im=head_lists[0],
+                                       il=head_lists[1],
+                                       Hpump_l = head_lists[2],
+                                       Hpump_m = head_lists[3]))
 
 HQ_TOOLTIPS = [('name', "$name"),
                ("Flow (m\u00b3/sec)", "@Q"),
@@ -97,13 +97,14 @@ HQ_plot.axis.minor_tick_out = 0
 HQ_plot.legend.location = "top_left"
 
 def update_all(pipeline):
-    """Placeholder for an update function"""
+    """Update the data sources and information boxes"""
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+    head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
     im_source.data=dict(Q=flow_list,
-                        im=[pipeline.calc_system_head(Q)[0] for Q in flow_list],
-                        il=[pipeline.calc_system_head(Q)[1] for Q in flow_list],
-                        Hpump_l = [pipeline.calc_system_head(Q)[2] for Q in flow_list],
-                        Hpump_m = [pipeline.calc_system_head(Q)[3] for Q in flow_list])
+                        im=head_lists[0],
+                        il=head_lists[1],
+                        Hpump_l = head_lists[2],
+                        Hpump_m = head_lists[3])
     HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
     for i, r in enumerate(pipecol.children):    # iterate over the rows of pipe
         if isinstance(pipeline.pipesections[i], Pipe):
