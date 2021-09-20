@@ -47,23 +47,29 @@ class Pump():
         N: New speed in Hz"""
         self._current_speed = N
 
-    def point(self, Q):
+    def point(self, Q, water=False):
         """Return the head and power
 
         Q: flow in m3/sec
+        water: If true return the ehad for water, else head for slurry
 
         returns a tuple: (Q: flow in m3/sec,
                           H: Head in m of water,
                           P: Power in kW,
                           N: Speed in Hz (for the power/torque limited case)"""
 
+        if water:
+            rho = self.slurry.rhol
+        else:
+            rho = self.slurry.rhom
+
         speed_ratio = self._current_speed / self.design_speed
         Q0 = Q /speed_ratio
         H0 = self.design_QH_curve[Q0]
         P0 = self.design_QP_curve[Q0]
 
-        H = H0 * speed_ratio**2 * self.slurry.rhom
-        P = P0 * speed_ratio**3 * self.slurry.rhom
+        H = H0 * speed_ratio**2 * rho
+        P = P0 * speed_ratio**3 * rho
 
         if self.limited.lower() == 'torque':
             Pavail = self.avail_power * self._current_speed / self.design_speed
@@ -79,9 +85,9 @@ class Pump():
                 Q0 = Q / speed_ratio
 
                 P0 = self.design_QP_curve[Q0]
-                P = P0 * speed_ratio ** 3 * self.slurry.rhom
+                P = P0 * speed_ratio ** 3 * rho
                 if self.limited.lower() == 'torque':
                     Pavail = self.avail_power * n_new / self.design_speed
         H0 = self.design_QH_curve[Q0]
-        H = H0 * speed_ratio ** 2 * self.slurry.rhom
+        H = H0 * speed_ratio ** 2 * rho
         return (Q, H, P, n_new)

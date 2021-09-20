@@ -137,9 +137,7 @@ class Pipeline():
                 il = self.slurries[p.diameter].im_curves['il'][index]
                 Hfric_l += il * p.length
             elif isinstance(p, Pump):
-                temp_rhom = p.slurry.rhom
-                p.slurry.rhom = p.slurry.rhol
-                Qp, Hp, Pp, np = p.point(Q)
+                Qp, Hp, Pp, np = p.point(Q, water=True)
                 Hpumps_l += Hp
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_m += Hp
