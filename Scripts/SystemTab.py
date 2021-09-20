@@ -88,6 +88,7 @@ HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
 HQ_plot.xaxis[1].axis_label = f'Flow (m\u00b3/sec)'
 HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
 HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
+HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]
 HQ_plot.axis.major_tick_in = 10
 HQ_plot.axis.minor_tick_in = 7
 HQ_plot.axis.minor_tick_out = 0
