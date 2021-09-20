@@ -106,9 +106,6 @@ def update_all(pipeline):
                         Hpump_l = head_lists[2],
                         Hpump_m = head_lists[3])
     HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
-    for i, r in enumerate(pipecol.children):    # iterate over the rows of pipe
-        if isinstance(pipeline.pipesections[i], Pipe):
-            r.children[2].value = f"{pipeline.pipesections[i].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
