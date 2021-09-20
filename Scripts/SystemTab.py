@@ -129,7 +129,7 @@ def pipe_panel(i, pipe):
 
 def pipeline_totals():
     """Create rows for totals in the pipeline"""
-    pipe_totals = row(TextInput(title="#", value=f'{len(pipeline.pipesections):3d}', width=45, disabled=True),
+    pipe_totals = row(TextInput(title="#", value=f'{pipeline.num_pipesections:3d}', width=45, disabled=True),
                       TextInput(title="Pipe Sections", value="Total", width=95, disabled=True),
                       TextInput(title="Disch Dia (m)", value=f"{pipeline.pipesections[-1].diameter:0.3f}", width=76, disabled=True),
                       TextInput(title="Length (m)", value=f"{sum([pipeline.total_length]):0.1f}", width=76, disabled=True),
