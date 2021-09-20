@@ -135,16 +135,22 @@ def pipeline_totals():
                       TextInput(title="Length (m)", value=f"{sum([pipeline.total_length]):0.1f}", width=76, disabled=True),
                       TextInput(title="Fitting K (-)", value=f"{pipeline.total_K:0.2f}", width=76, disabled=True),
                       TextInput(title="Delta z (m)", value=f"{pipeline.total_lift:0.1f}", width=76, disabled=True),)
-    return column(pipe_totals)
+    shutoff_head = pipeline.calc_system_head(0.01)
+    pump_totals = row(TextInput(title="#", value=f'{pipeline.num_pumps:3d}', width=45, disabled=True),
+                      TextInput(title="Pumps", value="Total", width=95, disabled=True),
+                      TextInput(title="Head Water", value=f"{shutoff_head[2]:0.0f}", width=95, disabled=True),
+                      TextInput(title="Head Slurry", value=f"{shutoff_head[3]:0.0f}", width=95, disabled=True),
+                      TextInput(title="Power (kW)", value=f"{pipeline.total_power:0.0f}", width=95, disabled=True),)
+    return column(pipe_totals, pump_totals)
 
 
 pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    return Panel(title="Pipeline", child = row(column(pipecol,
+    return Panel(title="Pipeline", child = row(column(pipeline_totals(),
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
-                                                      pipeline_totals()),
+                                                      pipecol),
                                                HQ_plot))
 
 
