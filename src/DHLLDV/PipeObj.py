@@ -50,6 +50,11 @@ class Pipeline():
         self.slurry = slurry
 
     @property
+    def num_pipesections(self):
+        """The total length of pipesections"""
+        return len([p for p in self.pipesections if isinstance(p, Pipe)])
+
+    @property
     def total_length(self):
         """The total length of pipesections"""
         return sum([p.length for p in self.pipesections if isinstance(p, Pipe)])
