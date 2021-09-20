@@ -50,6 +50,22 @@ class Pipeline():
         self.slurry = slurry
 
     @property
+    def total_length(self):
+        """The total length of pipesections"""
+        return sum([p.length for p in self.pipesections if isinstance(p, Pipe)])
+
+    @property
+    def total_K(self):
+        """The total k of pipesections"""
+        return sum([p.total_K for p in self.pipesections if isinstance(p, Pipe)])
+
+    @property
+    def total_lift(self):
+        """The total elev change of pipesections"""
+        return sum([p.elev_change for p in self.pipesections if isinstance(p, Pipe)]) - \
+               self.pipesections[0].elev_change
+
+    @property
     def Cv(self):
         return self.slurry.Cv
 
