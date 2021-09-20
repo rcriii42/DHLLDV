@@ -127,11 +127,25 @@ def pipe_panel(i, pipe):
     else:
         return row(TextInput(value="Unknown Item", width=76),)
 
+def pipeline_totals():
+    """Create rows for totals in the pipeline"""
+    pipe_totals = row(TextInput(title="#", value=f'{len(pipeline.pipesections):3d}', width=45, disabled=True),
+                      TextInput(title="Pipe Sections", value="Total", width=95, disabled=True),
+                      TextInput(title="Disch Dia (m)", value=f"{pipeline.pipesections[-1].diameter:0.3f}", width=76, disabled=True),
+                      TextInput(title="Length (m)", value=f"{sum([pipeline.total_length]):0.1f}", width=76, disabled=True),
+                      TextInput(title="Fitting K (-)", value=f"{pipeline.total_K:0.2f}", width=76, disabled=True),
+                      TextInput(title="Delta z (m)", value=f"{pipeline.total_lift:0.1f}", width=76, disabled=True),)
+    return column(pipe_totals)
+
+
 pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    return Panel(title="Pipeline", child = row(pipecol, HQ_plot))
+    return Panel(title="Pipeline", child = row(column(pipecol,
+                                                      Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                      pipeline_totals()),
+                                               HQ_plot))
 
 
 
