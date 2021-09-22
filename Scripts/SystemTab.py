@@ -143,20 +143,19 @@ def pipeline_totals():
                       TextInput(title="Head Slurry", value=f"{shutoff_head[3]:0.0f}", width=95, disabled=True),
                       TextInput(title="Power (kW)", value=f"{pipeline.total_power:0.0f}", width=95, disabled=True),)
     return column(pipe_totals, pump_totals)
-
+totalscol = pipeline_totals()
 
 pipecol = column(row(TextInput( value=f'#', width=45, disabled=True),
-                   TextInput(value='name', width=95, disabled=True),
-                   TextInput(value=f"diameter (m)", width=76, disabled=True),
-                   TextInput( value=f"Length (m)", width=76, disabled=True),
-                   TextInput( value=f"Total K", width=76, disabled=True),
-                   TextInput(value=f"Delta z (m)", width=76, disabled=True),))
-
+                     TextInput(value='name', width=95, disabled=True),
+                     TextInput(value=f"diameter (m)", width=76, disabled=True),
+                     TextInput( value=f"Length (m)", width=76, disabled=True),
+                     TextInput( value=f"Total K", width=76, disabled=True),
+                     TextInput(value=f"Delta z (m)", width=76, disabled=True),))
 [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
-    return Panel(title="Pipeline", child = row(column(pipeline_totals(),
+    return Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
                                                HQ_plot))
