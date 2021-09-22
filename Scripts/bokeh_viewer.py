@@ -14,7 +14,7 @@ from bokeh.models import Spacer, Div, Panel, Tabs
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
-from DHLLDV import SlurryObj, PipeObj
+from DHLLDV import PipeObj
 
 import SystemTab
 
