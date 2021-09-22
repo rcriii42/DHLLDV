@@ -78,7 +78,7 @@ def update_source_data():
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {slurry.Dp:0.3f}m pipe)'
-    SystemTab.update_all(pipeline)
+    sys_update(pipeline)
 
 ################
 # Set up HQ plot
@@ -442,8 +442,8 @@ def stop_button_callback():
 stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
-
+sys_tab, sys_update = SystemTab.system_panel(pipeline)
 curdoc().add_root(column(row(Spacer(width=1100), stop_button),
                          Tabs(tabs=[slurry_panel,
-                                    SystemTab.system_panel(pipeline)]),))
+                                    sys_tab]),))
 curdoc().title = "Visualizing DHLLDV"
