@@ -9,6 +9,7 @@ from . import heterogeneous
 from . import homogeneous
 from .DHLLDV_constants import gravity, particle_ratio, stk_fine
 from math import pi, exp, log10
+import functools
 
 alpha_xi = 0.5    # alpha in Eqn 8.12-9
 
@@ -182,7 +183,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     FL = max(FL_ul, FL_ll)  # Eqn 8.11-13
     return FL*fbot
 
-
+@functools.lru_cache(maxsize=1200)
 def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
     Return the slip ratio (Xi) for the given slurry.
