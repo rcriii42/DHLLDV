@@ -14,22 +14,23 @@ from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
-from ExamplePumps import Ladder_Pump, Main_Pump
+from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
-pipeline = Pipeline() #        Name             Dia     L    K      dZ
-pipeline.pipesections = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
-                         Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
-                         copy.copy(Ladder_Pump),
-                         Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
-                         copy.copy(Main_Pump),
-                         Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
-                         copy.copy(Main_Pump),
-                         Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
-                         Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
-                         Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
-                         Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
-                         Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)]
-pipeline.update_slurries()
+#        Name             Dia     L    K      dZ
+pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
+                                Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
+                                 copy.copy(Ladder_Pump),
+                                 Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
+                                 copy.copy(Main_Pump),
+                                 Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
+                                 copy.copy(Main_Pump),
+                                 Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
+                                 Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
+                                 Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
+                                 Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
+                                 Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
+                    slurry=base_slurry)
+
 
 def system_panel(PL):
     """Create a Bokeh Panel with the pipelinen and an overall HQ plot"""
