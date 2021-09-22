@@ -16,6 +16,9 @@ from bokeh.plotting import figure
 from DHLLDV import DHLLDV_framework
 from DHLLDV import PipeObj
 
+import cProfile
+pr = cProfile.Profile()
+pr.enable()
 import SystemTab
 
 # Set up data
@@ -442,7 +445,10 @@ def stop_button_callback():
 stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
+
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
+pr.disable()
+pr.print_stats()
 curdoc().add_root(column(row(Spacer(width=1100), stop_button),
                          Tabs(tabs=[slurry_panel,
                                     sys_tab]),))
