@@ -448,7 +448,8 @@ stop_button.on_click(stop_button_callback)
 
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
 pr.disable()
-pr.print_stats()
+from pstats import SortKey
+pr.print_stats(SortKey.CUMULATIVE)
 curdoc().add_root(column(row(Spacer(width=1100), stop_button),
                          Tabs(tabs=[slurry_panel,
                                     sys_tab]),))
