@@ -110,19 +110,19 @@ def update_all(pipeline):
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
     if isinstance(pipe, Pipe):
-        return row(TextInput(title="#", value=f'{i:3d}', width=45),
-                   TextInput(title="Pipe", value=pipe.name, width=95),
-                   TextInput(title="Dp (m)", value=f"{pipe.diameter:0.3f}", width=76),
-                   TextInput(title="Length (m)", value=f"{pipe.length:0.1f}", width=76),
-                   TextInput(title="Fitting K (-)", value=f"{pipe.total_K:0.2f}", width=76),
-                   TextInput(title="Delta z (m)", value=f"{pipe.elev_change:0.1f}", width=76),)
+        return row(TextInput( value=f'{i:3d}', width=45),
+                   TextInput(value=pipe.name, width=95),
+                   TextInput(value=f"{pipe.diameter:0.3f}", width=76),
+                   TextInput( value=f"{pipe.length:0.1f}", width=76),
+                   TextInput( value=f"{pipe.total_K:0.2f}", width=76),
+                   TextInput(value=f"{pipe.elev_change:0.1f}", width=76),)
     elif isinstance(pipe, Pump):
-        return row(TextInput(title="#", value=f'{i:3d}', width=45),
-                   TextInput(title="Pump", value=pipe.name, width=95),
-                   TextInput(title="Suction (m)", value=f"{pipe.suction_dia:0.3f}", width=76),
-                   TextInput(title="Discharge (m)", value=f"{pipe.disch_dia:0.3f}", width=76),
-                   TextInput(title="Impeller (m)", value=f"{pipe.design_impeller:0.3f}", width=76),
-                   TextInput(title="Power (kW)", value=f"{pipe.avail_power:0.0f}", width=76),)
+        return row(TextInput(title="#", value=f'{i:3d}', width=45, background='lightblue'),
+                   TextInput(title="Pump", value=pipe.name, width=95, background='lightblue'),
+                   TextInput(title="Suction (m)", value=f"{pipe.suction_dia:0.3f}", width=76, background='lightblue'),
+                   TextInput(title="Discharge (m)", value=f"{pipe.disch_dia:0.3f}", width=76, background='lightblue'),
+                   TextInput(title="Impeller (m)", value=f"{pipe.design_impeller:0.3f}", width=76, background='lightblue'),
+                   TextInput(title="Power (kW)", value=f"{pipe.avail_power:0.0f}", width=76, background='lightblue'),)
     else:
         return row(TextInput(value="Unknown Item", width=76),)
 
