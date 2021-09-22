@@ -143,7 +143,14 @@ def pipeline_totals():
     return column(pipe_totals, pump_totals)
 
 
-pipecol = column([pipe_panel(i, p) for i, p in enumerate(pipeline.pipesections)])
+pipecol = column(row(TextInput( value=f'#', width=45, disabled=True),
+                   TextInput(value='name', width=95, disabled=True),
+                   TextInput(value=f"diameter (m)", width=76, disabled=True),
+                   TextInput( value=f"Length (m)", width=76, disabled=True),
+                   TextInput( value=f"Total K", width=76, disabled=True),
+                   TextInput(value=f"Delta z (m)", width=76, disabled=True),))
+
+[pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
 def system_panel(PL):
     """Create a Bokeh Panel with the system elements"""
