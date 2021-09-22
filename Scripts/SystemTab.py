@@ -103,11 +103,17 @@ def update_all(pipeline):
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
     head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
     im_source.data=dict(Q=flow_list,
+                        v=pipeline.slurry.vls_list,
                         im=head_lists[0],
                         il=head_lists[1],
                         Hpump_l = head_lists[2],
                         Hpump_m = head_lists[3])
-    HQ_plot.xaxis[1].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    old_disch_dia = pipeline.pipesections[-1].diameter
+    for p, ti in zip(pipeline.pipesections, pipecol.children[1:]):
+        if isinstance(p, Pipe) and p.diameter == old_disch_dia:
+            ti.children[2].value=f"{p.diameter:0.3f}"
+    totalscol.children[0].children[2].value=f"{pipeline.pipesections[-1].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
     """Create a Bokeh row with information about the pipe"""
