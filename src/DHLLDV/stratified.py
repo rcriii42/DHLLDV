@@ -6,6 +6,7 @@ Created on Oct 22, 2014
 @author: RCRamsdell
 '''
 
+import functools
 from math import pi, sin, log
 
 from .DHLLDV_constants import gravity, Arel_to_beta, musf, Cvb, alpha_tel
@@ -91,6 +92,7 @@ def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rhol, rhos):
     return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second    # Eqn 8.4-14
 
 
+@functools.lru_cache(maxsize=1200)
 def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the pressure loss for fluid above a fixed bed.
        vls = average line speed (velocity, m/sec)
