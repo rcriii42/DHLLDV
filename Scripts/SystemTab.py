@@ -42,12 +42,12 @@ im_source = ColumnDataSource(data=dict(Q=flow_list,
                                        Hpump_m = head_lists[3]))
 
 HQ_TOOLTIPS = [('name', "$name"),
-               ("Flow (m\u00b3/sec)", "@Q"),
-               ("Velocity (m/sec)", "@v"),
-               ("Slurry Graded Cvt=c (m/m)", "@im"),
-               ("Fluid (m/m)", "@il"),
-               ("Pump Head Slurry (m)", "@Hpump_m",),
-               ("Pump Head Water (m)", "@Hpump_l",),
+               ("Flow (m\u00b3/sec)", "@Q{0.00}"),
+               ("Velocity (m/sec)", "@v{0.00}"),
+               ("Slurry Graded Cvt=c (m/m)", "@im{0,0.0}"),
+               ("Fluid (m/m)", "@il{0,0.0}"),
+               ("Pump Head Slurry (m)", "@Hpump_m{0,0.0}",),
+               ("Pump Head Water (m)", "@Hpump_l{0,0.0}",),
               ]
 HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                  tools="crosshair,pan,reset,save,wheel_zoom",
