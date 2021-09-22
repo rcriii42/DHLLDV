@@ -35,6 +35,7 @@ pipeline.update_slurries()
 flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
 head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
 im_source = ColumnDataSource(data=dict(Q=flow_list,
+                                       v=pipeline.slurry.vls_list,
                                        im=head_lists[0],
                                        il=head_lists[1],
                                        Hpump_l = head_lists[2],
@@ -42,10 +43,11 @@ im_source = ColumnDataSource(data=dict(Q=flow_list,
 
 HQ_TOOLTIPS = [('name', "$name"),
                ("Flow (m\u00b3/sec)", "@Q"),
+               ("Velocity (m/sec)", "@v"),
                ("Slurry Graded Cvt=c (m/m)", "@im"),
                ("Fluid (m/m)", "@il"),
-               ("Pump Head Slurry", "@Hpump_m",),
-               ("Pump Head Water", "@Hpump_l",),
+               ("Pump Head Slurry (m)", "@Hpump_m",),
+               ("Pump Head Water (m)", "@Hpump_l",),
               ]
 HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                  tools="crosshair,pan,reset,save,wheel_zoom",
