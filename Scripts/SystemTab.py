@@ -162,10 +162,11 @@ def system_panel(PL):
                          TextInput(value=f"Delta z (m)", width=76, disabled=True),))
     [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
-    return Panel(title="Pipeline", child = row(column(totalscol,
+    return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
-                                               HQ_plot))
+                                               HQ_plot)),
+            update_all)
 
 
 
