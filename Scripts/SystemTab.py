@@ -7,10 +7,9 @@ Added by R. Ramsdell 01 September, 2021
 """
 import copy
 
-from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div, Panel, Tabs, LinearAxis, Range1d
+from bokeh.models import ColumnDataSource, TextInput
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
