@@ -20,7 +20,8 @@ import SystemTab
 
 # Set up data
 
-slurry = SlurryObj.Slurry()
+pipeline = SystemTab.pipeline
+slurry = pipeline.slurry
 
 im_source = ColumnDataSource(data=dict(v=slurry.vls_list,
                                        graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
@@ -43,9 +44,6 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
-
-pipeline = SystemTab.pipeline
-pipeline.slurry = slurry
 
 def update_source_data():
     slurry.generate_curves()
