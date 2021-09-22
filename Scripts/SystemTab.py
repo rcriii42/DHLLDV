@@ -110,9 +110,9 @@ def update_all(pipeline):
                         Hpump_m = head_lists[3])
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
     old_disch_dia = pipeline.pipesections[-1].diameter
-    for p, ti in zip(pipeline.pipesections, pipecol.children[1:]):
+    for p, pipe_row in zip(pipeline.pipesections, pipecol.children[1:]):
         if isinstance(p, Pipe) and p.diameter == old_disch_dia:
-            ti.children[2].value=f"{p.diameter:0.3f}"
+            pipe_row.children[2].value=f"{p.diameter:0.3f}"
     totalscol.children[0].children[2].value=f"{pipeline.pipesections[-1].diameter:0.3f}"
 
 def pipe_panel(i, pipe):
