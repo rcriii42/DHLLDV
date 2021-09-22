@@ -6,6 +6,7 @@ Created on Oct 7, 2014
 @author: RCRamsdell
 '''
 
+import functools
 from math import log, exp
 
 from .DHLLDV_constants import gravity, musf, particle_ratio
@@ -22,7 +23,7 @@ def pipe_reynolds_number(vls, Dp, nu):
     """
     return vls*Dp/nu    # Eqn 8.7-2 / 3.2-1
 
-
+@functools.lru_cache(maxsize=1024)
 def swamee_jain_ff(Re, Dp, epsilon):
     """
     Return the friction factor using the Swaamee-Jain equation.

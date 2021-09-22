@@ -92,7 +92,7 @@ def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rhol, rhos):
     return 0.83*lambda1(Dp_H, v1, epsilon, nu_l) + 0.37*first*second    # Eqn 8.4-14
 
 
-@functools.lru_cache(maxsize=1200)
+@functools.lru_cache(maxsize=3000)
 def fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the pressure loss for fluid above a fixed bed.
        vls = average line speed (velocity, m/sec)
@@ -133,7 +133,7 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
     return delta_p /(rhol*gravity)  # Eqn 8.2-6 with deltaL = 1.0
 
-
+@functools.lru_cache(maxsize=3000)
 def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     """Return the ERHG for the fixed-bed case.
     """

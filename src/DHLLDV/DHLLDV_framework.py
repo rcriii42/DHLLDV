@@ -262,7 +262,7 @@ def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
     return (1/(1-Xi)) * Cvt # Eqn 8.12-12
 
-
+@functools.lru_cache(maxsize=2048)
 def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
     """
     Cvt_Erhg - Calculate the Erhg for the given Cvt, using the appropriate model
