@@ -259,11 +259,10 @@ def update_Dp(attrname, old, new):
     old_Dp = slurry.Dp
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp * 1000, '0.0f') / 1000
     for p in pipeline.pipesections:
-        if p.diameter == old_Dp:
+        if isinstance(p, PipeObj.Pipe) and p.diameter == old_Dp:
             p.diameter = slurry.Dp
-    pipeline.slurry = slurry
+    pipeline.update_slurries()
     update_source_data()
-
 
 def Dp_up_callback():
     Dp_input.value=f"{int(slurry.Dp*1000)+25}"
