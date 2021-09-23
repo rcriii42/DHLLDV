@@ -145,6 +145,10 @@ class MyTestCase(unittest.TestCase):
             if isinstance(p, Pump):
                 with self.subTest(msg=f'Test slurry changed for {p.name}'):
                     self.assertAlmostEqual(p.slurry.Cv, 0.1)
+            else:
+                with self.subTest(msg=f'Test slurry exists for {p.diameter:0.3f} pipe'):
+                    self.assertAlmostEqual(self.pipeline.slurries[p.diameter].Cv, 0.1)
+
 
 
 if __name__ == '__main__':
