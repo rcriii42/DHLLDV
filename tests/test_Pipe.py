@@ -139,5 +139,13 @@ class MyTestCase(unittest.TestCase):
     def test_total_power(self):
         self.assertAlmostEqual(self.pipeline.total_power, 5730.7)
 
+    def test_slurries_updated(self):
+        self.pipeline.Cv = 0.1
+        for p in self.pipeline.pipesections:
+            if isinstance(p, Pump):
+                with self.subTest(msg=f'Test slurry changed for {p.name}'):
+                    self.assertAlmostEqual(p.slurry.Cv, 0.1)
+
+
 if __name__ == '__main__':
     unittest.main()
