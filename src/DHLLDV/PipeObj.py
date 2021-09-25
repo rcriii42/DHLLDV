@@ -67,8 +67,7 @@ class Pipeline():
     @property
     def total_lift(self):
         """The total elev change of pipesections"""
-        return sum([p.elev_change for p in self.pipesections if isinstance(p, Pipe)]) - \
-               self.pipesections[0].elev_change
+        return sum([p.elev_change for p in self.pipesections if isinstance(p, Pipe)])
 
     @property
     def num_pumps(self):
@@ -118,7 +117,7 @@ class Pipeline():
         returns a tuple: (head slurry, head water) in m water column"""
         rhom = self.slurry.rhom
 
-        delta_z = -1 * self.pipesections[0].elev_change
+        delta_z = 0
         Hfit = 0
         Hfric_m = 0     # Total system head of slurry
         Hfric_l = 0     # Total system head of water
@@ -133,6 +132,7 @@ class Pipeline():
                 index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
                 im = self.slurries[p.diameter].im_curves['graded_Cvt_im'][index]
                 Hfric_m += im * p.length
+                print(p, v, v ** 2 / (2 * gravity), im, im * p.length, p.total_K * Hv)
                 index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
                 il = self.slurries[p.diameter].im_curves['il'][index]
                 Hfric_l += il * p.length
