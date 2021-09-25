@@ -104,22 +104,22 @@ Main_Pump = Pump(name="0.864x0.864x2.134m Pump at 315 RPM",
 
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
-        self.pipe = Pipe(diameter=0.5, length=10.0, total_K=0.1, elev_change=5.0)
-        self.pipeline = Pipeline([Pipe('Entrance', 0.5, 0, 0.5, -4.0),
+        self.pipe = Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0)
+        self.pipeline = Pipeline([Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                   self.pipe,
                                   Ladder_Pump,
-                                  Pipe('MP Suction', 0.6, 25.0, 0.1, 0.0),
+                                  Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
                                   Main_Pump,
-                                  Pipe('MP Discharge', diameter=0.6, length=20.0, total_K=0.2, elev_change=-1.0),
-                                  Pipe('Discharge', diameter=0.6, length=1000.0, total_K=1.0, elev_change=1.0)])
+                                  Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                  Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
 
     def test_v(self):
         """Test Pipe.velocity"""
-        self.assertAlmostEqual(self.pipe.velocity(1.0), 1.0/areas(0.5, 0.0)[0])
+        self.assertAlmostEqual(self.pipe.velocity(1.0), 1.0/areas(0.6, 0.0)[0])
 
     def test_Q(self):
         """Test Pipe.flow"""
-        self.assertAlmostEqual(self.pipe.flow(1.0), areas(0.5, 0.0)[0])
+        self.assertAlmostEqual(self.pipe.flow(1.0), areas(0.6, 0.0)[0])
 
     def test_total_length(self):
         self.assertEqual(self.pipeline.total_length, 1055.0)
@@ -150,6 +150,14 @@ class MyTestCase(unittest.TestCase):
                     self.assertAlmostEqual(self.pipeline.slurries[p.diameter].Cv, 0.1)
 
 
+    # def test_friction_head_fluid(self):
+    #     """Test the pipeline on fluid without elevation or fitting losses"""
+    #     for p in self.pipeline.pipesections:
+    #         if isinstance(p, Pipe):
+    #             p.total_K = 0
+    #             p.elev_change = 0
+    #     Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
+    #     self.assertAlmostEqual(Hpipe_l, 21.5570364, places=1)
 
 if __name__ == '__main__':
     unittest.main()
