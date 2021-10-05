@@ -132,7 +132,6 @@ class Pipeline():
                 index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
                 im = self.slurries[p.diameter].im_curves['graded_Cvt_im'][index]
                 Hfric_m += im * p.length
-                print(p, v, v ** 2 / (2 * gravity), im, im * p.length, p.total_K * Hv)
                 index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
                 il = self.slurries[p.diameter].im_curves['il'][index]
                 Hfric_l += il * p.length

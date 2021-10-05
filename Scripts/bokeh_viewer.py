@@ -294,7 +294,6 @@ fluid_properties = row(fluid_viscosity_label, fluid_density_label)
 
 def D50_adjust_proportionate(delta):
     """Adjust the D15 and D85 proportionately when D50 up/down buttons used"""
-    print(f"D50_adjust_proportionate D50 was {slurry.D50*1000:0.4f} / {slurry.get_dx(0.5)*1000:0.4f}: will be {slurry.D50*1000+delta:0.4f}")
     if DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000 <\
             slurry.D50*1000 + delta <=\
             slurry.Dp * 1000 * 0.25:
@@ -382,7 +381,6 @@ def check_value(widget, min, max, prev, fmt):
     fmt: The format of the value in the widget (for resetting)
 
     Returns the final value of the widget after error check"""
-    print(f"{widget.title}: New: {widget.value}, Bounds:{min} - {max}, Was:{prev:{fmt}}")
     try:
         new = float(widget.value)
     except ValueError:
