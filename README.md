@@ -16,8 +16,21 @@ Unless noted in a particular sub-directory, this project is licenced under the [
 * The files in the [Scripts](https://github.com/rcriii42/DHLLDV/tree/master/Scripts) directory are licensed under the [MIT license](https://github.com/rcriii42/DHLLDV/blob/master/Scripts/LICENSE). This allows the creation of proprietary modifications and extensions to the viewer code. If you distribute derivative works, you must preserve the copyright notice and provide access to the source code of the underlying DHLLDV library (a link to this repository is sufficient).
 
 ## Usage
-Once you have the code, navigate to the code directory and create a virtual environment (optional but recommended), install the requirements:
+Download the source code:
 
+`git clone https://github.com/rcriii42/DHLLDV.git DHLLDV`
+
+Change to the DHLLDV directory and create a virtual environment (not required but recommended):
+
+`python -m venv .\env`
+
+Activate the virtual environment:
+
+* In Bash (Linux, Unix, etc): `source env/bin/activate`
+* In Windows Powershell: `env\scripts\activate.ps1`
+* Commands for other command-line environments [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments) (scroll down to the table)
+
+Install the requirements:
 `(env) $ pip install -r requirements.tx`
 
 Run the tests:
