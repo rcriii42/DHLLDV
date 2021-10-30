@@ -1,4 +1,4 @@
-The file in this folder is copyright Prof. Dr. ir. Sape A. Miedema. Professor Miedema distributes the spreadsheet free of chareg with the following request and disclaimer:
+The file in this folder is copyright Prof. Dr. ir. Sape A. Miedema. Professor Miedema distributes the spreadsheet free of charge with the following request and disclaimer:
 
 If you use this Excel Workbook in any type of publication, please use the following reference: 
 Miedema, S.A., "Slurry Transport: Fundamentals, A Historical Overview & The Delft Head Loss & Limit Deposit Velocity Framework" Supplementary Excel Workbook. Delft University of Technology, Delft, the Netherlands, March 2017. 
