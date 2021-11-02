@@ -53,7 +53,7 @@ class Test(unittest.TestCase):
         for i, f in enumerate(fs):
             self.assertAlmostEqual(self.Cvs_Erhg_obj['fracs'][i], f)
 
-    def testFractions(self):
+    def test_fractions(self):
         """Test the scheme for dividing the GSD into fractions"""
         Dp = 0.5
         d = 1.0/1000
