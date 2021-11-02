@@ -371,7 +371,6 @@ def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
         fthis = flow
         for i in range(1, between_points+1):
             fthis += frac_size
-            logdlast = log10(dlow)
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - fthis) / (fnext - flow)
             new_GSD[fthis] = 10**logdthis
         new_GSD[fnext] = dnext
