@@ -18,11 +18,11 @@ Unless noted in a particular sub-directory, this project is licenced under the [
 ## Usage
 Download the source code:
 
-`git clone https://github.com/rcriii42/DHLLDV.git DHLLDV`
+`PS C:\Users\you\PycharmProjects\DHLLDV>git clone https://github.com/rcriii42/DHLLDV.git DHLLDV`
 
 Change to the DHLLDV directory and create a virtual environment (not required but recommended):
 
-`python -m venv .\env`
+`PS C:\Users\you\PycharmProjects\DHLLDV>python -m venv .\env`
 
 Activate the virtual environment:
 
@@ -30,8 +30,10 @@ Activate the virtual environment:
 * In Windows Powershell: `env\scripts\activate.ps1`
 * Commands for other command-line environments [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments) (scroll down to the table)
 
+After activating the virtual environment, the command prompt will be preceded by `(env) `.
+
 Install the requirements:
-`(env) $ pip install -r requirements.tx`
+`(env) PS C:\Users\you\PycharmProjects\DHLLDV>pip install -r requirements.tx`
 
 Run the tests:
 
