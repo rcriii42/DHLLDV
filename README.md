@@ -63,7 +63,7 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-The viewer has two tabs, a Slurry Tab and Pipeline Tab
+The viewer has two tabs, a Slurry Tab and Pipeline Tab, and a **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work. 
 
 ### Slurry Tab
 
@@ -78,9 +78,11 @@ The viewer allows you to adjust certain properties of the system:
   * The fines fraction can be set blank, in which case it is ignored when generating the GSD
   * The resulting GSD curve is calculated and shown on the "Grain Size Distribution" graph. The distribution starts at the low end with the 'pseudoliquid diameter', the diameter of particle below which particles are essentially part of the fluid (this is pipe-size, fluid, and particle density dependent). It then calculates the fractions of particles between the given D15, D50, and D85, targeting a 10-point distribution, then adds one above the largest particle diameter.
 * **Concentrations**: Allows adjusting the concentration of the slurry by adjusting either the Cv or the rhom. The up and down arrows adjust the Cv by 0.005 each way.
-* **Stop**: The Stop button stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
+
 
 ### Pipeline Tab
+
+Shows a particular pipeline, including a dredge with three pumps. Not currently configuable, but responds to changes on the slurry tab.
 
 ![image](https://user-images.githubusercontent.com/9353408/139908284-c9862fc5-bcd8-4d93-92cb-3e319547d94d.png)
 
