@@ -107,7 +107,7 @@ class Slurry():
                 fnext = fracs[index+1]
             dlow = self.GSD[flow]
             dnext = self.GSD[fnext]
-            logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.15) / (fnext - flow)
+            logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - frac) / (fnext - flow)
         return 10 ** logdthis
 
     def generate_Erhg_curves(self):
