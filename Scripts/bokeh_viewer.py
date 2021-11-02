@@ -11,7 +11,9 @@ from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
 from bokeh.models import Spacer, Div, Panel, Tabs
+from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
+
 
 from DHLLDV import DHLLDV_framework
 from DHLLDV import PipeObj
@@ -244,7 +246,10 @@ GSD_plot.line('dia', 'p', source=GSD_source,
 
 GSD_plot.circle_dot('dia', 'p', source=GSD_source, name='GSD')
 GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
+
 GSD_plot.yaxis[0].axis_label = '% passing'
+GSD_plot.yaxis.ticker = FixedTicker(ticks=[x*0.2 for x in range(5)],
+                                    minor_ticks=[x*.05 for x in range(1, 20)])
 GSD_plot.axis.major_tick_in = 10
 GSD_plot.axis.minor_tick_in = 7
 GSD_plot.axis.minor_tick_out = 0
@@ -310,6 +315,7 @@ def D50_adjust_proportionate(delta):
         D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
         D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
         D15_input.value = f"{slurry.get_dx(0.15) * 1000:0.3f}"
+
         D15_input.on_change('value', update_data)
         D50_input.on_change('value', update_data)
         D85_input.on_change('value', update_data)
