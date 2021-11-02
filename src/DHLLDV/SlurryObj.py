@@ -97,7 +97,6 @@ class Slurry():
             return self.GSD[frac]
         else:
             fracs = sorted(self.GSD.keys())
-            logds = [log10(self.GSD[f]) for f in self.GSD]
             index = bisect.bisect(fracs, frac)
             if index >= len(fracs)-1:
                 flow = fracs[-2]
