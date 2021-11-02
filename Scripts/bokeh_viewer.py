@@ -311,6 +311,8 @@ def D50_adjust_proportionate(delta):
             D15_ratio = slurry.D50 / (0.08/1000)
         D85_ratio = slurry.get_dx(0.85) / slurry.get_dx(0.50)
         slurry.generate_GSD(D15_ratio, D85_ratio)
+        print(f"Input: {slurry.D50/D15_ratio*1000:0.4f}, Output: {slurry.get_dx(0.15) * 1000:0.4f}")
+        print(slurry.GSD)
         update_source_data()
         D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
         D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
