@@ -67,7 +67,7 @@ The viewer has two tabs, a Slurry Tab and Pipeline Tab
 
 ### Slurry Tab
 
-![image](https://user-images.githubusercontent.com/9353408/139898882-d5eff772-f4b4-4feb-9c88-84aa9d95bafa.png)
+![image](https://user-images.githubusercontent.com/9353408/139908222-947d4edd-3403-4a1a-99a7-f55c0c650ddf.png)
 
 The viewer allows you to adjust certain properties of the system:
 
@@ -82,6 +82,5 @@ The viewer allows you to adjust certain properties of the system:
 
 ### Pipeline Tab
 
-![image](https://user-images.githubusercontent.com/9353408/139900083-7589b7b7-65b0-4c50-bd9a-c8fb2054de93.png)
-
+![image](https://user-images.githubusercontent.com/9353408/139908284-c9862fc5-bcd8-4d93-92cb-3e319547d94d.png)
 
