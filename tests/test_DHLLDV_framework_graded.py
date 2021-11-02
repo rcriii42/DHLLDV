@@ -3,10 +3,13 @@ Created on Apr 190 2019
 
 @author: rcriii
 '''
+import math
 import unittest
+
 
 from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
+from DHLLDV import DHLLDV_Utils
 
 class Test(unittest.TestCase):
     def setUp(self):
@@ -89,6 +92,21 @@ class Test(unittest.TestCase):
                 self.assertAlmostEqual(fracs[i], f[0])
             with self.subTest(msg = f"Testing diameter {i}: {f[0]*100:0.2f}% : {f[1]:0.3}mm"):
                 self.assertAlmostEqual(ds[i]*1000, f[1])
+
+
+    def test_d15_preserved(self):
+        """Test that the d15 is preserved when the pseuodoliquid fraction is negative"""
+        Dp = 0.5
+        GSD = {0.85: 2.992/1000,
+               0.5: 1.1/1000,
+               0.15: 0.2368/1000,}
+        nu = 0.001005 / (0.9982 * 1000)
+        rhos = 2.65
+        rhol = DHLLDV_constants.water_density[20]
+        new_GSD = DHLLDV_framework.create_fracs(GSD, Dp, nu, rhol, rhos)
+        log_GSD = DHLLDV_Utils.interpDict(dict([k, math.log10(v)] for k, v in new_GSD.items()))
+        logd15 = log_GSD[0.15]
+        self.assertAlmostEqual(GSD[0.15]*1000, 10**logd15*1000)
 
 
     def test_Erhg_graded_ds(self):
