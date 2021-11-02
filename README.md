@@ -18,11 +18,11 @@ Unless noted in a particular sub-directory, this project is licenced under the [
 ## Usage
 Download the source code:
 
-`git clone https://github.com/rcriii42/DHLLDV.git DHLLDV`
+`PS C:\Users\you\PycharmProjects\DHLLDV>git clone https://github.com/rcriii42/DHLLDV.git DHLLDV`
 
 Change to the DHLLDV directory and create a virtual environment (not required but recommended):
 
-`python -m venv .\env`
+`PS C:\Users\you\PycharmProjects\DHLLDV>python -m venv .\env`
 
 Activate the virtual environment:
 
@@ -30,8 +30,10 @@ Activate the virtual environment:
 * In Windows Powershell: `env\scripts\activate.ps1`
 * Commands for other command-line environments [here](https://docs.python.org/3/library/venv.html#creating-virtual-environments) (scroll down to the table)
 
+After activating the virtual environment, the command prompt will be preceded by `(env) `.
+
 Install the requirements:
-`(env) $ pip install -r requirements.tx`
+`(env) PS C:\Users\you\PycharmProjects\DHLLDV>pip install -r requirements.tx`
 
 Run the tests:
 
@@ -61,14 +63,26 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-![image](https://user-images.githubusercontent.com/9353408/131259001-3ce1bc1b-8a22-4ac8-9351-26d4481c97d8.png)
+The viewer has two tabs, a Slurry Tab and Pipeline Tab, and a **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work. 
+
+### Slurry Tab
+
+![image](https://user-images.githubusercontent.com/9353408/139908222-947d4edd-3403-4a1a-99a7-f55c0c650ddf.png)
 
 The viewer allows you to adjust certain properties of the system:
 
-* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way
-* **Fluid**: Allows selection of fresh or salt water at 20&deg;C (68&deg;F)
-* **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075mm). The up and down arrows vary the D50 by 0.1mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction. The resulting GSD curve is shown with an added point representing the particle diameter that forms part of the carrier liquid.
+* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way. The roughness is the absolute roughness of new steel pipe in m (per Cameron Hydraulic Data).
+* **Fluid**: Allows selection of fresh or salt water at 20&deg;C (68&deg;F). This adjusts the density and viscosity of the carrier fluid.
+* **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075mm).
+  * The up and down arrows vary the D50 by 0.1mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction.
+  * The fines fraction can be set blank, in which case it is ignored when generating the GSD
+  * The resulting GSD curve is calculated and shown on the "Grain Size Distribution" graph. The distribution starts at the low end with the 'pseudoliquid diameter', the diameter of particle below which particles are essentially part of the fluid (this is pipe-size, fluid, and particle density dependent). It then calculates the fractions of particles between the given D15, D50, and D85, targeting a 10-point distribution, then adds one above the largest particle diameter.
 * **Concentrations**: Allows adjusting the concentration of the slurry by adjusting either the Cv or the rhom. The up and down arrows adjust the Cv by 0.005 each way.
-* **Stop**: The Stop button stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
+
+### Pipeline Tab
+
+Shows a particular pipeline, including a dredge with three pumps. Not currently configuable, but responds to changes on the slurry tab.
+
+![image](https://user-images.githubusercontent.com/9353408/139908284-c9862fc5-bcd8-4d93-92cb-3e319547d94d.png)
 
