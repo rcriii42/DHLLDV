@@ -122,7 +122,7 @@ class Slurry():
         Assumes the GSD is already generated"""
         return DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon,
                                             self.nu, self.rhol, self.rhos,
-                                            self.Cv, Cvt_eq_Cvs=True)
+                                            self.Cv, Cvt_eq_Cvs=True, num_fracs=None)
 
     def im(self, vls):
         """Return the im at the given velocity.
