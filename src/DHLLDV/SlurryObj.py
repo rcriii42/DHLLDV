@@ -116,7 +116,7 @@ class Slurry():
         return homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol)
 
     def Erhg(self, vls):
-        """Return the Erhg at the given velocity. Just a wrapper around Erhg_graded
+        """Return the Erhg at the given velocity, GSD, Cvt. Just a wrapper around Erhg_graded
 
         vls = Velocity (m/sec)
         Assumes the GSD is already generated"""
@@ -125,7 +125,7 @@ class Slurry():
                                             self.Cv, Cvt_eq_Cvs=True, num_fracs=None)
 
     def im(self, vls):
-        """Return the im at the given velocity.
+        """Return the im at the given velocity, GSD, Cvt.
 
         vls = Velocity (m/sec)
         Assumes the GSD is already generated"""
