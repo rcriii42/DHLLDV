@@ -398,6 +398,7 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     rhol = density of the fluid (ton/m3)
     rhos = particle density (ton/m3)
     Cv = insitu volume concentration
+    Cvt_eq_Cvs = True to calculate Erhg assuming the Cvt was given
     num_fracs = The number of fractions to divide the GSD, if not >0, use the GSD as is,
                 assuming that the bottom fraction is the peudoliquid
     get_dict: Whether to return a dict, or a single number
