@@ -38,7 +38,7 @@ class interpDict(dict):
                 y1 = dict.__getitem__(self, x1)
                 y2 = dict.__getitem__(self, x2)
                 val = ((y2 - y1) / (x2 - x1)) * (key - x1) + y1
-            elif index == 0 and self.extrapolate_high:
+            elif index == 0 and self.extrapolate_low:
                 x1 = keys[0]
                 x2 = keys[1]
                 y1 = dict.__getitem__(self, x1)
