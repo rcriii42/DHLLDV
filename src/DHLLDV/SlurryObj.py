@@ -13,7 +13,7 @@ from . import DHLLDV_constants
 from . import homogeneous
 
 class Slurry():
-    def __init__(self, Dp=0.762, D50=1.0/1000., silt=None, fluid='fresh', Cv=0.175, max_index=100):
+    def __init__(self, Dp=0.762, D50=1.0/1000., silt=None, fluid='salt', Cv=0.175, max_index=100):
         self.max_index = max_index
         self.Dp = Dp
         self.D50 = D50
@@ -23,9 +23,9 @@ class Slurry():
             self._silt = silt
         self.epsilon = DHLLDV_constants.steel_roughness
         self._fluid = fluid
-        self.Cv = Cv
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
+        self.Cv = Cv
         self.rhos = 2.65
         self.rhoi = 1.92
         self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
