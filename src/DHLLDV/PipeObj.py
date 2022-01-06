@@ -129,11 +129,9 @@ class Pipeline():
                 Hv = v ** 2 / (2 * gravity)
                 Hfit += p.total_K*Hv
                 delta_z += p.elev_change
-                index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
-                im = self.slurries[p.diameter].im_curves['graded_Cvt_im'][index]
+                im = self.slurries[p.diameter].im(v)
                 Hfric_m += im * p.length
-                index = bisect.bisect_left(self.slurries[p.diameter].vls_list, v)
-                il = self.slurries[p.diameter].im_curves['il'][index]
+                il = self.slurries[p.diameter].il(v)
                 Hfric_l += il * p.length
             elif isinstance(p, Pump):
                 Qp, Hp, Pp, np = p.point(Q, water=True)
