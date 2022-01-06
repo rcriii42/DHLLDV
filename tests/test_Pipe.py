@@ -112,6 +112,8 @@ class MyTestCase(unittest.TestCase):
                                   Main_Pump,
                                   Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
                                   Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
+        self.pipeline.slurry.fluid = 'salt'
+        self.pipeline.update_slurries()
 
     def test_v(self):
         """Test Pipe.velocity"""
