@@ -151,16 +151,16 @@ class MyTestCase(unittest.TestCase):
                 with self.subTest(msg=f'Test slurry exists for {p.diameter:0.3f} pipe'):
                     self.assertAlmostEqual(self.pipeline.slurries[p.diameter].Cv, 0.1)
 
-    # def test_total_head_slurry(self):
-    #     """Test the total head calc on slurry"""
-    #     Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
-    #     self.assertAlmostEqual(Hpipe_m, 96.50397004)
-    #
-    # def test_total_head_fluid(self):
-    #     """Test the total head calc on fluid"""
-    #     Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
-    #     self.assertAlmostEqual(Hpipe_l, 25.76477185)
-    #
+    def test_total_head_slurry(self):
+        """Test the total head calc on slurry"""
+        Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
+        self.assertAlmostEqual(Hpipe_m, 86.44754, places=3)
+
+    def test_total_head_fluid(self):
+        """Test the total head calc on fluid"""
+        Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
+        self.assertAlmostEqual(Hpipe_l, 57.23772, places=3)
+
     def test_friction_head_slurry(self):
         """Test the pipeline on slurry without elevation or fitting losses"""
         for p in self.pipeline.pipesections:
@@ -168,16 +168,16 @@ class MyTestCase(unittest.TestCase):
                 p.total_K = 0
                 p.elev_change = 0
         Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.21579636)
-        self.assertAlmostEqual(Hpipe_m, 82.23280988, places=4)
+        self.assertAlmostEqual(Hpipe_m, 81.07081, places=3)
 
-    # def test_friction_head_fluid(self):
-    #     """Test the pipeline on fluid without elevation or fitting losses"""
-    #     for p in self.pipeline.pipesections:
-    #         if isinstance(p, Pipe):
-    #             p.total_K = 0
-    #             p.elev_change = 0
-    #     Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
-    #     self.assertAlmostEqual(Hpipe_l, 21.5570364, places=1)
+    def test_friction_head_fluid(self):
+        """Test the pipeline on fluid without elevation or fitting losses"""
+        for p in self.pipeline.pipesections:
+            if isinstance(p, Pipe):
+                p.total_K = 0
+                p.elev_change = 0
+        Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
+        self.assertAlmostEqual(Hpipe_l, 53.02901, places=4)
 
 if __name__ == '__main__':
     unittest.main()
