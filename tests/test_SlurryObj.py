@@ -5,6 +5,7 @@ from DHLLDV import SlurryObj
 class Test(unittest.TestCase):
     def setUp(self) -> None:
         self.slurry = SlurryObj.Slurry()
+        print(self.slurry)
 
     def test_il(self):
         vls = self.slurry.vls_list[42]
