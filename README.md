@@ -33,7 +33,7 @@ Activate the virtual environment:
 After activating the virtual environment, the command prompt will be preceded by `(env) `.
 
 Install the requirements:
-`(env) PS C:\Users\you\PycharmProjects\DHLLDV>pip install -r requirements.tx`
+`(env) PS C:\Users\you\PycharmProjects\DHLLDV>pip install -r requirements.txt`
 
 Run the tests:
 
