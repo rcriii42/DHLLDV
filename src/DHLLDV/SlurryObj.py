@@ -109,6 +109,28 @@ class Slurry():
             logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - frac) / (fnext - flow)
         return 10 ** logdthis
 
+    def il(self, vls):
+        """Return the il at the given velocity. Just a wrapper around homogeneous.fluid_head_loss
+
+        vls = Velocity (m/sec)"""
+        return homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol)
+
+    def Erhg(self, vls):
+        """Return the Erhg at the given velocity. Just a wrapper around Erhg_graded
+
+        vls = Velocity (m/sec)
+        Assumes the GSD is already generated"""
+        return DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon,
+                                            self.nu, self.rhol, self.rhos,
+                                            self.Cv, Cvt_eq_Cvs=True)
+
+    def im(self, vls):
+        """Return the im at the given velocity.
+
+        vls = Velocity (m/sec)
+        Assumes the GSD is already generated"""
+        return self.Erhg(vls) * self.Rsd * self.Cv + self.il(vls)
+
     def generate_Erhg_curves(self):
         """Generate a dict with the Erhg curves
 
