@@ -102,7 +102,7 @@ class Slurry():
         else:
             fracs = sorted(self.GSD.keys())
             log10s = [log10(self.GSD[x]) for x in fracs]
-            log10_iterp = DHLLDV_Utils.interpDict(*zip(fracs, log10s))
+            log10_iterp = DHLLDV_Utils.interpDict(*zip(fracs, log10s), extrapolate_low=True)
             logdthis = log10_iterp[frac]
         return 10 ** logdthis
 
