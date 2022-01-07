@@ -9,6 +9,10 @@ class Test(unittest.TestCase):
         self.slurry.Dp = 0.5
         self.slurry.generate_curves()
 
+    def test_Cvi(self):
+        cvi = (1.287265 - 0.9982)/(1.92 - 0.9982)
+        self.assertAlmostEqual(self.slurry.Cvi, cvi)
+
     def test_dx_1mm(self):
         """Test the calculation of GSD for 1mm D50"""
         self.assertAlmostEqual(self.slurry.get_dx(0.10)*1000, 0.4528618)
