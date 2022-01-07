@@ -18,10 +18,7 @@ class Slurry():
         self.max_index = max_index
         self.Dp = Dp
         self.D50 = D50
-        if silt == None:
-            self._silt = -1
-        else:
-            self._silt = silt
+        self._silt = silt
         self.epsilon = DHLLDV_constants.steel_roughness
         self._fluid = fluid
         self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
@@ -53,7 +50,7 @@ class Slurry():
     @silt.setter
     def silt(self, X):
         if X is None:
-            X = -1
+            X = None
         elif X < 0:
             X = 0.0
         elif X > 1:   #In this case D85 is < 0.075 and the ELM will be invoked
@@ -89,7 +86,7 @@ class Slurry():
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,}
-        if self._silt >= 0:
+        if self._silt is not None:
             temp_GSD[self._silt] = 0.075/1000
         self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
