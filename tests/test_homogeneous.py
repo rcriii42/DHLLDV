@@ -87,8 +87,23 @@ class Test(unittest.TestCase):
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*10, 0.01678936498079*10)
-        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.164351061)
+        self.assertAlmostEqual(homogeneous.homogeneous_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)*10,
+                               0.01678936498079*10)
+        self.assertAlmostEqual(homogeneous.homogeneous_pressure_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs),
+                               0.164351061)
+
+    def test_fluid_head_loss(self):
+        vls = 3.0
+        Dp = 0.5
+        d = 0.075 / 1000
+        epsilon = DHLLDV_constants.steel_roughness
+        rhol = DHLLDV_constants.water_density[20]
+        nu = DHLLDV_constants.water_viscosity[20]
+        g = DHLLDV_constants.gravity
+        self.assertAlmostEqual(homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)*10,
+                               0.011876232*10)
+        self.assertAlmostEqual(homogeneous.fluid_pressure_loss(vls, Dp, epsilon, nu, rhol),
+                               0.011876232*g*rhol)
     
     def test_Erhg_med_sand(self):
         vls = 3.0
