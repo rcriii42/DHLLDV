@@ -78,7 +78,10 @@ class Slurry():
         self.Cv = (Sm - self.rhol) / (self.rhos - self.rhol)
 
     def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
+        """Generate the full GSD based on the given D50 and slope
 
+        d15_ratio = d50/d15 (-) if 0 or None, use the current ratio
+        d85_ratio = d85/d50 (-) if 0 or None, use the current ratio"""
         if not d85_ratio:
             d85_ratio = self.get_dx(0.85) / self.get_dx(0.5)
         if not d15_ratio:
