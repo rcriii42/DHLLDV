@@ -14,11 +14,10 @@ from . import DHLLDV_Utils
 from . import homogeneous
 
 class Slurry():
-    def __init__(self, Dp=0.762, D50=1.0/1000., silt=None, fluid='salt', Cv=0.175, max_index=100):
+    def __init__(self, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
         self.max_index = max_index
         self.Dp = Dp
         self.D50 = D50
-        self._silt = silt
         self.epsilon = DHLLDV_constants.steel_roughness
         self.fluid = fluid
         # self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
@@ -42,21 +41,6 @@ class Slurry():
         else:
             self.nu = DHLLDV_constants.water_viscosity[20]
             self.rhol = DHLLDV_constants.water_density[20]
-
-    @property
-    def silt(self):
-        return self._silt
-
-    @silt.setter
-    def silt(self, X):
-        if X is None:
-            X = None
-        elif X < 0:
-            X = 0.0
-        elif X > 1:   #In this case D85 is < 0.075 and the ELM will be invoked
-            X = 0.999
-        self._silt = X
-        self.generate_GSD(d15_ratio=None, d85_ratio=None)
 
     @property
     def Rsd(self):
@@ -86,8 +70,6 @@ class Slurry():
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,}
-        if self._silt is not None:
-            temp_GSD[self._silt] = 0.075/1000
         self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
     def get_dx(self, frac):
