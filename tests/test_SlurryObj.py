@@ -28,7 +28,7 @@ class Test(unittest.TestCase):
         This tests the case where the Xmin > 0.1"""
         s = SlurryObj.Slurry()
         s.D50 = 0.22/1000
-        s.generate_GSD()
+        s.generate_GSD(d15_ratio=None, d85_ratio=None)
         self.assertAlmostEqual(min(s.GSD.keys()), 0.156748040)
         self.assertAlmostEqual(s.get_dx(0.10)*1000, 0.0996296)
         self.assertAlmostEqual(s.get_dx(0.15)*1000, 0.11)
