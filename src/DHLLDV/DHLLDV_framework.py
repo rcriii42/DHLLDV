@@ -357,9 +357,12 @@ def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
         else:
             break
     X = fnext - (log10(dnext) - log10(dmin)) * (fnext - flow) / (log10(dnext) - log10(dlow))
-    if X < 0:
+    if X > 0:
+        new_GSD[X] = dmin
+    else:
+        logd0 = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - 0.0) / (fnext - flow)
+        dmin = 10**logd0
         X = 0
-    new_GSD[X] = dmin
     num_divs = num_fracs - points_left - 1
     between_points = int(num_divs/points_left + 0.5)
 
