@@ -10,6 +10,7 @@ from math import log10
 
 from . import DHLLDV_framework
 from . import DHLLDV_constants
+from . import DHLLDV_Utils
 from . import homogeneous
 
 class Slurry():
@@ -97,16 +98,9 @@ class Slurry():
             return self.GSD[frac]
         else:
             fracs = sorted(self.GSD.keys())
-            index = bisect.bisect(fracs, frac)
-            if index >= len(fracs)-1:
-                flow = fracs[-2]
-                fnext = fracs[-1]
-            else:
-                flow = fracs[index]
-                fnext = fracs[index+1]
-            dlow = self.GSD[flow]
-            dnext = self.GSD[fnext]
-            logdthis = log10(dnext) - (log10(dnext) - log10(dlow)) * (fnext - frac) / (fnext - flow)
+            log10s = [log10(self.GSD[x]) for x in fracs]
+            log10_iterp = DHLLDV_Utils.interpDict(*zip(fracs, log10s))
+            logdthis = log10_iterp[frac]
         return 10 ** logdthis
 
     def il(self, vls):
