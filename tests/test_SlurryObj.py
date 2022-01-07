@@ -11,7 +11,7 @@ class Test(unittest.TestCase):
 
     def test_dx_10(self):
         """Test the calculation of d10"""
-        self.assertAlmostEqual(self.slurry.get_dx(0.10)*1000, 0.2657)
+        self.assertAlmostEqual(self.slurry.get_dx(0.10)*1000, 0.4528618)
 
     def test_dx_15(self):
         """Test the calculation of d15"""
@@ -19,23 +19,18 @@ class Test(unittest.TestCase):
 
     def test_dx_42(self):
         """Test the calculation of d42"""
-        self.assertAlmostEqual(self.slurry.get_dx(0.42)*1000, 0.8535)
-
+        self.assertAlmostEqual(self.slurry.get_dx(0.42)*1000, 0.8534796)
     def test_dx50(self):
         """Test the calculation of d50"""
         self.assertAlmostEqual(self.slurry.get_dx(0.50) * 1000, 1.0)
 
     def test_dx_69(self):
         """Test the calculation of d69"""
-        self.assertAlmostEqual(self.slurry.get_dx(0.69)*1000, 1.7215)
+        self.assertAlmostEqual(self.slurry.get_dx(0.69)*1000, 1.7215072)
 
     def test_dx85(self):
         """Test the calculation of d85"""
         self.assertAlmostEqual(self.slurry.get_dx(0.85) * 1000, 2.72)
-
-
-
-
 
     def test_il_fresh(self):
         vls = self.slurry.vls_list[42]
