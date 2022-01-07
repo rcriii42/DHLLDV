@@ -20,9 +20,9 @@ class Slurry():
         self.D50 = D50
         self._silt = silt
         self.epsilon = DHLLDV_constants.steel_roughness
-        self._fluid = fluid
-        self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
-        self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
+        self.fluid = fluid
+        # self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
+        # self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
         self.Cv = Cv
         self.rhos = 2.65
         self.rhoi = 1.92
