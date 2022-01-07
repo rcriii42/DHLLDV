@@ -325,14 +325,6 @@ def D50_up_callback():
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
 
-def update_silt(attrname, old, new):
-    if silt_input.value == '':
-        slurry.silt = None
-    else:
-        slurry.silt = check_value(silt_input, 0.0, 49.99, slurry.silt, '0.1f') / 100
-    slurry.generate_GSD(d15_ratio=slurry.D50 / slurry.get_dx(0.15), d85_ratio=slurry.get_dx(0.85) / slurry.D50)
-    update_source_data()
-
 
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.get_dx(0.85) * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
@@ -341,11 +333,9 @@ D50_up_button.on_click(D50_up_callback)
 D50_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
 D50_down_button.on_click(D50_down_callback)
 D15_input = TextInput(title="D15 (mm)", value=f"{slurry.get_dx(0.15) * 1000:0.3f}", width=95)
-silt_input = TextInput(title="% of 0.075 mm", value="", width=95)
-silt_input.on_change('value', update_silt)
 
 D50_updown = column(D50_up_button, D50_down_button)
-GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input, silt_input)
+GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input)
 
 def update_rhos(attrname, old, new):
     Cvi = (slurry.rhoi - slurry.rhol) / (slurry.rhos - slurry.rhol)
