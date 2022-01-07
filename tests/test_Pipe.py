@@ -154,7 +154,7 @@ class MyTestCase(unittest.TestCase):
     def test_total_head_slurry(self):
         """Test the total head calc on slurry"""
         Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
-        self.assertAlmostEqual(Hpipe_m, 86.44754, places=3)
+        self.assertAlmostEqual(Hpipe_m, 89.3955159, places=3)
 
     def test_total_head_fluid(self):
         """Test the total head calc on fluid"""
@@ -167,8 +167,8 @@ class MyTestCase(unittest.TestCase):
             if isinstance(p, Pipe):
                 p.total_K = 0
                 p.elev_change = 0
-        Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.21579636)
-        self.assertAlmostEqual(Hpipe_m, 81.07081, places=3)
+        Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
+        self.assertAlmostEqual(Hpipe_m, 84.0187941, places=3)
 
     def test_friction_head_fluid(self):
         """Test the pipeline on fluid without elevation or fitting losses"""
@@ -178,6 +178,8 @@ class MyTestCase(unittest.TestCase):
                 p.elev_change = 0
         Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
         self.assertAlmostEqual(Hpipe_l, 53.02901, places=4)
+
+
 
 if __name__ == '__main__':
     unittest.main()
