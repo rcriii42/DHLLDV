@@ -30,7 +30,7 @@ class Slurry():
         self._D50 = D50
         self._GSD = None
         self.GSD_curves_dirty = True
-        self.generate_GSD()
+        self.generate_GSD(d15_ratio=2.0, d85_ratio=2.72)
 
         self._vls_list = None
         self._Erhg_curves = None
@@ -161,7 +161,7 @@ class Slurry():
             self.generate_curves()
         return self._LDV85_curves
 
-    def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
+    def generate_GSD(self, d15_ratio=None, d85_ratio=None):
         """Generate the full GSD based on the given D50 and slope
 
         d15_ratio = d50/d15 (-) if 0 or None, use the current ratio
