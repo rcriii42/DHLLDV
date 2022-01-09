@@ -165,6 +165,7 @@ class Slurry():
 
         d15_ratio = d50/d15 (-) if 0 or None, use the current ratio
         d85_ratio = d85/d50 (-) if 0 or None, use the current ratio"""
+        self.GSD_curves_dirty = False
         if not d85_ratio:
             d85_ratio = self.get_dx(0.85) / self.get_dx(0.5)
         if not d15_ratio:
@@ -173,6 +174,7 @@ class Slurry():
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,}
         self._GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
+        self.curves_dirty = True
 
     def get_dx(self, frac):
         """Get the grain size associated with the given frac
