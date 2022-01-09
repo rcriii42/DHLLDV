@@ -64,7 +64,7 @@ class Test(unittest.TestCase):
         vls = self.slurry.vls_list[42]
         self.assertEqual(self.slurry.im(vls), self.slurry.im_curves['graded_Cvt_im'][42])
 
-    # Test all the setters and getters
+    # Test all the setters and getters and auto-updating of curves
     def test_fluid(self):
         self.assertEqual(self.slurry.fluid, 'fresh')
 
@@ -83,27 +83,27 @@ class Test(unittest.TestCase):
         self.assertEqual(self.slurry.Erhg_curves['il'][42], erhg_il)  # should have changed back
 
     def test_epsilon_changed(self):
-        """Test that changing epsilon triggers changes in the curves"""
+        """Test that changing epsilon triggers changes in the curves
+
+        Also tests that im_curves auto-update"""
         self.slurry.generate_curves()               # Make sure the curves were up-to-date
         self.assertFalse(self.slurry.curves_dirty)  # generating curves should set this false
         il = self.slurry.im_curves['il'][42]
-        erhg_il = self.slurry.Erhg_curves['il'][42]
-        self.assertEqual(il, erhg_il)
         self.slurry.epsilon = 4.0e-05
         self.assertTrue(self.slurry.curves_dirty)   # Curves should be dirty after updating epsilon
         self.assertNotEqual(self.slurry.im_curves['il'][42], il)    # The value of il for that velocity
-        self.assertNotEqual(self.slurry.im_curves['il'][42], erhg_il)    # should have changed
+                                                                    # should have changed
 
     def test_rhos_changed(self):
-        """Test that the curves are regenerated after changing rhos"""
+        """Test that the curves are regenerated after changing rhos
+
+        Also tests that LDV curves auto-update"""
         self.slurry.generate_curves()               # Make sure the curves were up-to-date
         self.assertFalse(self.slurry.curves_dirty)  # generating curves should set this false
-        im = self.slurry.im_curves['Cvt_im'][42]
         ldv_im = self.slurry.LDV_curves['im'][21]
         ldv85_im = self.slurry.LDV85_curves['im'][11]
         self.slurry.rhos = 3.0
-        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating epsilon
-        self.assertNotEqual(self.slurry.im_curves['Cvt_im'][42], im)  # The values of im should have changed
+        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating rhos
         self.assertNotEqual(self.slurry.LDV_curves['im'][21], ldv_im)
         self.assertNotEqual(self.slurry.LDV85_curves['im'][11], ldv85_im)
 
@@ -112,9 +112,8 @@ class Test(unittest.TestCase):
         self.assertFalse(self.slurry.curves_dirty)  # generating curves should set this false
         vmax = max(self.slurry.vls_list)
         self.slurry.max_index = 50
-        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating epsilon
+        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating max_index
         self.assertNotEqual(max(self.slurry.vls_list), vmax)  # The maximum velocity is tied to the max_index
-
 
 
 if __name__ == '__main__':
