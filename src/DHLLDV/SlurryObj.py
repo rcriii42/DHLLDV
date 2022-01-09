@@ -79,6 +79,7 @@ class Slurry():
     def D50(self, d):
         self._D50 = d
         self.GSD_curves_dirty = True
+        self.curves_dirty = True
 
     @property
     def GSD(self):
