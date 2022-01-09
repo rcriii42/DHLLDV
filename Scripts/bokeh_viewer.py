@@ -306,10 +306,9 @@ def D50_adjust_proportionate(delta):
         D15_input.remove_on_change('value', update_data)
         slurry.D50 += delta / 1000
         D15_ratio = slurry.get_dx(0.50) / slurry.get_dx(0.15)
-        if slurry.D50 / D15_ratio < 0.08/1000:
-            D15_ratio = slurry.D50 / (0.08/1000)
-        D85_ratio = slurry.get_dx(0.85) / slurry.get_dx(0.50)
-        slurry.generate_GSD(D15_ratio, D85_ratio)
+        if slurry.D50 / D15_ratio < 0.04/1000:
+            D15_ratio = slurry.D50 / (0.04/1000)
+        slurry.generate_GSD(D15_ratio)
         update_source_data()
         D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
         D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
@@ -402,7 +401,7 @@ def update_data(attrname, old, new):
                              min(slurry.get_dx(0.85)*1000-0.01,
                                  slurry.Dp * 1000 * 0.25),
                              slurry.D50 * 1000, '0.3f') / 1000
-    d15 = check_value(D15_input, 0.08, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
+    d15 = check_value(D15_input, 0.04, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
     slurry.generate_GSD(d15_ratio=slurry.D50/d15, d85_ratio=d85/slurry.D50)
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
