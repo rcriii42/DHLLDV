@@ -48,7 +48,6 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 
 def update_source_data():
-    slurry.generate_curves()
     im_source.data = dict(v=slurry.vls_list,
                           graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                           Cvs_im=slurry.im_curves['Cvs_im'],
