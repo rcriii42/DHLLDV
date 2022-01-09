@@ -68,6 +68,20 @@ class Test(unittest.TestCase):
     def test_fluid(self):
         self.assertEqual(self.slurry.fluid, 'fresh')
 
+    def test_fluid_changed(self):
+        """Test that changing the fluid triggers changing the curves
+
+        Also tests that Erhg curves auto-update"""
+        self.slurry.generate_curves()  # Make sure the curves were up-to-date
+        self.assertFalse(self.slurry.curves_dirty)  # generating curves should set this false
+        erhg_il = self.slurry.Erhg_curves['il'][42]
+        self.slurry.fluid = 'salt'
+        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating the fluid
+        self.assertNotEqual(self.slurry.Erhg_curves['il'][42], erhg_il)  # should have changed
+        self.slurry.fluid = 'fresh'
+        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating the fluid
+        self.assertEqual(self.slurry.Erhg_curves['il'][42], erhg_il)  # should have changed back
+
     def test_epsilon_changed(self):
         """Test that changing epsilon triggers changes in the curves"""
         self.slurry.generate_curves()               # Make sure the curves were up-to-date
