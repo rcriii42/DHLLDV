@@ -7,7 +7,6 @@ class Test(unittest.TestCase):
         self.slurry = SlurryObj.Slurry()
         self.slurry.fluid = 'fresh'
         self.slurry.Dp = 0.5
-        self.slurry.generate_curves()
 
     def test_Cvi(self):
         cvi = (1.287265 - 0.9982)/(1.92 - 0.9982)
@@ -28,7 +27,6 @@ class Test(unittest.TestCase):
         This tests the case where the Xmin > 0.1"""
         s = SlurryObj.Slurry()
         s.D50 = 0.22/1000
-        s.generate_GSD(d15_ratio=None, d85_ratio=None)
         self.assertAlmostEqual(min(s.GSD.keys()), 0.156748040)
         self.assertAlmostEqual(s.get_dx(0.10)*1000, 0.0996296)
         self.assertAlmostEqual(s.get_dx(0.15)*1000, 0.11)
@@ -44,7 +42,6 @@ class Test(unittest.TestCase):
 
     def test_il_salt(self):
         self.slurry.fluid = 'salt'
-        self.slurry.generate_curves()
         vls = self.slurry.vls_list[42]
         self.assertEqual(self.slurry.il(vls), self.slurry.Erhg_curves['il'][42])
         self.assertEqual(self.slurry.il(vls), self.slurry.im_curves['il'][42])
@@ -55,7 +52,6 @@ class Test(unittest.TestCase):
 
     def test_Erhg_salt(self):
         self.slurry.fluid = 'salt'
-        self.slurry.generate_curves()
         vls = self.slurry.vls_list[42]
         self.assertEqual(self.slurry.Erhg(vls), self.slurry.Erhg_curves['graded_Cvt_Erhg'][42])
 
@@ -65,7 +61,6 @@ class Test(unittest.TestCase):
 
     def test_im_salt(self):
         self.slurry.fluid = 'salt'
-        self.slurry.generate_curves()
         vls = self.slurry.vls_list[42]
         self.assertEqual(self.slurry.im(vls), self.slurry.im_curves['graded_Cvt_im'][42])
 
