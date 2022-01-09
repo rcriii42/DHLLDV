@@ -15,19 +15,29 @@ from . import homogeneous
 
 class Slurry():
     def __init__(self, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
-        self.max_index = max_index
-        self.Dp = Dp
-        self.D50 = D50
-        self.epsilon = DHLLDV_constants.steel_roughness
-        self.fluid = fluid
+        self._max_index = max_index
+        self._Dp = Dp
+        self._epsilon = DHLLDV_constants.steel_roughness
+
+        self.fluid = fluid  # This also sets nu and rhol
         # self.nu = 1.0508e-6  # DHLLDV_constants.water_viscosity[20]
         # self.rhol = 1.0248103  # DHLLDV_constants.water_density[20]
-        self.Cv = Cv
-        self.rhos = 2.65
+
+        self._Cv = Cv
+        self._rhos = 2.65
         self.rhoi = 1.92
-        self.vls_list = [(i + 1) / 10. for i in range(self.max_index)]
+
+        self._D50 = D50
+        self._GSD = None
+        self.GSD_curves_dirty = True
         self.generate_GSD()
-        self.generate_curves()
+
+        self._vls_list = None
+        self._Erhg_curves = None
+        self._im_curves = None
+        self._LDV_curves = None
+        self._LDV85_curves = None
+        self.curves_dirty = True
 
     @property
     def fluid(self):
@@ -35,12 +45,64 @@ class Slurry():
 
     @fluid.setter
     def fluid(self, fluid):
+        self.curves_dirty = True
         if fluid == 'salt':
             self.nu = 1.0508e-6
             self.rhol = 1.0248103
         else:
             self.nu = DHLLDV_constants.water_viscosity[20]
             self.rhol = DHLLDV_constants.water_density[20]
+
+    @property
+    def Dp(self):
+        return self._Dp
+
+    @Dp.setter
+    def Dp(self, Dp):
+        self.curves_dirty = True
+        self._Dp = Dp
+
+    @property
+    def epsilon(self):
+        return self._epsilon
+
+    @epsilon.setter
+    def epsilon(self, e):
+        self.curves_dirty = True
+        return self._epsilon
+
+    @property
+    def D50(self):
+        return self._D50
+
+    @D50.setter
+    def D50(self, d):
+        self._D50 = d
+        self.GSD_curves_dirty = True
+
+    @property
+    def GSD(self):
+        if self.GSD_curves_dirty:
+            self.generate_GSD()
+        return self._GSD
+
+    @property
+    def Cv(self):
+        return self._Cv
+
+    @Cv.setter
+    def Cv(self, c):
+        self.curves_dirty = True
+        self._Cv = c
+
+    @property
+    def rhos(self):
+        return self._rhos
+
+    @rhos.setter
+    def rhos(self, r):
+        self.curves_dirty = True
+        self._rhos = r
 
     @property
     def Rsd(self):
@@ -58,6 +120,45 @@ class Slurry():
     def rhom(self, Sm):
         self.Cv = (Sm - self.rhol) / (self.rhos - self.rhol)
 
+    @property
+    def max_index(self):
+        return self._max_index
+
+    @max_index.setter
+    def max_index(self, imax):
+        self.curves_dirty = True
+        self._max_index = imax
+
+    @property
+    def vls_list(self):
+        if self.curves_dirty or self._vls_list is None:
+            self.generate_curves()
+        return self._vls_list
+
+    @property
+    def Erhg_curves(self):
+        if self.curves_dirty or self._Erhg_curves is None:
+            self.generate_curves()
+        return self._Erhg_curves
+
+    @property
+    def im_curves(self):
+        if self.curves_dirty or self._im_curves is None:
+            self.generate_curves()
+        return self._im_curves
+
+    @property
+    def LDV_curves(self):
+        if self.curves_dirty or self._LDV_curves is None:
+            self.generate_curves()
+        return self._LDV_curves
+
+    @property
+    def LDV85_curves(self):
+        if self.curves_dirty or self._LDV85_curves is None:
+            self.generate_curves()
+        return self._LDV85_curves
+
     def generate_GSD(self, d15_ratio=2.0, d85_ratio=2.72):
         """Generate the full GSD based on the given D50 and slope
 
@@ -70,7 +171,7 @@ class Slurry():
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,}
-        self.GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
+        self._GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
     def get_dx(self, frac):
         """Get the grain size associated with the given frac
@@ -169,7 +270,11 @@ class Slurry():
                 'regime': [f'LDV for {d * 1000:0.3f} mm particle at Cvs={Cv_list[i]}' for i in range(cv_points)]
                 }
     def generate_curves(self):
-        self.Erhg_curves = self.generate_Erhg_curves()
-        self.im_curves = self.generate_im_curves()
-        self.LDV_curves = self.generate_LDV_curves(self.get_dx(0.5))
-        self.LDV85_curves = self.generate_LDV_curves(self.get_dx(0.85))
+        self.curves_dirty = False   # set it at the top so curves generate only once
+        self._vls_list = [(i + 1) / 10. for i in range(self.max_index)]
+        self._Erhg_curves = self.generate_Erhg_curves()
+        self._im_curves = self.generate_im_curves()
+        self._LDV_curves = self.generate_LDV_curves(self.get_dx(0.5))
+        self._LDV85_curves = self.generate_LDV_curves(self.get_dx(0.85))
+
+
