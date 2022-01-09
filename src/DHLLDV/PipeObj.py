@@ -88,7 +88,6 @@ class Pipeline():
         """Allow the user to set the Cv for the entire system"""
         for s in self.slurries.values():
             s.Cv = Cv
-            s.generate_curves()
 
     @property
     def slurry(self):
@@ -105,7 +104,6 @@ class Pipeline():
             if isinstance(p, Pipe) and p.diameter not in self.slurries:
                 self.slurries[p.diameter] = copy(self._slurry)
                 self.slurries[p.diameter].Dp = p.diameter
-                self.slurries[p.diameter].generate_curves()
             elif isinstance(p, Pump):
                 p.slurry = self.slurry
 
