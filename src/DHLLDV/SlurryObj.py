@@ -70,7 +70,7 @@ class Slurry():
     @epsilon.setter
     def epsilon(self, e):
         self.curves_dirty = True
-        return self._epsilon
+        self._epsilon = e
 
     @property
     def D50(self):
