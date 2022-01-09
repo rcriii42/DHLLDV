@@ -64,6 +64,10 @@ class Test(unittest.TestCase):
         vls = self.slurry.vls_list[42]
         self.assertEqual(self.slurry.im(vls), self.slurry.im_curves['graded_Cvt_im'][42])
 
+    # Test all the setters and getters
+    def test_fluid(self):
+        self.assertEqual(self.slurry.fluid, 'fresh')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -46,6 +46,7 @@ class Slurry():
     @fluid.setter
     def fluid(self, fluid):
         self.curves_dirty = True
+        self._fluid = fluid
         if fluid == 'salt':
             self.nu = 1.0508e-6
             self.rhol = 1.0248103
