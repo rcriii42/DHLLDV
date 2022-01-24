@@ -17,23 +17,31 @@ from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
 #                                      Name             Dia     L    K      dZ
-pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
-                                Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
-                                 copy.copy(Ladder_Pump),
-                                 Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
-                                 Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
-                                 Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
-                                 Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
-                                 Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
-                    slurry=base_slurry)
+# pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
+#                                 Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
+#                                  copy.copy(Ladder_Pump),
+#                                  Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
+#                                  copy.copy(Main_Pump),
+#                                  Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
+#                                  copy.copy(Main_Pump),
+#                                  Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
+#                                  Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
+#                                  Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
+#                                  Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
+#                                  Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
+#                     slurry=base_slurry)
+
+pipeline = Pipeline(pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                  Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                                  Ladder_Pump,
+                                  Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                  Main_Pump,
+                                  Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                  Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
 
 
 def system_panel(PL):
-    """Create a Bokeh Panel with the pipelinen and an overall HQ plot"""
+    """Create a Bokeh Panel with the pipeline and an overall HQ plot"""
 
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
     head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
@@ -162,10 +170,42 @@ def system_panel(PL):
                          TextInput(value=f"Delta z (m)", width=76, disabled=True),))
     [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
+
+    # Create textboxes with operating points
+    qimin = pipeline.qimin(flow_list)
+    try:
+        qop = pipeline.find_operating_point(flow_list)
+        qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+        vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
+        hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
+        prod = f'{pipeline.slurry.Cvi*qop*60*60:0.0f}'
+    except ValueError:
+        qop_str = "None"
+        vop = "None"
+        hop = "None"
+        prod = "None"
+    opcol = column(row(TextInput(title="Qimin (m\u00b3/sec)", value=f'{qimin:0.2f}', width=95, disabled=True),
+                       TextInput(title="Vimin (m/sec)", value=f'{pipeline.pipesections[-1].velocity(qimin):0.2f}',
+                                 width=95, disabled=True),
+                       TextInput(title="Hmin (m)", value=f'{pipeline.calc_system_head(qimin)[0]:0.1f}',
+                                 width=95, disabled=True)
+                       ),
+                   row(TextInput(title="Qop (m\u00b3/sec)", value=qop_str, width=95, disabled=True),
+                       TextInput(title="Vop (m/sec)", value=vop,
+                                 width=95, disabled=True),
+                       TextInput(title="Hop (m)", value=hop,
+                                 width=95, disabled=True),
+                       TextInput(title="Production (m\u00b3/Hr)", value=prod,
+                                 width=95, disabled=True)
+                       )
+                   )
+
     return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
-                                               HQ_plot)),
+                                                Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                column(HQ_plot,
+                                                       opcol))),
             update_all)
 
 
