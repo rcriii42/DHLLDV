@@ -84,6 +84,5 @@ The viewer allows you to adjust certain properties of the system:
 
 Shows a particular pipeline, including a dredge with three pumps. Not currently configurable, but responds to changes on the slurry tab.
 
-<img alt="Pipeline tab" src="https://user-images.githubusercontent.com/9353408/150882979-8c61f701-a915-462e-88dc-ee7185530197.png">
-
+<img alt="Pipeline Tab" src="https://user-images.githubusercontent.com/9353408/150883303-3b75198d-1c26-4d4c-8186-b065cb7855ad.png">
 
