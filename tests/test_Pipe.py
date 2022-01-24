@@ -179,7 +179,11 @@ class MyTestCase(unittest.TestCase):
         Hpipe_m, Hpipe_l, Hpump_l, Hpump_m = self.pipeline.calc_system_head(1.215796)
         self.assertAlmostEqual(Hpipe_l, 53.02901, places=4)
 
-
+    def test_qimin(self):
+        """Test the qimin calculation"""
+        flow_list = [self.pipeline.pipesections[-1].flow(v) for v in self.pipeline.slurry.vls_list]
+        qimin = self.pipeline.qimin(flow_list, precision=0.01)
+        self.assertAlmostEqual(qimin, 1.12, places=4)
 
 if __name__ == '__main__':
     unittest.main()
