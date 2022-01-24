@@ -128,6 +128,7 @@ def system_panel(PL):
             if isinstance(p, Pipe) and p.diameter == old_disch_dia:
                 pipe_row.children[2].value=f"{p.diameter:0.3f}"
         totalscol.children[0].children[2].value=f"{pipeline.pipesections[-1].diameter:0.3f}"
+        update_opcol()
 
     def pipe_panel(i, pipe):
         """Create a Bokeh row with information about the pipe"""
@@ -206,6 +207,30 @@ def system_panel(PL):
                                  width=95, disabled=True)
                        )
                    )
+
+
+    def update_opcol():
+        """Update the operating point boxes"""
+        qimin = pipeline.qimin(flow_list)
+        imin_row = opcol.children[2].children
+        imin_row[0].value = f'{qimin:0.2f}'
+        imin_row[1].value = f'{pipeline.pipesections[-1].velocity(qimin):0.2f}'
+        imin_row[2].value = f'{pipeline.calc_system_head(qimin)[0]:0.1f}'
+        try:
+            qop = pipeline.find_operating_point(flow_list)
+            qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+            vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
+            hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
+            prod = f'{pipeline.slurry.Cvi * qop * 60 * 60:0.0f}'
+        except ValueError:
+            qop_str = "None"
+            vop = "None"
+            hop = "None"
+            prod = "None"
+        oppnt_row = opcol.children[5].children
+        for i, op_str in enumerate([qop_str, vop, hop, prod]):
+            oppnt_row[i].value = op_str
+
 
     return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
