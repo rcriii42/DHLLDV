@@ -157,11 +157,36 @@ class Pipeline():
             """Calculate the second derivative of im at the given flow"""
             return (imprime(q+precision/2) - imprime(q-precision/2))/precision
         q1 = q0 - imprime(q0)/imprime2(q0)
-        while abs(q1-q0) > precision/2:
+        while abs(q1-q0) > precision/10:
             q0 = q1
             q1 = q0 - imprime(q0) / imprime2(q0)
             iters += 1
-        print(f"Pipeline.vimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
+        #print(f"Pipeline.vimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
         return q1
 
+    def find_operating_point(self, flow_list, precision = 0.02):
+        """Find the operating point (intersection above qimin)
+
+        flow_list is a list of flowrates (m3/sec) to consider
+        precision is the flow precision (m3/sec) to use
+        """
+        def curvediff(q):
+            """Return the difference in the curves at the given flow"""
+            im, _, _, pm = self.calc_system_head(q)
+            return im - pm
+        def curvediffprime(q):
+            """Calculate the first dervative of the difference in curves"""
+            return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
+        def curvediffprime2(q):
+            """Calculate the second dervative of the difference in curves"""
+            return (curvediffprime(q+precision/2) - curvediffprime(q-precision/2))/precision
+        indexmin = bisect.bisect_right(flow_list, self.qimin(flow_list))
+        q0 = flow_list[int((len(flow_list)+indexmin)/2)]
+        q1 = q0 - curvediff(q0)/curvediffprime(q0)
+        delta = abs(q1 - q0)
+        while delta > precision / 10:
+            q0 = q1
+            q1 = q0 - curvediff(q0) / curvediffprime(q0)
+            delta = abs(q1 - q0)
+        return q1
 

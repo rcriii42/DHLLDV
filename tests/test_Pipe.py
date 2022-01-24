@@ -185,5 +185,11 @@ class MyTestCase(unittest.TestCase):
         qimin = self.pipeline.qimin(flow_list, precision=0.01)
         self.assertAlmostEqual(qimin, 1.12, places=3)
 
+    def test_intersection(self):
+        """Test the operating point calculation"""
+        flow_list = [self.pipeline.pipesections[-1].flow(v) for v in self.pipeline.slurry.vls_list]
+        qop = self.pipeline.find_operating_point(flow_list)
+        self.assertAlmostEqual(qop, 1.9295, places=3)
+
 if __name__ == '__main__':
     unittest.main()
