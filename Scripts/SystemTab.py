@@ -16,6 +16,7 @@ from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
+# The below is a default 30" pipeline
 #                                      Name             Dia     L    K      dZ
 # pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
 #                                 Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
@@ -31,6 +32,8 @@ from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 #                                  Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
 #                     slurry=base_slurry)
 
+
+# This is the pipeline from the tests
 pipeline = Pipeline(pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                   Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
                                   Ladder_Pump,
