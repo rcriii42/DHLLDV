@@ -206,7 +206,7 @@ def system_panel(PL):
     return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
-                                                Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
                                                 column(HQ_plot,
                                                        opcol))),
             update_all)
