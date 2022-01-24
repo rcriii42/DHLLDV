@@ -16,9 +16,9 @@ from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
-#        Name             Dia     L    K      dZ
+#                                      Name             Dia     L    K      dZ
 pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
-                                Pipe('UWP Suction',   0.864, 15.0, 0.05,   5.0),
+                                Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
                                  copy.copy(Ladder_Pump),
                                  Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
                                  copy.copy(Main_Pump),
