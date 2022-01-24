@@ -183,7 +183,7 @@ class MyTestCase(unittest.TestCase):
         """Test the qimin calculation"""
         flow_list = [self.pipeline.pipesections[-1].flow(v) for v in self.pipeline.slurry.vls_list]
         qimin = self.pipeline.qimin(flow_list, precision=0.01)
-        self.assertAlmostEqual(qimin, 1.12, places=4)
+        self.assertAlmostEqual(qimin, 1.12, places=3)
 
 if __name__ == '__main__':
     unittest.main()
