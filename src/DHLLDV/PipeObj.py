@@ -170,6 +170,10 @@ class Pipeline():
         flow_list is a list of flowrates (m3/sec) to consider
         precision is the flow precision (m3/sec) to use
         """
+        Qimin = self.qimin(flow_list)
+        im, _, _, pm = self.calc_system_head(Qimin)
+        if im > pm:
+            raise ValueError("There is no intersection")
         def curvediff(q):
             """Return the difference in the curves at the given flow"""
             im, _, _, pm = self.calc_system_head(q)
@@ -177,10 +181,7 @@ class Pipeline():
         def curvediffprime(q):
             """Calculate the first dervative of the difference in curves"""
             return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
-        def curvediffprime2(q):
-            """Calculate the second dervative of the difference in curves"""
-            return (curvediffprime(q+precision/2) - curvediffprime(q-precision/2))/precision
-        indexmin = bisect.bisect_right(flow_list, self.qimin(flow_list))
+        indexmin = bisect.bisect_right(flow_list, Qimin)
         q0 = flow_list[int((len(flow_list)+indexmin)/2)]
         q1 = q0 - curvediff(q0)/curvediffprime(q0)
         delta = abs(q1 - q0)
