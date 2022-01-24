@@ -141,3 +141,27 @@ class Pipeline():
                 Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol, # System (pipeline) head losses fluid
                 Hpumps_l,                                           # Pump head slurry
                 Hpumps_m)                                           # Pump head fluid
+
+    def qimin(self, flow_list, precision = 0.02):
+        """Find the minimum friction point in the slurry system
+
+        flow_list is a list of flowrates (m3/sec) to consider
+        precision is the flow precision (m3/sec) to use"""
+        iters = 1
+        mid =int(len(flow_list)/2)
+        q0 = flow_list[mid]
+        def imprime(q):
+            """Calculate the first derivative of im at the given flow"""
+            return (self.calc_system_head(q+precision/2)[0] - self.calc_system_head(q-precision/2)[0])/precision
+        def imprime2(q):
+            """Calculate the second derivative of im at the given flow"""
+            return (imprime(q+precision/2) - imprime(q-precision/2))/precision
+        q1 = q0 - imprime(q0)/imprime2(q0)
+        while abs(q1-q0) > precision/2:
+            q0 = q1
+            q1 = q0 - imprime(q0) / imprime2(q0)
+            iters += 1
+        print(f"Pipeline.vimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
+        return q1
+
+
