@@ -9,7 +9,7 @@ import copy
 
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
@@ -187,16 +187,20 @@ def system_panel(PL):
         vop = "None"
         hop = "None"
         prod = "None"
-    opcol = column(row(TextInput(title="Qimin (m\u00b3/sec)", value=f'{qimin:0.2f}', width=95, disabled=True),
-                       TextInput(title="Vimin (m/sec)", value=f'{pipeline.pipesections[-1].velocity(qimin):0.2f}',
+    opcol = column(Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                   Div(text="""<B>Minimum Slurry Friction Point</B>"""),
+                   row(TextInput(title="Q (m\u00b3/sec)", value=f'{qimin:0.2f}', width=95, disabled=True),
+                       TextInput(title="v\u2098 (m/sec)", value=f'{pipeline.pipesections[-1].velocity(qimin):0.2f}',
                                  width=95, disabled=True),
-                       TextInput(title="Hmin (m)", value=f'{pipeline.calc_system_head(qimin)[0]:0.1f}',
+                       TextInput(title="H (m)", value=f'{pipeline.calc_system_head(qimin)[0]:0.1f}',
                                  width=95, disabled=True)
                        ),
-                   row(TextInput(title="Qop (m\u00b3/sec)", value=qop_str, width=95, disabled=True),
-                       TextInput(title="Vop (m/sec)", value=vop,
+                   Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                   Div(text="""<B>Pump/Pipeline Slurry Operating Point</B>"""),
+                   row(TextInput(title="Q (m\u00b3/sec)", value=qop_str, width=95, disabled=True),
+                       TextInput(title="v\u2098 (m/sec)", value=vop,
                                  width=95, disabled=True),
-                       TextInput(title="Hop (m)", value=hop,
+                       TextInput(title="H (m)", value=hop,
                                  width=95, disabled=True),
                        TextInput(title="Production (m\u00b3/Hr)", value=prod,
                                  width=95, disabled=True)
