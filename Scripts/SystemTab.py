@@ -70,7 +70,7 @@ def system_panel(PL):
 
     HQ_plot.line('Q', 'im', source=im_source,
                  color='black',
-                 line_dash='dashed',
+                 line_dash='solid',
                  line_width=3,
                  line_alpha=0.6,
                  legend_label='Slurry Graded Cvt=c (m/m)',
@@ -78,7 +78,7 @@ def system_panel(PL):
 
     HQ_plot.line('Q', 'il', source=im_source,
                  color='blue',
-                 line_dash='dashed',
+                 line_dash='solid',
                  line_width=2,
                  line_alpha=0.3,
                  legend_label='Water',
