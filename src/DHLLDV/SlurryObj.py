@@ -274,6 +274,8 @@ class Slurry():
                 'regime': [f'LDV for {d * 1000:0.3f} mm particle at Cvs={Cv_list[i]}' for i in range(cv_points)]
                 }
     def generate_curves(self):
+        if self.GSD_curves_dirty:
+            self.generate_GSD()
         self.curves_dirty = False   # set it at the top so curves generate only once
         self._vls_list = [(i + 1) / 10. for i in range(self.max_index)]
         self._Erhg_curves = self.generate_Erhg_curves()
