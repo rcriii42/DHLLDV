@@ -231,7 +231,7 @@ GSD_TOOLTIPS = [
 ]
 GSD_plot = figure(height=280, width=450, title="Grain Size Distribution",
                  tools="crosshair,pan,reset,save,wheel_zoom",
-                 x_range=[0.0001, 1000], y_range=[0, 1.0],
+                 x_range=[0.01, 100], y_range=[0, 1.0],
                  x_axis_type='log', y_axis_type='auto',
                  tooltips=GSD_TOOLTIPS)
 
