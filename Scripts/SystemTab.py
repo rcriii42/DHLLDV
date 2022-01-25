@@ -58,8 +58,8 @@ def system_panel(PL):
     HQ_TOOLTIPS = [('name', "$name"),
                    ("Flow (m\u00b3/sec)", "@Q{0.00}"),
                    ("Velocity (m/sec)", "@v{0.00}"),
-                   ("Slurry Graded Cvt=c (m/m)", "@im{0,0.0}"),
-                   ("Fluid (m/m)", "@il{0,0.0}"),
+                   ("Slurry Graded Cvt=c (m)", "@im{0,0.0}"),
+                   ("Fluid (m)", "@il{0,0.0}"),
                    ("Pump Head Slurry (m)", "@Hpump_m{0,0.0}",),
                    ("Pump Head Water (m)", "@Hpump_l{0,0.0}",),
                   ]
@@ -73,7 +73,7 @@ def system_panel(PL):
                  line_dash='solid',
                  line_width=3,
                  line_alpha=0.6,
-                 legend_label='Slurry Graded Cvt=c (m/m)',
+                 legend_label='Slurry Graded Cvt=c (m)',
                  name='Slurry graded Sand Cvt=c')
 
     HQ_plot.line('Q', 'il', source=im_source,
@@ -103,7 +103,7 @@ def system_panel(PL):
     HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
     HQ_plot.xaxis[1].axis_label = f'Flow (m\u00b3/sec)'
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
-    HQ_plot.yaxis[0].axis_label = 'Head (m/m)'
+    HQ_plot.yaxis[0].axis_label = 'Head (m)'
     HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]
     HQ_plot.axis.major_tick_in = 10
     HQ_plot.axis.minor_tick_in = 7
