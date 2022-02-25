@@ -108,8 +108,6 @@ def system_panel(PL):
     HQ_plot.axis.major_tick_in = 10
     HQ_plot.axis.minor_tick_in = 7
     HQ_plot.axis.minor_tick_out = 0
-
-
     HQ_plot.legend.location = "top_left"
 
     def update_all(pipeline):
@@ -174,16 +172,16 @@ def system_panel(PL):
                          TextInput(value=f"Delta z (m)", width=76, disabled=True),))
     [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
-
     # Create textboxes with operating points
     qimin = pipeline.qimin(flow_list)
     try:
         qop = pipeline.find_operating_point(flow_list)
-        qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+        qop_str = f'{qop:0.2f}'
         vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
         hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
         prod = f'{pipeline.slurry.Cvi*qop*60*60:0.0f}'
     except ValueError:
+        qop = qimin
         qop_str = "None"
         vop = "None"
         hop = "None"
@@ -208,6 +206,28 @@ def system_panel(PL):
                        )
                    )
 
+    ###################################################################
+    # The hydraulic gradeline plot
+    hyd_TOOLTIPS = [('name', "$name"),
+                   ("Location (m)", "@x{0.1}"),
+                   ("Head (m)", "@h{0.1}"),
+                   ]
+    x, h = pipeline.hydraulic_gradient(qop)
+    hyd_source = ColumnDataSource(data=dict(x=x,
+                                            h=h))
+    hyd_plot = figure(height=450, width=725, title="Hydraulic Gradeline",
+                      tools="crosshair,pan,reset,save,wheel_zoom",
+    tooltips= hyd_TOOLTIPS)
+
+    hyd_plot.line('x', 'h', source=hyd_source,
+                  color='black',
+                  line_dash='solid',
+                  line_width=3,
+                  line_alpha=0.6,
+                  legend_label='Hydraulic Gradeline slurry',
+                  name='Hydraulic Gradeline slurry')
+    hyd_plot.xaxis[0].axis_label = f'Location in pipeline (m)'
+    hyd_plot.yaxis[0].axis_label = 'Head (m)'
 
     def update_opcol():
         """Update the operating point boxes"""
@@ -218,11 +238,12 @@ def system_panel(PL):
         imin_row[2].value = f'{pipeline.calc_system_head(qimin)[0]:0.1f}'
         try:
             qop = pipeline.find_operating_point(flow_list)
-            qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+            qop_str = f'{qop:0.2f}'
             vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
             hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
             prod = f'{pipeline.slurry.Cvi * qop * 60 * 60:0.0f}'
         except ValueError:
+            qop = qimin
             qop_str = "None"
             vop = "None"
             hop = "None"
@@ -230,17 +251,15 @@ def system_panel(PL):
         oppnt_row = opcol.children[5].children
         for i, op_str in enumerate([qop_str, vop, hop, prod]):
             oppnt_row[i].value = op_str
-
+        X, H = pipeline.hydraulic_gradient(qop)
+        hyd_source.data = dict(x=X,
+                               h=H)
 
     return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
                                                 Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
                                                 column(HQ_plot,
-                                                       opcol))),
+                                                       opcol,
+                                                       hyd_plot))),
             update_all)
-
-
-
-
-
