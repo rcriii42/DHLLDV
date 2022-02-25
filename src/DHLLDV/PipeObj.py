@@ -127,10 +127,11 @@ class Pipeline():
                 Hv = v ** 2 / (2 * gravity)
                 Hfit += p.total_K*Hv
                 delta_z += p.elev_change
-                im = self.slurries[p.diameter].im(v)
-                Hfric_m += im * p.length
-                il = self.slurries[p.diameter].il(v)
-                Hfric_l += il * p.length
+                if p.length > 0:
+                    im = self.slurries[p.diameter].im(v)
+                    Hfric_m += im * p.length
+                    il = self.slurries[p.diameter].il(v)
+                    Hfric_l += il * p.length
             elif isinstance(p, Pump):
                 Qp, Hp, Pp, np = p.point(Q, water=True)
                 Hpumps_l += Hp
