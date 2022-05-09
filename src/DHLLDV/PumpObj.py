@@ -20,7 +20,8 @@ class Pump():
     design_QH_curve: interpDict    # dict {flow (m/sec): head (m)}
     design_QP_curve: interpDict    # dict {flow (m/sec): power (kW}
     avail_power: float            # kW
-    limited: str = 'torque'       # 'torque', 'power', 'None'
+    limited: str = 'torque'       # 'torque', 'power', 'curve', 'None'
+    design_power_curve: interpDict or None = None   # dict {design_speed/n (-): power (kW)
     slurry: Slurry = None
 
     def __post_init__(self):
@@ -73,6 +74,8 @@ class Pump():
 
         if self.limited.lower() == 'torque':
             Pavail = self.avail_power * self._current_speed / self.design_speed
+        elif self.limited.lower() == 'curve':
+            Pavail = self.design_power_curve[self._current_speed / self.design_speed]
         else:
             Pavail = self.avail_power
         if self.limited.lower() == 'none' or P <= Pavail:
@@ -88,6 +91,8 @@ class Pump():
                 P = P0 * speed_ratio ** 3 * rho
                 if self.limited.lower() == 'torque':
                     Pavail = self.avail_power * n_new / self.design_speed
+                elif self.limited.lower() == 'curve':
+                    Pavail = self.design_power_curve[n_new / self.design_speed]
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio ** 2 * rho
         return (Q, H, P, n_new)
