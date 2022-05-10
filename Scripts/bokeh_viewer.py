@@ -14,7 +14,6 @@ from bokeh.models import Spacer, Div, Panel, Tabs
 from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
 
-
 from DHLLDV import DHLLDV_framework
 from DHLLDV import PipeObj
 
