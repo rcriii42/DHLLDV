@@ -180,7 +180,7 @@ class Pipeline():
             im, _, _, pm = self.calc_system_head(q)
             return im - pm
         def curvediffprime(q):
-            """Calculate the first dervative of the difference in curves"""
+            """Calculate the first derivative of the difference in curves"""
             return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
         indexmin = bisect.bisect_right(flow_list, Qimin)
         q0 = flow_list[int((len(flow_list)+indexmin)/2)]
