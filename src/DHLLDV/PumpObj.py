@@ -14,7 +14,7 @@ class Pump():
     """Model a pump and driver"""
     name: str
     design_speed: float     # Hz
-    design_impeller: float  # m
+    design_impeller: float  # impeller dia in m
     suction_dia: float      # m
     disch_dia: float        # m
     design_QH_curve: interpDict    # dict {flow (m/sec): head (m)}
@@ -65,7 +65,7 @@ class Pump():
         """Return the head and power
 
         Q: flow in m3/sec
-        water: If true return the ehad for water, else head for slurry
+        water: If true return the head for water, else head for slurry
 
         returns a tuple: (Q: flow in m3/sec,
                           H: Head in m of water,
