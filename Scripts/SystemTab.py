@@ -43,6 +43,7 @@ pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0)
 #                                   Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
 
 
+
 def system_panel(PL):
     """Create a Bokeh Panel with the pipeline and an overall HQ plot"""
 
