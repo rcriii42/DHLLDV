@@ -33,7 +33,7 @@ except ImportError:
     print('Import Error: Custom Dredge setups not found. To use, create file named CustomSetups.py with a dictionary '
           'similar to setups with dredge_name: Pipeline() items.')
 
-pipeline = setups["1870"]
+pipeline = setups["1870"] # Update this with the pipeline setup you want to use
 pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
 pipeline.update_slurries()
 
