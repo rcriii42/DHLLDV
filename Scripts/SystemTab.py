@@ -16,32 +16,26 @@ from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
-# The below is a default 30" pipeline
-#                                      Name             Dia     L    K      dZ
-pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
-                                Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
-                                 copy.copy(Ladder_Pump),
-                                 Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
-                                 Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
-                                 Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
-                                 Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
-                                 Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
-                    slurry=base_slurry)
+setups = {"Example": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                         Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                                         copy.copy(Ladder_Pump),
+                                         Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                         copy.copy(Main_Pump),
+                                         Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                         Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
+                              slurry=base_slurry),
+          }
 
+try:
+    import CustomSetups
+    setups.update(CustomSetups.setups)
+except ImportError:
+    print('Import Error: Custom Dredge setups not found. To use, create file named CustomSetups.py with a dictionary '
+          'similar to setups with dredge_name: Pipeline() items.')
 
-# This is the pipeline from the tests
-# pipeline = Pipeline(pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
-#                                   Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
-#                                   Ladder_Pump,
-#                                   Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
-#                                   Main_Pump,
-#                                   Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
-#                                   Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
-
+pipeline = setups["1870"]
+pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
+pipeline.update_slurries()
 
 
 def system_panel(PL):
