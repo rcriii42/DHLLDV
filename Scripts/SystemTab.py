@@ -27,9 +27,9 @@ setups = {"Example": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
           }
 
 try:
-    import CustomSetup
+    import CustomSetups
     setups.update(CustomSetups.setups)
-    pipeline = setups["1870"]  # Update this with the pipeline setup you want to use
+    pipeline = setups["Rudee II"]  # Update this with the pipeline setup you want to use
 except ImportError:
     print('Import Error: Custom Dredge setups not found. To use, create file named CustomSetups.py with a dictionary '
           'named setups with dredge_name: Pipeline() items.')
