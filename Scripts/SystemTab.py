@@ -9,7 +9,7 @@ import copy
 
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
@@ -100,6 +100,7 @@ def system_panel(PL):
     HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
     HQ_plot.xaxis[1].axis_label = f'Flow (m\u00b3/sec)'
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    HQ_plot.xaxis[0].formatter=NumeralTickFormatter(format="0.0")
     HQ_plot.yaxis[0].axis_label = 'Head (m)'
     HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]
     HQ_plot.axis.major_tick_in = 10
