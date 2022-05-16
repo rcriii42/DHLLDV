@@ -85,6 +85,7 @@ class Pump():
         Q is the flow rate in m3/sec
         water is True if calculating for the carrier fluid, False if for slurry
         """
+
         n_new = self._current_speed
         P = self.power_required(Q, self.current_speed, water=water)
         Pavail = self.avail_power * self._current_speed / self.design_speed
@@ -92,9 +93,14 @@ class Pump():
             return n_new
         while not (-0.1 < Pavail - P < 0.1):
             n_new *= (Pavail / P) ** 0.5
+            assert n_new > 1/60
             speed_ratio = n_new / self.design_speed
-            P = self.power_required(Q, self.current_speed, water=water)
-            Pavail = self.avail_power * self._current_speed / self.design_speed
+            P = self.power_required(Q, n_new, water=water)
+            Pavail = self.avail_power * n_new / self.design_speed
+            print(
+                f'{self.name}: Speeds: {self.current_speed * 60:0.0f}, {n_new * 60:0.0f}, {speed_ratio:0.3f}  '
+                f'Power: {Pavail / 0.7457:0.3f}, {P / 0.7457:0.3f}, gap: {Pavail - P:0.3f},')
+        return n_new
 
     def find_curve_limited_speed(self, Q, water=False):
         """Find the pump speed (Hz) at the given flow if there is a power curve
@@ -102,7 +108,7 @@ class Pump():
         Q is the flow rate in m3/sec
         water is True if calculating for the carrier fluid, False if for slurry
         """
-        print(f"Finding curve limited pump speed at flow of {Q:0.3f}")
+
         n_new = self._current_speed
         speed_ratio_new = n_new / self.design_speed
         P = self.power_required(Q, self.current_speed, water=water)
