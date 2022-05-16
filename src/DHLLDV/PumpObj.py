@@ -187,56 +187,9 @@ class Pump():
             print(f"Finding torque limited pump speed at flow of {Q:0.3f} and density {rho:0.3f}")
             n_new = self.find_torque_limited_speed(Q, water=water)
         else:
-            n_new = self.find_curve_limited_speed(Q, water)
-        # Find reduced speed/head/power
-            # print(f"Finding pump speed at flow of {Q:0.3f}")
-            # n_new = self._current_speed
-            # n_gap = n_gap0 = 0.02 # The range of speed (Hz) to use when calculating the derivative
-            # n_list = []
-            # max_iters = 100
-            # while not (-0.1 < Pavail - P < 0.1):
-            #
-            #     else:   # If pump curve given, use Newton-Rhapson method to set Pavail-P to 0
-            #         # First the high and low n for calculating the derivative
-            #         # speed_ratio = n_new / self.design_speed
-            #         # speed_ratio_high = min(speed_ratio + n_gap/2, max(self.design_power_curve.keys()))
-            #         # n_high = self.design_speed * speed_ratio_high
-            #         # speed_ratio_low = max(speed_ratio_high - n_gap, min(self.design_power_curve.keys()))
-            #         # n_low = self.design_speed * speed_ratio_low
-            #         # # Next the derivative
-            #         # gap_high = self.design_power_curve[speed_ratio_high] - power_required(n_high)
-            #         # gap_low = self.design_power_curve[speed_ratio_low] - power_required(n_low)
-            #         # slope = (gap_high - gap_low) / (n_high - n_low)
-            #         # n_new = n_new - (self.design_power_curve[speed_ratio] - power_required(n_new))/slope
-            #         # speed_ratio = n_new / self.design_speed
-            #         # if speed_ratio > max(self.design_power_curve.keys()):
-            #         #     n_gap *= 2
-            #         #     speed_ratio = speed_ratio_low
-            #         #     n_new = self.design_speed * speed_ratio
-            #         # elif speed_ratio < min(self.design_power_curve.keys()):
-            #         #     speed_ratio = speed_ratio_high
-            #         #     n_new = self.design_speed * speed_ratio
-            #         #     n_gap *= 2
-            #         # elif n_gap > n_gap0:
-            #         #     n_gap /= 2
-            #
-            #
-            #
-            #
-            #     P = power_required(n_new)
-            #     if self.limited.lower() == 'torque':
-            #         Pavail = self.avail_power * speed_ratio
-            #     elif self.limited.lower() == 'curve':
-            #         Pavail = self.design_power_curve[speed_ratio]
-            #     # n_list.append((n_new, Pavail, P))
-            #     # if len(n_list) > max_iters:
-            #     #     n_new, Pavail, P = min(n_list, key=lambda t: abs(t[1]-t[2]))
-            #     #     speed_ratio = n_new / self.design_speed
-            #     #     print(f'Pump.point Max Iterations at flow of {Q:0.3f}: Speeds: {self.current_speed * 60:0.0f}, '
-            #     #           f'{n_new * 60:0.0f}, {speed_ratio:0.3f} gap: {n_gap:0.3f}, '
-            #     #           f'Power: {Pavail / 0.7457:0.3f}, {P / 0.7457:0.3f}, {(Pavail - P) / 0.7457:0.3f}')
-            #     #     # print(n_list)
-            #     #     break
+            n_new = self.find_curve_limited_speed(Q, water=water)
+        speed_ratio = self._current_speed / n_new
+        Q0 = Q / (speed_ratio * impeller_ratio ** 2)  # Use affinity law for trimmed impeller, WACS 3rd Edition page 207
         P = self.power_required(Q, n_new, water=water)
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio ** 2 * impeller_ratio**2 * rho
