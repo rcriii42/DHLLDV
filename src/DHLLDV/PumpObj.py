@@ -177,12 +177,14 @@ class Pump():
         if self.limited.lower() == 'torque':
             Pavail = self.avail_power * self._current_speed / self.design_speed
         elif self.limited.lower() == 'curve':
+            print(f"Finding curve limited pump speed at flow of {Q:0.3f} and density {rho:0.3f}")
             Pavail = self.design_power_curve[self._current_speed / self.design_speed]
         else:
             Pavail = self.avail_power
         if self.limited.lower() == 'none' or P <= Pavail:
             return (Q, H, P, self._current_speed)
         elif self.limited.lower() in ['torque', 'power']:
+            print(f"Finding torque limited pump speed at flow of {Q:0.3f} and density {rho:0.3f}")
             n_new = self.find_torque_limited_speed(Q, water=water)
         else:
             n_new = self.find_curve_limited_speed(Q, water)
