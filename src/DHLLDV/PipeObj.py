@@ -183,15 +183,17 @@ class Pipeline():
         Qimin = self.qimin(flow_list)
         im, _, _, pm = self.calc_system_head(Qimin)
         if im > pm:
-            raise ValueError("There is no intersection")
-
-        indexmin = bisect.bisect_right(flow_list, Qimin)
-        q0 = flow_list[int((len(flow_list)+indexmin)/2)]
-        q1 = q0 - curvediff(q0)/curvediffprime(q0)
+            # There is no intersection or the itersection is to the left of Qimin
+            q0 = Qimin
+            q1 = max(q0 - curvediff(q0) / curvediffprime(q0), min(flow_list))
+        else:
+            indexmin = bisect.bisect_right(flow_list, Qimin)
+            q0 = flow_list[int((len(flow_list)+indexmin)/2)]
+            q1 = max(q0 - curvediff(q0)/curvediffprime(q0), Qimin)
         delta = abs(q1 - q0)
         while delta > precision / 10:
             q0 = q1
-            q1 = q0 - curvediff(q0) / curvediffprime(q0)
+            q1 = q0 - curvediff(q0)/curvediffprime(q0)
             delta = abs(q1 - q0)
         return q1
 
