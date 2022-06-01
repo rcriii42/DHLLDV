@@ -188,7 +188,7 @@ class Pump():
             n_new = self.find_torque_limited_speed(Q, water=water)
         else:
             n_new = self.find_curve_limited_speed(Q, water=water)
-        speed_ratio = self._current_speed / n_new
+        speed_ratio = n_new / self.design_speed
         Q0 = Q / (speed_ratio * impeller_ratio ** 2)  # Use affinity law for trimmed impeller, WACS 3rd Edition page 207
         P = self.power_required(Q, n_new, water=water)
         H0 = self.design_QH_curve[Q0]
