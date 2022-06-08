@@ -106,9 +106,9 @@ class MyTestCase(unittest.TestCase):
         with self.subTest(msg='Test the torque limited flow'):
             self.assertAlmostEqual(Q, 3.03243, places=6)
         with self.subTest(msg='Test the torque limited power'):
-            self.assertAlmostEqual(P, 805.03, places=2)
+            self.assertAlmostEqual(P, 805.0921, places=2)
         with self.subTest(msg='Test the torque limited head'):
-            self.assertAlmostEqual(H, 20.926, places=3)
+            self.assertAlmostEqual(H, 20.928, places=3)
 
 if __name__ == '__main__':
     unittest.main()
