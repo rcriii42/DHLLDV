@@ -9,38 +9,35 @@ import copy
 
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
-# The below is a default 30" pipeline
-#                                      Name             Dia     L    K      dZ
-pipeline = Pipeline(pipe_list = [Pipe('Entrance',      0.864,  0.0, 0.50, -10.0),
-                                Pipe('UWP Suction',    0.864, 15.0, 0.05,   5.0),
-                                 copy.copy(Ladder_Pump),
-                                 Pipe('MP1 Suction',   0.864, 20.0, 0.30,  10.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Suction',   0.864,  5.0, 0.30,   0.0),
-                                 copy.copy(Main_Pump),
-                                 Pipe('MP2 Discharge', 0.762, 60.0, 0.45,  -5.0),
-                                 Pipe('Float Hose',    0.762,600.0, 0.20,   0.0),
-                                 Pipe('Riser',         0.762, 40.0, 0.60, -10.0),
-                                 Pipe('Submerged Pipe',0.762,3000.0,0.20,  11.5),
-                                 Pipe('Shore Pipe',    0.762,750.0, 9.80,   0.0)],
-                    slurry=base_slurry)
+setups = {"Example": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                         Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                                         copy.copy(Ladder_Pump),
+                                         Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                         copy.copy(Main_Pump),
+                                         Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                         Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
+                              slurry=base_slurry),
+          }
+
+try:
+    import CustomSetups
+    setups.update(CustomSetups.setups)
+    pipeline = setups["My Dredge"]  # Update this with the pipeline setup you want to use
+except ImportError:
+    print('Import Error: Custom Dredge setups not found. To use, create file named CustomSetups.py with a dictionary '
+          'named setups with dredge_name: Pipeline() items.')
+    pipeline = setups["Example"]
 
 
-# This is the pipeline from the tests
-# pipeline = Pipeline(pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
-#                                   Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
-#                                   Ladder_Pump,
-#                                   Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
-#                                   Main_Pump,
-#                                   Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
-#                                   Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)])
+pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
+pipeline.update_slurries()
 
 
 def system_panel(PL):
@@ -103,13 +100,12 @@ def system_panel(PL):
     HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
     HQ_plot.xaxis[1].axis_label = f'Flow (m\u00b3/sec)'
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    HQ_plot.xaxis[0].formatter=NumeralTickFormatter(format="0.0")
     HQ_plot.yaxis[0].axis_label = 'Head (m)'
     HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]
     HQ_plot.axis.major_tick_in = 10
     HQ_plot.axis.minor_tick_in = 7
     HQ_plot.axis.minor_tick_out = 0
-
-
     HQ_plot.legend.location = "top_left"
 
     def update_all(pipeline):
@@ -174,16 +170,16 @@ def system_panel(PL):
                          TextInput(value=f"Delta z (m)", width=76, disabled=True),))
     [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
 
-
     # Create textboxes with operating points
     qimin = pipeline.qimin(flow_list)
     try:
         qop = pipeline.find_operating_point(flow_list)
-        qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+        qop_str = f'{qop:0.2f}'
         vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
         hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
         prod = f'{pipeline.slurry.Cvi*qop*60*60:0.0f}'
     except ValueError:
+        qop = qimin
         qop_str = "None"
         vop = "None"
         hop = "None"
@@ -208,6 +204,28 @@ def system_panel(PL):
                        )
                    )
 
+    ###################################################################
+    # The hydraulic gradeline plot
+    hyd_TOOLTIPS = [('name', "$name"),
+                   ("Location (m)", "@x{0.1}"),
+                   ("Head (m)", "@h{0.1}"),
+                   ]
+    x, h = pipeline.hydraulic_gradient(qop)
+    hyd_source = ColumnDataSource(data=dict(x=x,
+                                            h=h))
+    hyd_plot = figure(height=450, width=725, title="Hydraulic Gradeline",
+                      tools="crosshair,pan,reset,save,wheel_zoom",
+    tooltips= hyd_TOOLTIPS)
+
+    hyd_plot.line('x', 'h', source=hyd_source,
+                  color='black',
+                  line_dash='solid',
+                  line_width=3,
+                  line_alpha=0.6,
+                  legend_label='Hydraulic Gradeline slurry',
+                  name='Hydraulic Gradeline slurry')
+    hyd_plot.xaxis[0].axis_label = f'Location in pipeline (m)'
+    hyd_plot.yaxis[0].axis_label = 'Head (m)'
 
     def update_opcol():
         """Update the operating point boxes"""
@@ -218,11 +236,12 @@ def system_panel(PL):
         imin_row[2].value = f'{pipeline.calc_system_head(qimin)[0]:0.1f}'
         try:
             qop = pipeline.find_operating_point(flow_list)
-            qop_str = f'{pipeline.find_operating_point(flow_list):0.2f}'
+            qop_str = f'{qop:0.2f}'
             vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
             hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
             prod = f'{pipeline.slurry.Cvi * qop * 60 * 60:0.0f}'
         except ValueError:
+            qop = qimin
             qop_str = "None"
             vop = "None"
             hop = "None"
@@ -230,17 +249,15 @@ def system_panel(PL):
         oppnt_row = opcol.children[5].children
         for i, op_str in enumerate([qop_str, vop, hop, prod]):
             oppnt_row[i].value = op_str
-
+        X, H = pipeline.hydraulic_gradient(qop)
+        hyd_source.data = dict(x=X,
+                               h=H)
 
     return (Panel(title="Pipeline", child = row(column(totalscol,
                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                       pipecol),
                                                 Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
                                                 column(HQ_plot,
-                                                       opcol))),
+                                                       opcol,
+                                                       hyd_plot))),
             update_all)
-
-
-
-
-

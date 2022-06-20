@@ -127,10 +127,11 @@ class Pipeline():
                 Hv = v ** 2 / (2 * gravity)
                 Hfit += p.total_K*Hv
                 delta_z += p.elev_change
-                im = self.slurries[p.diameter].im(v)
-                Hfric_m += im * p.length
-                il = self.slurries[p.diameter].il(v)
-                Hfric_l += il * p.length
+                if p.length > 0:
+                    im = self.slurries[p.diameter].im(v)
+                    Hfric_m += im * p.length
+                    il = self.slurries[p.diameter].il(v)
+                    Hfric_l += il * p.length
             elif isinstance(p, Pump):
                 Qp, Hp, Pp, np = p.point(Q, water=True)
                 Hpumps_l += Hp
@@ -170,24 +171,44 @@ class Pipeline():
         flow_list is a list of flowrates (m3/sec) to consider
         precision is the flow precision (m3/sec) to use
         """
-        Qimin = self.qimin(flow_list)
-        im, _, _, pm = self.calc_system_head(Qimin)
-        if im > pm:
-            raise ValueError("There is no intersection")
+
         def curvediff(q):
             """Return the difference in the curves at the given flow"""
             im, _, _, pm = self.calc_system_head(q)
             return im - pm
         def curvediffprime(q):
-            """Calculate the first dervative of the difference in curves"""
+            """Calculate the first derivative of the difference in curves"""
             return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
-        indexmin = bisect.bisect_right(flow_list, Qimin)
-        q0 = flow_list[int((len(flow_list)+indexmin)/2)]
-        q1 = q0 - curvediff(q0)/curvediffprime(q0)
+
+        Qimin = self.qimin(flow_list)
+        im, _, _, pm = self.calc_system_head(Qimin)
+        if im > pm:
+            # There is no intersection or the itersection is to the left of Qimin
+            q0 = Qimin
+            q1 = max(q0 - curvediff(q0) / curvediffprime(q0), min(flow_list))
+        else:
+            indexmin = bisect.bisect_right(flow_list, Qimin)
+            q0 = flow_list[int((len(flow_list)+indexmin)/2)]
+            q1 = max(q0 - curvediff(q0)/curvediffprime(q0), Qimin)
         delta = abs(q1 - q0)
         while delta > precision / 10:
             q0 = q1
-            q1 = q0 - curvediff(q0) / curvediffprime(q0)
+            q1 = q0 - curvediff(q0)/curvediffprime(q0)
             delta = abs(q1 - q0)
         return q1
+
+    def hydraulic_gradient(self, Q):
+        """Calculate the hydraulic gradient of the pipe"""
+        temp_pl = Pipeline([copy(p) for p in self.pipesections], self.slurry)
+        loc_list = [temp_pl.total_length]
+        hpipe_m, hpipe_l, hpump_l, hpump_m = self.calc_system_head(Q)
+        head_list_m = [hpump_m - hpipe_m]
+        head_list_l = [hpump_l - hpipe_l]
+        while len(temp_pl.pipesections) > 1:
+            temp_pl.pipesections.pop()
+            hpipe_m, hpipe_l, hpump_l, hpump_m = temp_pl.calc_system_head(Q)
+            loc_list.append(temp_pl.total_length)
+            head_list_m.append((hpump_m - hpipe_m))
+            head_list_l.append((hpump_l - hpipe_l))
+        return loc_list, head_list_m
 

@@ -14,7 +14,6 @@ from bokeh.models import Spacer, Div, Panel, Tabs
 from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
 
-
 from DHLLDV import DHLLDV_framework
 from DHLLDV import PipeObj
 
@@ -260,9 +259,6 @@ def update_Dp(attrname, old, new):
     """Update the pipe diameter"""
     old_Dp = slurry.Dp
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp * 1000, '0.0f') / 1000
-    for p in pipeline.pipesections:
-        if isinstance(p, PipeObj.Pipe) and p.diameter == old_Dp:
-            p.diameter = slurry.Dp
     pipeline.update_slurries()
     update_source_data()
 

@@ -37,7 +37,8 @@ Install the requirements:
 
 Run the tests:
 
-```(venv) PS C:\Users\you\PycharmProjects\DHLLDV>> pytest --cov-report term-missing --cov=DHLLDV
+```
+(venv) PS C:\Users\you\PycharmProjects\DHLLDV>> pytest --cov-report term-missing --cov=DHLLDV
 ============================= test session starts =============================
 platform win32 -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
 rootdir: C:\Users\rcrii\PycharmProjects\DHLLDV
