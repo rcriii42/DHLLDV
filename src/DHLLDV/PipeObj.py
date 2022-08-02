@@ -138,8 +138,8 @@ class Pipeline():
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_m += Hp
 
-        return (Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom, # System (pipeline) head losses slurry
-                Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol, # System (pipeline) head losses fluid
+        return ((Hfric_m + Hfit + delta_z + Hv) * self.slurry.rhom /self.slurry.rhol, # System (pipeline) head losses slurry
+                (Hfric_l + Hfit + delta_z + Hv), # System (pipeline) head losses fluid
                 Hpumps_l,                                           # Pump head slurry
                 Hpumps_m)                                           # Pump head fluid
 
