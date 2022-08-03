@@ -32,7 +32,7 @@ try:
     pipeline = setups["My Dredge"]  # Update this with the pipeline setup you want to use
 except ImportError:
     print('Import Error: Custom Dredge setups not found. To use, create file Scripts\CustomSetups.py with the following code:')
-    print("""'''Custom setups for My Project'''
+    print('''"""Custom setups for My Project"""
 
 import copy
 
@@ -51,7 +51,7 @@ setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                            Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
                                            Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
                                 slurry=my_slurry),
-          }""")
+          }''')
     pipeline = setups["Example"]
 
 
