@@ -31,8 +31,27 @@ try:
     setups.update(CustomSetups.setups)
     pipeline = setups["My Dredge"]  # Update this with the pipeline setup you want to use
 except ImportError:
-    print('Import Error: Custom Dredge setups not found. To use, create file named CustomSetups.py with a dictionary '
-          'named setups with dredge_name: Pipeline() items.')
+    print('Import Error: Custom Dredge setups not found. To use, create file Scripts\CustomSetups.py with the following code:')
+    print("""'''Custom setups for My Project'''
+
+import copy
+
+from DHLLDV.PipeObj import Pipeline, Pipe
+from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
+
+my_slurry = copy.deepcopy(base_slurry)
+my_slurry.D50 = 0.4/1000    # Set the GSD to medium sand
+
+
+setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                           Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                                           copy.copy(Ladder_Pump),
+                                           Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                           copy.copy(Main_Pump),
+                                           Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                           Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
+                                slurry=my_slurry),
+          }""")
     pipeline = setups["Example"]
 
 
