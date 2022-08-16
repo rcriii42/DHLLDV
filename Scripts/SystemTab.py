@@ -6,7 +6,7 @@ Added by R. Ramsdell 01 September, 2021
 import copy
 
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput
+from bokeh.models import ColumnDataSource, TextInput, HoverTool
 from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
 from bokeh.plotting import figure
 
@@ -75,13 +75,14 @@ unit_label_US = {'len': 'Ft',
 unit_conv_SI = {v: 1.0 for v in unit_conv_US.keys()}
 unit_conv_SI['rot_speed'] = unit_conv_US['rot speed']
 unit_conv_SI['dia'] = 1000
+unit_conv_SI['pressure'] = 9.804139
 unit_label_SI = {'len': 'm',
                  'vel': 'm/sec',
                  'dia': 'mm',
                  'vol': 'm\u00b3',
                  'flow': 'm\u00b3/sec',
                  'power': 'kW',
-                 'pressure': 'm',
+                 'pressure': 'kPa',
                  'rot speed': 'RPM',}
 
 unit_convs = unit_conv_US
@@ -315,16 +316,17 @@ def system_panel(PL):
 
     ###################################################################
     # The hydraulic gradeline plot
-    hyd_TOOLTIPS = [('name', "$name"),
-                   (f"Location ({unit_labels['len']})", "@x{0.0}"),
-                   (f"Pressure (({unit_labels['pressure']})", "@h{0.1}"),
-                   ]
+    hyd_hover = HoverTool(tooltips=[('name', "$name"),
+                                    (f"Location ({unit_labels['len']})", "@x{0.0}"),
+                                    (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
+                                    ])
     x, h = pipeline.hydraulic_gradient(qop)
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
                                             h=convert_list(unit_convs['pressure'], h)))
     hyd_plot = figure(height=330, width=595, title="Hydraulic Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
-    tooltips= hyd_TOOLTIPS)
+                      )
+    hyd_plot.tools.append(hyd_hover)
 
     hyd_plot.line('x', 'h', source=hyd_source,
                   color='black',
@@ -371,6 +373,11 @@ def system_panel(PL):
                                h=convert_list(unit_convs['pressure'], h))
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
+        hyd_plot.tools[5].tooltips = [('name', "$name"),
+                                      (f"Location ({unit_labels['len']})", "@x{0.0}"),
+                                      (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
+                                      ]
+
 
     return (Panel(title="Pipeline", child = row(column(pipeline_dropdown,
                                                        totalscol,
