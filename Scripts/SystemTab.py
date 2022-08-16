@@ -334,7 +334,8 @@ def system_panel(PL):
                                  width=95, disabled=True),
                        TextInput(title=f"Production ({unit_labels['vol']}/Hr)", value=prod,
                                  width=95, disabled=True)
-                       )
+                       ),
+                   Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0))
                    )
 
     ###################################################################
