@@ -133,7 +133,7 @@ def system_panel(PL):
                    (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
                    (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
                   ]
-    HQ_plot = figure(height=450, width=725, title="System Head Requirement",
+    HQ_plot = figure(height=450, width=595, title="System Head Requirement",
                      tools="crosshair,pan,reset,save,wheel_zoom",
                      x_range=[0, flow_list[-1]*unit_convs['flow']], y_range=[0, 100],
                      tooltips=HQ_TOOLTIPS)
@@ -322,7 +322,7 @@ def system_panel(PL):
     x, h = pipeline.hydraulic_gradient(qop)
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
                                             h=convert_list(unit_convs['pressure'], h)))
-    hyd_plot = figure(height=450, width=725, title="Hydraulic Gradeline",
+    hyd_plot = figure(height=330, width=595, title="Hydraulic Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
     tooltips= hyd_TOOLTIPS)
 
