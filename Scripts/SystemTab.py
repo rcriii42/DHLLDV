@@ -35,7 +35,7 @@ setups = {"CSD Example w/ Ladder Pump": Pipeline(name="CSD with Ladder Pump",
                                                             Pipe('Hull Suction', 0.86, 6.0, 0.1, 0.0),
                                                             copy.copy(Main_Pump),
                                                             Pipe('MP Discharge', 0.762, 20.0, 0.2, -1.0),
-                                                            Pipe('Discharge', 0.762, 2000.0, 1.0, 1.0)],
+                                                            Pipe('Discharge', 0.762, 2000.0, 1.0, 5.0)],
                                                  slurry=base_slurry),
           }
 
@@ -251,7 +251,7 @@ def system_panel(PL):
             flow_pipe = Pipe(diameter=pipeline.slurry.Dp)
             flow_list = [flow_pipe.flow(v) for v in pipeline.slurry.vls_list]
             qop = pipeline.find_operating_point(flow_list)
-            locs, heads = pipeline.hydraulic_gradient(qop)
+            locs, heads, _ = pipeline.hydraulic_gradient(qop)
             _, _, P, n = pipe.point(qop)
             row2 = row(TextInput(title="", value="At Operating Point:", width=150, background='lightblue'),
                        TextInput(title=f"Suction ({unit_labels['pressure']})",
@@ -342,10 +342,12 @@ def system_panel(PL):
     # The hydraulic gradeline plot
     hyd_hover = HoverTool(tooltips=[('name', "$name"),
                                     (f"Location ({unit_labels['len']})", "@x{0.0}"),
+                                    (f"Elevation ({unit_labels['len']})", "@e{0.0}"),
                                     (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
                                     ])
-    x, h = pipeline.hydraulic_gradient(qop)
+    x, h, e = pipeline.hydraulic_gradient(qop)
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
+                                            e=convert_list(unit_convs['len'], e),
                                             h=convert_list(unit_convs['pressure'], h)))
     hyd_plot = figure(height=330, width=595, title="Pressure Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
@@ -359,6 +361,13 @@ def system_panel(PL):
                   line_alpha=0.6,
                   legend_label='Pressure Gradeline slurry',
                   name='Pressure Gradeline slurry')
+    hyd_plot.line('x', 'e', source=hyd_source,
+                  color='green',
+                  line_dash='solid',
+                  line_width=3,
+                  line_alpha=0.6,
+                  legend_label='Pipeline Elevations',
+                  name='Pipeline Elevations')
     hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
     hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
 
@@ -392,16 +401,17 @@ def system_panel(PL):
                                       f"H ({unit_labels['len']})",
                                       f"Production ({unit_labels['vol']}/Hr)",]):
             oppnt_row[i].title = op_label
-        x, h = pipeline.hydraulic_gradient(qop)
+        x, h, e = pipeline.hydraulic_gradient(qop)
         hyd_source.data = dict(x=convert_list(unit_convs['len'], x),
+                               e=convert_list(unit_convs['len'], e),
                                h=convert_list(unit_convs['pressure'], h))
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
         hyd_plot.tools[5].tooltips = [('name', "$name"),
                                       (f"Location ({unit_labels['len']})", "@x{0.0}"),
+                                      (f"Elevation ({unit_labels['len']})", "@e{0.0}"),
                                       (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
                                       ]
-
 
     return (Panel(title="Pipeline", child = row(column(pipeline_dropdown,
                                                        totalscol,
