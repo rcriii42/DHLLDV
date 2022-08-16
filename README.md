@@ -87,7 +87,7 @@ The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
 ### Top Bar
 
-<img width="587" alt="image" src="https://user-images.githubusercontent.com/9353408/184939978-b944ecba-043a-44a8-a30b-e7653d6c0743.png">
+<img src="https://user-images.githubusercontent.com/9353408/184939978-b944ecba-043a-44a8-a30b-e7653d6c0743.png"  width="125%" alt="Vierwer Top Bar" >
 
 * Two tabs, to show info about the **Slurry** or the **Pipeline**
 * A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
@@ -95,7 +95,7 @@ The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
 ### Slurry Tab
 
-<img width="533" alt="Slurry Tab" src="https://user-images.githubusercontent.com/9353408/184931303-00ec8b59-1909-4a34-a0c1-813dab834d29.png">
+<img src="https://user-images.githubusercontent.com/9353408/184931303-00ec8b59-1909-4a34-a0c1-813dab834d29.png" width="125%" alt="Slurry Tab">
 
 The viewer allows you to adjust certain properties of the system:
 
@@ -112,4 +112,4 @@ The viewer allows you to adjust certain properties of the system:
 
 Shows a particular pipeline, including a dredge with two pumps. The dropdown at the top selects a pipeline from those pre-defined in the System Tab or a CustomSetups.py file.
 
-<img width="530" alt="image" src="https://user-images.githubusercontent.com/9353408/184991580-4b65050c-8f6a-48d2-9310-aad8af93e87f.png">
+<img src="https://user-images.githubusercontent.com/9353408/184991580-4b65050c-8f6a-48d2-9310-aad8af93e87f.png" width="125%" alt="Pipeline Tab">
