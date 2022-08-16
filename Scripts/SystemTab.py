@@ -1,7 +1,5 @@
 """
-SystemTab: Create the tab with the system (pipeline and pumps) information
-
-Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab in your browser
+SystemTab: Create the tab with the system (pipeline and pumps) information, in US units
 
 Added by R. Ramsdell 01 September, 2021
 """
@@ -9,7 +7,7 @@ import copy
 
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
 from bokeh.plotting import figure
 
 from DHLLDV.PipeObj import Pipeline, Pipe
@@ -29,7 +27,7 @@ setups = {"Example": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
 try:
     import CustomSetups
     setups.update(CustomSetups.setups)
-    pipeline = setups["My Dredge"]  # Update this with the pipeline setup you want to use
+    pipeline = setups[CustomSetups.setup_to_use]
 except ImportError:
     print('Import Error: Custom Dredge setups not found. To use, create file Scripts\CustomSetups.py with the following code:')
     print('''"""Custom setups for My Project"""
@@ -42,7 +40,7 @@ from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 my_slurry = copy.deepcopy(base_slurry)
 my_slurry.D50 = 0.4/1000    # Set the GSD to medium sand
 
-
+setup_to_use = "My Dredge" # Update this with the pipeline setup you want shown at the start
 setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                            Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
                                            copy.copy(Ladder_Pump),
@@ -58,30 +56,85 @@ setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
 pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
 pipeline.update_slurries()
 
+# Unit conversions
+unit_conv_US = {'len': 1/0.3048,
+                'dia': 12/0.3048,
+                'vol': (1/.3048)**3/27,
+                'flow': 15850.32,
+                'power': 1/0.7457,
+                'pressure': 1.42,
+                'rot speed': 60}
+unit_label_US = {'len': 'Ft',
+                 'vel': 'Ft/sec',
+                 'dia': 'In',
+                 'vol': 'CY',
+                 'flow': 'GPM',
+                 'power': 'HP',
+                 'pressure': 'psi',
+                 'rot speed': 'RPM',}
+unit_conv_SI = {v: 1.0 for v in unit_conv_US.keys()}
+unit_conv_SI['rot_speed'] = unit_conv_US['rot speed']
+unit_label_SI = {'len': 'm',
+                 'vel': 'm/sec',
+                 'dia': 'm',
+                 'vol': 'm\u00b3',
+                 'flow': 'm\u00b3/sec',
+                 'power': 'kW',
+                 'pressure': 'm',
+                 'rot speed': 'RPM',}
+
+unit_convs = unit_conv_US
+unit_labels = unit_label_US
+def select_units(units='SI'):
+    global unit_convs, unit_labels
+    if units == 'US':
+        unit_convs = unit_conv_US
+        unit_labels = unit_label_US
+    else:
+        unit_convs = unit_conv_SI
+        unit_labels = unit_label_SI
+
+
+def convert_list(conversion, values):
+    """Covert the values in a list using the given conversion"""
+    return [v*conversion for v in values]
+
 
 def system_panel(PL):
-    """Create a Bokeh Panel with the pipeline and an overall HQ plot"""
+    """Create a Bokeh Panel with the pipeline and an overall HQ plot
+
+    Return a bokeh Panel and update function"""
+    pipeline = PL
+
+    def choose_pipeline(event):
+        """Change to the chosen pipeline"""
+        global pipeline
+        pipeline = setups[event.item]
+        pipeline_dropdown.label = pipeline.name
+        update_all(pipeline)
+    pipeline_dropdown = Dropdown(label=pipeline.name, menu=[(s, s) for s in setups.keys()])
+    pipeline_dropdown.on_click(choose_pipeline)
 
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
     head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
-    im_source = ColumnDataSource(data=dict(Q=flow_list,
-                                           v=pipeline.slurry.vls_list,
-                                           im=head_lists[0],
-                                           il=head_lists[1],
-                                           Hpump_l = head_lists[2],
-                                           Hpump_m = head_lists[3]))
+    im_source = ColumnDataSource(data=dict(Q=convert_list(unit_convs['flow'], flow_list),
+                                           v=convert_list(unit_convs['len'], pipeline.slurry.vls_list),
+                                           im=convert_list(unit_convs['len'], head_lists[0]),
+                                           il=convert_list(unit_convs['len'], head_lists[1]),
+                                           Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
+                                           Hpump_m=convert_list(unit_convs['len'], head_lists[3])))
 
     HQ_TOOLTIPS = [('name', "$name"),
-                   ("Flow (m\u00b3/sec)", "@Q{0.00}"),
-                   ("Velocity (m/sec)", "@v{0.00}"),
-                   ("Slurry Graded Cvt=c (m)", "@im{0,0.0}"),
-                   ("Fluid (m)", "@il{0,0.0}"),
-                   ("Pump Head Slurry (m)", "@Hpump_m{0,0.0}",),
-                   ("Pump Head Water (m)", "@Hpump_l{0,0.0}",),
+                   (f"Flow ({unit_labels['flow']})", "@Q{0.00}"),
+                   (f"Velocity ({unit_labels['vel']})", "@v{0.0}"),
+                   (f"Slurry Graded Cvt=c ({unit_labels['len']})", "@im{0,0.0}"),
+                   (f"Fluid ({unit_labels['len']})", "@il{0,0.0}"),
+                   (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
+                   (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
                   ]
     HQ_plot = figure(height=450, width=725, title="System Head Requirement",
                      tools="crosshair,pan,reset,save,wheel_zoom",
-                     #x_range=[0, 10], y_range=[0, 0.6],
+                     x_range=[0, flow_list[-1]*unit_convs['flow']], y_range=[0, 100],
                      tooltips=HQ_TOOLTIPS)
 
     HQ_plot.line('Q', 'im', source=im_source,
@@ -89,7 +142,7 @@ def system_panel(PL):
                  line_dash='solid',
                  line_width=3,
                  line_alpha=0.6,
-                 legend_label='Slurry Graded Cvt=c (m)',
+                 legend_label=f'Slurry Graded Cvt=c ({unit_labels["len"]})',
                  name='Slurry graded Sand Cvt=c')
 
     HQ_plot.line('Q', 'il', source=im_source,
@@ -115,13 +168,13 @@ def system_panel(PL):
                  line_alpha=0.3,
                  legend_label='Pump Water',
                  name='Pump Water')
-    HQ_plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0], pipeline.slurry.vls_list[-1])}
+    HQ_plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0]*unit_convs['len'], pipeline.slurry.vls_list[-1]*unit_convs['len'])}
     HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
-    HQ_plot.xaxis[1].axis_label = f'Flow (m\u00b3/sec)'
-    HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
+    HQ_plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
+    HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f}In pipe)'
     HQ_plot.xaxis[0].formatter=NumeralTickFormatter(format="0.0")
-    HQ_plot.yaxis[0].axis_label = 'Head (m)'
-    HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]
+    HQ_plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
+    HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]*unit_convs['len']
     HQ_plot.axis.major_tick_in = 10
     HQ_plot.axis.minor_tick_in = 7
     HQ_plot.axis.minor_tick_out = 0
@@ -129,75 +182,111 @@ def system_panel(PL):
 
     def update_all(pipeline):
         """Update the data sources and information boxes"""
-        flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+        this_pipe = Pipe(diameter=pipeline.slurry.Dp)
+        flow_list = [this_pipe.flow(v) for v in pipeline.slurry.vls_list]
         head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
-        im_source.data=dict(Q=flow_list,
-                            v=pipeline.slurry.vls_list,
-                            im=head_lists[0],
-                            il=head_lists[1],
-                            Hpump_l = head_lists[2],
-                            Hpump_m = head_lists[3])
-        HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {pipeline.slurry.Dp:0.3f}m pipe)'
-        old_disch_dia = pipeline.pipesections[-1].diameter
-        for p, pipe_row in zip(pipeline.pipesections, pipecol.children[1:]):
-            if isinstance(p, Pipe) and p.diameter == old_disch_dia:
-                pipe_row.children[2].value=f"{p.diameter:0.3f}"
-        totalscol.children[0].children[2].value=f"{pipeline.pipesections[-1].diameter:0.3f}"
-        update_opcol()
+        im_source.data=dict(Q=convert_list(unit_convs['flow'], flow_list),
+                                           v=convert_list(unit_convs['len'], pipeline.slurry.vls_list),
+                                           im=convert_list(unit_convs['len'], head_lists[0]),
+                                           il=convert_list(unit_convs['len'], head_lists[1]),
+                                           Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
+                                           Hpump_m=convert_list(unit_convs['len'], head_lists[3]))
+        HQ_plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
+        HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f}({unit_labels["dia"]} pipe)'
+        HQ_plot.x_range.end=flow_list[-1]*unit_convs['flow']
+        HQ_plot.extra_x_ranges['vel_range'].end = pipeline.slurry.vls_list[-1]*unit_convs['len']
+        HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]*unit_convs['len']
+        HQ_plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
 
-    def pipe_panel(i, pipe):
+        # Update the pipeline columns
+        del totalscol.children[:]
+        totalscol.children.extend(pipeline_totals(pipeline).children)
+        del pipecol.children[1:]
+        [pipecol.children.append(pipe_panel(pipeline, i)) for i, p in enumerate(pipeline.pipesections)]
+
+        update_opcol(pipeline)
+
+    def pipe_panel(pipeline, i):
         """Create a Bokeh row with information about the pipe"""
+        pipe = pipeline.pipesections[i]
         if isinstance(pipe, Pipe):
             return row(TextInput( value=f'{i:3d}', width=45),
-                       TextInput(value=pipe.name, width=95),
-                       TextInput(value=f"{pipe.diameter:0.3f}", width=76),
-                       TextInput( value=f"{pipe.length:0.1f}", width=76),
+                       TextInput(value=pipe.name, width=150),
+                       TextInput(value=f"{pipe.diameter*unit_convs['dia']:0.1f}", width=76),
+                       TextInput( value=f"{pipe.length*unit_convs['len']:0.0f}", width=76),
                        TextInput( value=f"{pipe.total_K:0.2f}", width=76),
-                       TextInput(value=f"{pipe.elev_change:0.1f}", width=76),)
+                       TextInput(value=f"{pipe.elev_change*unit_convs['len']:0.1f}", width=76),)
         elif isinstance(pipe, Pump):
-            return row(TextInput(title="#", value=f'{i:3d}', width=45, background='lightblue'),
-                       TextInput(title="Pump", value=pipe.name, width=95, background='lightblue'),
-                       TextInput(title="Suction (m)", value=f"{pipe.suction_dia:0.3f}", width=76, background='lightblue'),
-                       TextInput(title="Discharge (m)", value=f"{pipe.disch_dia:0.3f}", width=76, background='lightblue'),
-                       TextInput(title="Impeller (m)", value=f"{pipe.design_impeller:0.3f}", width=76, background='lightblue'),
-                       TextInput(title="Power (kW)", value=f"{pipe.avail_power:0.0f}", width=76, background='lightblue'),)
+            num = TextInput(title="#", value=f'{i:3d}', width=45, background='lightblue')
+            row1 = row(TextInput(title="Pump", value=pipe.name, width=150, background='lightblue'),
+                       TextInput(title=f"Suction ({unit_labels['dia']})", value=f"{pipe.suction_dia*unit_convs['dia']:0.1f}", width=76, background='lightblue'),
+                       TextInput(title=f"Discharge ({unit_labels['dia']})", value=f"{pipe.disch_dia*unit_convs['dia']:0.1f}", width=76, background='lightblue'),
+                       TextInput(title=f"Impeller ({unit_labels['dia']})", value=f"{pipe.design_impeller*unit_convs['dia']:0.1f}", width=76, background='lightblue'),
+                       TextInput(title=f"Power ({unit_labels['power']})", value=f"{pipe.avail_power*unit_convs['power']:0.0f}", width=76, background='lightblue'),)
+            flow_pipe = Pipe(diameter=pipeline.slurry.Dp)
+            flow_list = [flow_pipe.flow(v) for v in pipeline.slurry.vls_list]
+            qop = pipeline.find_operating_point(flow_list)
+            locs, heads = pipeline.hydraulic_gradient(qop)
+            _, _, P, n = pipe.point(qop)
+            row2 = row(TextInput(title="", value="At Operating Point:", width=150, background='lightblue'),
+                       TextInput(title=f"Suction ({unit_labels['pressure']})",
+                                 value=f"{heads[i-1]*unit_convs['pressure']:0.1f}",
+                                 width=76, background='lightblue'),
+                       TextInput(title=f"Discharge ({unit_labels['pressure']})",
+                                 value=f"{heads[i]*unit_convs['pressure']:0.1f}",
+                                 width=76, background='lightblue'),
+                       TextInput(title=f"Speed ({unit_labels['rot speed']})",
+                                 value=f"{n * unit_convs['rot speed']:0.0f}",
+                                 width=76, background='lightblue'),
+                       TextInput(title=f"Power ({unit_labels['power']})",
+                                 value=f"{P*unit_convs['power']:0.0f}",
+                                 width=76, background='lightblue'),)
+            return row(num, column(row1, row2))
         else:
             return row(TextInput(value="Unknown Item", width=76),)
 
-    def pipeline_totals():
+    def pipeline_totals(pipeline):
         """Create rows for totals in the pipeline"""
+        if pipeline.pipesections[0].length > 0:
+            dig_depth = 0
+            lift = pipeline.total_lift
+        else:
+            dig_depth = pipeline.pipesections[0].elev_change
+            lift = pipeline.total_lift - dig_depth
         pipe_totals = row(TextInput(title="#", value=f'{pipeline.num_pipesections:3d}', width=45, disabled=True),
-                          TextInput(title="Pipe Sections", value="Total", width=95, disabled=True),
-                          TextInput(title="Disch Dia (m)", value=f"{pipeline.pipesections[-1].diameter:0.3f}", width=76, disabled=True),
-                          TextInput(title="Length (m)", value=f"{sum([pipeline.total_length]):0.1f}", width=76, disabled=True),
+                          TextInput(title="Pipe Sections", value="Total", width=150, disabled=True),
+                          TextInput(title=f"Disch Dia ({unit_labels['dia']})", value=f"{pipeline.pipesections[-1].diameter*unit_convs['dia']:0.1f}", width=76, disabled=True),
+                          TextInput(title=f"Length ({unit_labels['len']})", value=f"{pipeline.total_length*unit_convs['len']:0.0f}", width=76, disabled=True),
                           TextInput(title="Fitting K (-)", value=f"{pipeline.total_K:0.2f}", width=76, disabled=True),
-                          TextInput(title="Delta z (m)", value=f"{pipeline.total_lift:0.1f}", width=76, disabled=True),)
+                          TextInput(title=f"Delta z ({unit_labels['len']})", value=f"{lift*unit_convs['len']:0.1f}", width=76, disabled=True),)
+        elevations = row(TextInput(title=f"Dig Depth ({unit_labels['len']})", value=f"{dig_depth*unit_convs['len']:0.1f}", width=100, disabled=True),
+                         TextInput(title=f"Discharge Elevation ({unit_labels['len']})", value=f"{pipeline.total_lift * unit_convs['len']:0.1f}", width=100, disabled=True))
         shutoff_head = pipeline.calc_system_head(0.01)
         pump_totals = row(TextInput(title="#", value=f'{pipeline.num_pumps:3d}', width=45, disabled=True),
-                          TextInput(title="Pumps", value="Total", width=95, disabled=True),
-                          TextInput(title="Head Water", value=f"{shutoff_head[2]:0.0f}", width=95, disabled=True),
-                          TextInput(title="Head Slurry", value=f"{shutoff_head[3]:0.0f}", width=95, disabled=True),
-                          TextInput(title="Power (kW)", value=f"{pipeline.total_power:0.0f}", width=95, disabled=True),)
-        return column(pipe_totals, pump_totals)
-    totalscol = pipeline_totals()
+                          TextInput(title="Pumps", value="Total", width=150, disabled=True),
+                          TextInput(title="Head Water", value=f"{shutoff_head[2]*unit_convs['len']:0.0f}", width=95, disabled=True),
+                          TextInput(title="Head Slurry", value=f"{shutoff_head[3]*unit_convs['len']:0.0f}", width=95, disabled=True),
+                          TextInput(title=f"Power ({unit_labels['power']})", value=f"{pipeline.total_power*unit_convs['power']:0.0f}", width=95, disabled=True),)
+        return column(pipe_totals, elevations, pump_totals)
+    totalscol = pipeline_totals(pipeline)
 
     pipecol = column(row(TextInput( value=f'#', width=45, disabled=True),
-                         TextInput(value='name', width=95, disabled=True),
-                         TextInput(value=f"diameter (m)", width=76, disabled=True),
-                         TextInput( value=f"Length (m)", width=76, disabled=True),
+                         TextInput(value='name', width=150, disabled=True),
+                         TextInput(value=f"diameter ({unit_labels['dia']})", width=76, disabled=True),
+                         TextInput( value=f"Length ({unit_labels['len']})", width=76, disabled=True),
                          TextInput( value=f"Total K", width=76, disabled=True),
-                         TextInput(value=f"Delta z (m)", width=76, disabled=True),))
-    [pipecol.children.append(pipe_panel(i, p)) for i, p in enumerate(pipeline.pipesections)]
+                         TextInput(value=f"Delta z ({unit_labels['len']})", width=76, disabled=True),))
+    [pipecol.children.append(pipe_panel(pipeline, i)) for i, p in enumerate(pipeline.pipesections)]
 
     # Create textboxes with operating points
     qimin = pipeline.qimin(flow_list)
     try:
         qop = pipeline.find_operating_point(flow_list)
-        qop_str = f'{qop:0.2f}'
-        vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
-        hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
-        prod = f'{pipeline.slurry.Cvi*qop*60*60:0.0f}'
-    except ValueError:
+        qop_str = f'{qop*unit_convs["flow"]:0.2f}'
+        vop = f'{pipeline.pipesections[-1].velocity(qop)*unit_convs["len"]:0.1f}'
+        hop = f'{pipeline.calc_system_head(qop)[0]*unit_convs["len"]:0.1f}'
+        prod = f'{pipeline.slurry.Cvi*qop*60*60*unit_convs["vol"]:0.0f}'
+    except ZeroDivisionError:
         qop = qimin
         qop_str = "None"
         vop = "None"
@@ -205,20 +294,20 @@ def system_panel(PL):
         prod = "None"
     opcol = column(Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                    Div(text="""<B>Minimum Slurry Friction Point</B>"""),
-                   row(TextInput(title="Q (m\u00b3/sec)", value=f'{qimin:0.2f}', width=95, disabled=True),
-                       TextInput(title="v\u2098 (m/sec)", value=f'{pipeline.pipesections[-1].velocity(qimin):0.2f}',
+                   row(TextInput(title=f"Q {unit_labels['flow']}", value=f'{qimin*unit_convs["flow"]:0.2f}', width=95, disabled=True),
+                       TextInput(title=f"v\u2098 ({unit_labels['vel']})", value=f'{pipeline.pipesections[-1].velocity(qimin)*unit_convs["len"]:0.1f}',
                                  width=95, disabled=True),
-                       TextInput(title="H (m)", value=f'{pipeline.calc_system_head(qimin)[0]:0.1f}',
+                       TextInput(title=f"H ({unit_labels['len']})", value=f'{pipeline.calc_system_head(qimin)[0]*unit_convs["len"]:0.1f}',
                                  width=95, disabled=True)
                        ),
                    Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                    Div(text="""<B>Pump/Pipeline Slurry Operating Point</B>"""),
-                   row(TextInput(title="Q (m\u00b3/sec)", value=qop_str, width=95, disabled=True),
-                       TextInput(title="v\u2098 (m/sec)", value=vop,
+                   row(TextInput(title=f"Q ({unit_labels['flow']})", value=qop_str, width=95, disabled=True),
+                       TextInput(title=f"v\u2098 ({unit_labels['vel']})", value=vop,
                                  width=95, disabled=True),
-                       TextInput(title="H (m)", value=hop,
+                       TextInput(title=f"H ({unit_labels['len']})", value=hop,
                                  width=95, disabled=True),
-                       TextInput(title="Production (m\u00b3/Hr)", value=prod,
+                       TextInput(title=f"Production ({unit_labels['vol']}/Hr)", value=prod,
                                  width=95, disabled=True)
                        )
                    )
@@ -226,12 +315,12 @@ def system_panel(PL):
     ###################################################################
     # The hydraulic gradeline plot
     hyd_TOOLTIPS = [('name', "$name"),
-                   ("Location (m)", "@x{0.1}"),
-                   ("Head (m)", "@h{0.1}"),
+                   (f"Location ({unit_labels['len']})", "@x{0.0}"),
+                   (f"Pressure (({unit_labels['pressure']})", "@h{0.1}"),
                    ]
     x, h = pipeline.hydraulic_gradient(qop)
-    hyd_source = ColumnDataSource(data=dict(x=x,
-                                            h=h))
+    hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
+                                            h=convert_list(unit_convs['pressure'], h)))
     hyd_plot = figure(height=450, width=725, title="Hydraulic Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
     tooltips= hyd_TOOLTIPS)
@@ -241,25 +330,28 @@ def system_panel(PL):
                   line_dash='solid',
                   line_width=3,
                   line_alpha=0.6,
-                  legend_label='Hydraulic Gradeline slurry',
-                  name='Hydraulic Gradeline slurry')
-    hyd_plot.xaxis[0].axis_label = f'Location in pipeline (m)'
-    hyd_plot.yaxis[0].axis_label = 'Head (m)'
+                  legend_label='Pressure Gradeline slurry',
+                  name='Pressure Gradeline slurry')
+    hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
+    hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
 
-    def update_opcol():
+    def update_opcol(pipeline):
         """Update the operating point boxes"""
         qimin = pipeline.qimin(flow_list)
         imin_row = opcol.children[2].children
-        imin_row[0].value = f'{qimin:0.2f}'
-        imin_row[1].value = f'{pipeline.pipesections[-1].velocity(qimin):0.2f}'
-        imin_row[2].value = f'{pipeline.calc_system_head(qimin)[0]:0.1f}'
+        imin_row[0].title = f"Q ({unit_labels['flow']})"
+        imin_row[0].value = f'{qimin*unit_convs["flow"]:0.2f}'
+        imin_row[1].title = f"v\u2098 ({unit_labels['vel']})"
+        imin_row[1].value = f'{pipeline.pipesections[-1].velocity(qimin)*unit_convs["len"]:0.1f}'
+        imin_row[2].title = f"H ({unit_labels['len']})"
+        imin_row[2].value = f'{pipeline.calc_system_head(qimin)[0]*unit_convs["len"]:0.1f}'
         try:
             qop = pipeline.find_operating_point(flow_list)
-            qop_str = f'{qop:0.2f}'
-            vop = f'{pipeline.pipesections[-1].velocity(qop):0.2f}'
-            hop = f'{pipeline.calc_system_head(qop)[0]:0.1f}'
-            prod = f'{pipeline.slurry.Cvi * qop * 60 * 60:0.0f}'
-        except ValueError:
+            qop_str = f'{qop*unit_convs["flow"]:0.2f}'
+            vop = f'{pipeline.pipesections[-1].velocity(qop)*unit_convs["len"]:0.1f}'
+            hop = f'{pipeline.calc_system_head(qop)[0]*unit_convs["len"]:0.1f}'
+            prod = f'{pipeline.slurry.Cvi * qop * 60 * 60 * unit_convs["vol"]:0.0f}'
+        except ZeroDivisionError:
             qop = qimin
             qop_str = "None"
             vop = "None"
@@ -268,13 +360,21 @@ def system_panel(PL):
         oppnt_row = opcol.children[5].children
         for i, op_str in enumerate([qop_str, vop, hop, prod]):
             oppnt_row[i].value = op_str
-        X, H = pipeline.hydraulic_gradient(qop)
-        hyd_source.data = dict(x=X,
-                               h=H)
+        for i, op_label in enumerate([f"Q ({unit_labels['flow']})",
+                                      f"v\u2098 ({unit_labels['vel']})",
+                                      f"H ({unit_labels['len']})",
+                                      f"Production ({unit_labels['vol']}/Hr)",]):
+            oppnt_row[i].title = op_label
+        x, h = pipeline.hydraulic_gradient(qop)
+        hyd_source.data = dict(x=convert_list(unit_convs['len'], x),
+                               h=convert_list(unit_convs['pressure'], h))
+        hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
+        hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
 
-    return (Panel(title="Pipeline", child = row(column(totalscol,
-                                                      Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
-                                                      pipecol),
+    return (Panel(title="Pipeline US", child = row(column(pipeline_dropdown,
+                                                       totalscol,
+                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                       pipecol),
                                                 Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
                                                 column(HQ_plot,
                                                        opcol,
