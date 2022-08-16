@@ -78,25 +78,24 @@ TOTAL                              864     24    97%
 ======================= 109 passed, 1 skipped in 5.23s ========================
 ```
 
-## Interactive Viewer
+# Interactive Viewer
 There is an interactive viewer that runs in a bokeh server, the following command will open a tab in your browser:
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
 The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
-<img width="658" alt="Top Bar" src="https://user-images.githubusercontent.com/9353408/184929274-d0009e50-e74e-4383-a297-d85c670b3dca.png">
+## Top Bar
 
-
-### Top Bar
+<img src="https://user-images.githubusercontent.com/9353408/184939978-b944ecba-043a-44a8-a30b-e7653d6c0743.png"  width="125%" alt="Vierwer Top Bar" >
 
 * Two tabs, to show info about the **Slurry** or the **Pipeline**
 * A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
 * A **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
-### Slurry Tab
+## Slurry Tab
 
-<img width="533" alt="Slurry Tab" src="https://user-images.githubusercontent.com/9353408/184931303-00ec8b59-1909-4a34-a0c1-813dab834d29.png">
+<img src="https://user-images.githubusercontent.com/9353408/184931303-00ec8b59-1909-4a34-a0c1-813dab834d29.png" width="125%" alt="Slurry Tab">
 
 The viewer allows you to adjust certain properties of the system:
 
@@ -109,8 +108,23 @@ The viewer allows you to adjust certain properties of the system:
 * **Concentrations**: Allows adjusting the concentration of the slurry by adjusting either the Cv or the rhom. The up and down arrows adjust the Cv by 0.005 each way.
 
 
-### Pipeline Tab
+## Pipeline Tab
 
-Shows a particular pipeline, including a dredge with three pumps. Not currently configurable, but responds to changes on the slurry tab.
+Shows a particular pipeline, including a CSD dredge with two pumps. 
 
-<img alt="Pipeline Tab" src="https://user-images.githubusercontent.com/9353408/150885791-3721df07-9059-4c51-8e01-418ec6bf9f2a.png">
+### Left Panel
+* The dropdown at the top selects a pipeline from those pre-defined in the System Tab or a CustomSetups.py file.
+* The total length, K, and delta-z for the pipeline
+* The dig depth and final discharge elevation
+* The number of pumps, maximum total head, maximum available power
+* A sequential list of the pipe sections and pumps in the pipeline
+  * Pipe sections display the name, diameter, length, K, and elevation change
+  * Pumps are two rows. The first gives details about the pump, including the driver (motor or engine) power. The second gives the pump speed and power demand at the operating point.
+
+### Right Panel
+* An interactive head-flow-velocity plot of the system (head required) and pump (head available) curves.
+* The system minimum friction point - flow, velocity (in the same pipe diamater as in the plot above), and slurry head requirement.
+* The **Operating Point**, the right-hand intersection of the system and pump curves for slurry - flow, velocity, head requrement, and delivered production.
+* A plot of the pressure gradeline - shows the pressure change along the pipe
+
+<img src="https://user-images.githubusercontent.com/9353408/184991580-4b65050c-8f6a-48d2-9310-aad8af93e87f.png" width="125%" alt="Pipeline Tab">
