@@ -83,7 +83,16 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-The viewer has two tabs, a Slurry Tab and Pipeline Tab, and a **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work. 
+The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
+
+<img width="658" alt="image" src="https://user-images.githubusercontent.com/9353408/184929274-d0009e50-e74e-4383-a297-d85c670b3dca.png">
+
+
+### Top Bar
+
+* Two tabs, to show info about the **Slurry** or the **Pipeline**
+* A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
+* A **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
 ### Slurry Tab
 
