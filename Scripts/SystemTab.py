@@ -14,14 +14,29 @@ from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
 
-setups = {"Example": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
-                                         Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
-                                         copy.copy(Ladder_Pump),
-                                         Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
-                                         copy.copy(Main_Pump),
-                                         Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
-                                         Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
-                              slurry=base_slurry),
+
+# Example of how to handle ladder pump elevations
+# The ladder pump elev, and thus elev_change, varies with dig depth
+dig_elev = -10      # Depths are positive down, elevations are positive up
+ladder_length = 30
+ladder_pump_location = 10
+MP_elev = 1
+LP_elev = dig_elev + ladder_pump_location * (MP_elev - dig_elev) / ladder_length
+
+
+setups = {"CSD Example w/ Ladder Pump": Pipeline(name="CSD with Ladder Pump",
+                                                 pipe_list=[Pipe(name='Entrance', diameter=0.85, length=0,
+                                                                 total_K=0.5, elev_change=dig_elev),
+                                                            Pipe('LP Suction', 0.86, ladder_pump_location, 0.1,
+                                                                 LP_elev-dig_elev),
+                                                            copy.copy(Ladder_Pump),
+                                                            Pipe('LP Discharge', 0.86, ladder_length-ladder_pump_location,
+                                                                 0.15, MP_elev-LP_elev),
+                                                            Pipe('Hull Suction', 0.86, 6.0, 0.1, 0.0),
+                                                            copy.copy(Main_Pump),
+                                                            Pipe('MP Discharge', 0.762, 20.0, 0.2, -1.0),
+                                                            Pipe('Discharge', 0.762, 2000.0, 1.0, 1.0)],
+                                                 slurry=base_slurry),
           }
 
 try:
@@ -50,7 +65,7 @@ setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                            Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
                                 slurry=my_slurry),
           }''')
-    pipeline = setups["Example"]
+    pipeline = setups["CSD Example w/ Ladder Pump"]
 
 
 pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
@@ -111,10 +126,10 @@ def system_panel(PL):
     def choose_pipeline(event):
         """Change to the chosen pipeline"""
         global pipeline
+        pipeline_dropdown.label = "Pipeline: " + pipeline.name
         pipeline = setups[event.item]
-        pipeline_dropdown.label = pipeline.name
         update_all(pipeline)
-    pipeline_dropdown = Dropdown(label=pipeline.name, menu=[(s, s) for s in setups.keys()])
+    pipeline_dropdown = Dropdown(label="Pipeline: "+pipeline.name, menu=[(s, s) for s in setups.keys()])
     pipeline_dropdown.on_click(choose_pipeline)
 
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
