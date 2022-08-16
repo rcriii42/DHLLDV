@@ -203,19 +203,22 @@ class Pipeline():
         return q1
 
     def hydraulic_gradient(self, Q):
-        """Calculate the hydraulic gradient of the pipe"""
+        """Calculate the hydraulic gradient of the pipe at the given flow"""
         temp_pl = Pipeline(pipe_list=[copy(p) for p in self.pipesections], slurry=self.slurry)
         loc_list = [temp_pl.total_length]
+        elev_list = [temp_pl.total_lift]
         hpipe_m, hpipe_l, hpump_l, hpump_m = self.calc_system_head(Q)
         head_list_m = [hpump_m - hpipe_m]
         head_list_l = [hpump_l - hpipe_l]
         while len(temp_pl.pipesections) > 1:
-            temp_pl.pipesections.pop()
+            p = temp_pl.pipesections.pop()
             hpipe_m, hpipe_l, hpump_l, hpump_m = temp_pl.calc_system_head(Q)
             loc_list.append(temp_pl.total_length)
             head_list_m.append((hpump_m - hpipe_m))
             head_list_l.append((hpump_l - hpipe_l))
+            elev_list.append(temp_pl.total_lift)
         loc_list.reverse()
         head_list_m.reverse()
-        return loc_list, head_list_m
+        elev_list.reverse()
+        return loc_list, head_list_m, elev_list
 
