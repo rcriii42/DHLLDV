@@ -203,7 +203,9 @@ class Pipeline():
         return q1
 
     def hydraulic_gradient(self, Q):
-        """Calculate the hydraulic gradient of the pipe at the given flow"""
+        """Calculate the hydraulic gradient of the pipe at the given flow
+
+        Returns 3 lists: pipeline locations, slurry head, pipeline elevations at each pipesection boundary"""
         temp_pl = Pipeline(pipe_list=[copy(p) for p in self.pipesections], slurry=self.slurry)
         loc_list = [temp_pl.total_length]
         elev_list = [temp_pl.total_lift]
