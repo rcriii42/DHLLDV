@@ -331,7 +331,7 @@ def system_panel(PL):
     x, h = pipeline.hydraulic_gradient(qop)
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
                                             h=convert_list(unit_convs['pressure'], h)))
-    hyd_plot = figure(height=330, width=595, title="Hydraulic Gradeline",
+    hyd_plot = figure(height=330, width=595, title="Pressure Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
                       )
     hyd_plot.tools.append(hyd_hover)
