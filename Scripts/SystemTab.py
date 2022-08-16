@@ -74,9 +74,10 @@ unit_label_US = {'len': 'Ft',
                  'rot speed': 'RPM',}
 unit_conv_SI = {v: 1.0 for v in unit_conv_US.keys()}
 unit_conv_SI['rot_speed'] = unit_conv_US['rot speed']
+unit_conv_SI['dia'] = 1000
 unit_label_SI = {'len': 'm',
                  'vel': 'm/sec',
-                 'dia': 'm',
+                 'dia': 'mm',
                  'vol': 'm\u00b3',
                  'flow': 'm\u00b3/sec',
                  'power': 'kW',
