@@ -126,18 +126,18 @@ def system_panel(PL):
                                            Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
                                            Hpump_m=convert_list(unit_convs['len'], head_lists[3])))
 
-    HQ_TOOLTIPS = [('name', "$name"),
-                   (f"Flow ({unit_labels['flow']})", "@Q{0.00}"),
-                   (f"Velocity ({unit_labels['vel']})", "@v{0.0}"),
-                   (f"Slurry Graded Cvt=c ({unit_labels['len']})", "@im{0,0.0}"),
-                   (f"Fluid ({unit_labels['len']})", "@il{0,0.0}"),
-                   (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
-                   (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
-                  ]
+    HQ_hover = HoverTool(tooltips =[('name', "$name"),
+                                    (f"Flow ({unit_labels['flow']})", "@Q{0.00}"),
+                                    (f"Velocity ({unit_labels['vel']})", "@v{0.0}"),
+                                    (f"Slurry Graded Cvt=c ({unit_labels['len']})", "@im{0,0.0}"),
+                                    (f"Fluid ({unit_labels['len']})", "@il{0,0.0}"),
+                                    (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
+                                    (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
+                                    ])
     HQ_plot = figure(height=450, width=595, title="System Head Requirement",
                      tools="crosshair,pan,reset,save,wheel_zoom",
-                     x_range=[0, flow_list[-1]*unit_convs['flow']], y_range=[0, 100],
-                     tooltips=HQ_TOOLTIPS)
+                     x_range=[0, flow_list[-1]*unit_convs['flow']], y_range=[0, 100])
+    HQ_plot.tools.append(HQ_hover)
 
     HQ_plot.line('Q', 'im', source=im_source,
                  color='black',
@@ -199,6 +199,14 @@ def system_panel(PL):
         HQ_plot.extra_x_ranges['vel_range'].end = pipeline.slurry.vls_list[-1]*unit_convs['len']
         HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]*unit_convs['len']
         HQ_plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
+        HQ_plot.tools[5].tooltips = [('name', "$name"),
+                                     (f"Flow ({unit_labels['flow']})", "@Q{0.00}"),
+                                     (f"Velocity ({unit_labels['vel']})", "@v{0.0}"),
+                                     (f"Slurry Graded Cvt=c ({unit_labels['len']})", "@im{0,0.0}"),
+                                     (f"Fluid ({unit_labels['len']})", "@il{0,0.0}"),
+                                     (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
+                                     (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
+                                     ]
 
         # Update the pipeline columns
         del totalscol.children[:]
