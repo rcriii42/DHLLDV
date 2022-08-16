@@ -10,7 +10,7 @@ import sys
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div, Panel, Tabs
+from bokeh.models import Spacer, Div, Panel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
 
@@ -79,6 +79,7 @@ def update_source_data():
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {slurry.Dp:0.3f}m pipe)'
     sys_update(pipeline)
+
 
 ################
 # Set up HQ plot
@@ -284,7 +285,8 @@ def update_fluid(index):
         slurry.fluid = 'salt'
     update_source_data()
 
-fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active=1)
+fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active={'fresh': 0,
+                                                                 'salt': 1}[pipeline.slurry.fluid])
 fluid_radio.on_click(update_fluid)
 fluid_viscosity_label = TextInput(title=f"Viscosity \u03BD\u2097 (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
                                   width=125, disabled=True)
@@ -430,8 +432,22 @@ def stop_button_callback():
 stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
+#Dropdown to pick units
+def choose_units(event):
+    """Select the units-of-measure for the System Tab"""
+    unit_picker.label = event.item + " Units"
+    SystemTab.select_units(event.item)
+    sys_update(pipeline)
+
+unit_picker = Dropdown(label='US Units', menu=[('SI', 'SI'),
+                                               ('US', 'US')])
+unit_picker.on_click(choose_units)
+
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
-curdoc().add_root(column(row(Spacer(width=1100), stop_button),
-                         Tabs(tabs=[slurry_panel,
-                                    sys_tab]),))
+
+tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
+tabbed_panels.active = 1
+curdoc().add_root(column(row(Spacer(width=900), unit_picker, stop_button),
+                         tabbed_panels))
+
 curdoc().title = "Visualizing DHLLDV"
