@@ -110,6 +110,6 @@ The viewer allows you to adjust certain properties of the system:
 
 ### Pipeline Tab
 
-Shows a particular pipeline, including a dredge with three pumps. Not currently configurable, but responds to changes on the slurry tab.
+Shows a particular pipeline, including a dredge with two pumps. The dropdown at the top selects a pipeline from those pre-defined in the System Tab or a CustomSetups.py file.
 
-<img alt="Pipeline Tab" src="https://user-images.githubusercontent.com/9353408/150885791-3721df07-9059-4c51-8e01-418ec6bf9f2a.png">
+<img width="530" alt="image" src="https://user-images.githubusercontent.com/9353408/184991580-4b65050c-8f6a-48d2-9310-aad8af93e87f.png">
