@@ -371,7 +371,7 @@ def system_panel(PL):
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
 
-    return (Panel(title="Pipeline US", child = row(column(pipeline_dropdown,
+    return (Panel(title="Pipeline", child = row(column(pipeline_dropdown,
                                                        totalscol,
                                                        Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                        pipecol),
