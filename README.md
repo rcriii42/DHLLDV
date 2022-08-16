@@ -85,10 +85,9 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
-<img width="658" alt="Top Bar" src="https://user-images.githubusercontent.com/9353408/184929274-d0009e50-e74e-4383-a297-d85c670b3dca.png">
-
-
 ### Top Bar
+
+<img width="587" alt="image" src="https://user-images.githubusercontent.com/9353408/184939978-b944ecba-043a-44a8-a30b-e7653d6c0743.png">
 
 * Two tabs, to show info about the **Slurry** or the **Pipeline**
 * A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
