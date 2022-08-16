@@ -39,7 +39,8 @@ class Pipe():
 
 class Pipeline():
     """Object to manage the pipeline system"""
-    def __init__(self, pipe_list=None, slurry=None):
+    def __init__(self, name="Pipeline", pipe_list=None, slurry=None):
+        self.name = name
         if not slurry:
             slurry = Slurry()
         if pipe_list:
