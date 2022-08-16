@@ -83,15 +83,24 @@ There is an interactive viewer that runs in a bokeh server, the following comman
 
 `(env) PS C:\Users\you\PycharmProjects\DHLLDV> bokeh serve --show .\Scripts\bokeh_viewer.py`
 
-The viewer has two tabs, a Slurry Tab and Pipeline Tab, and a **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work. 
+The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
+
+<img width="658" alt="Top Bar" src="https://user-images.githubusercontent.com/9353408/184929274-d0009e50-e74e-4383-a297-d85c670b3dca.png">
+
+
+### Top Bar
+
+* Two tabs, to show info about the **Slurry** or the **Pipeline**
+* A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
+* A **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
 ### Slurry Tab
 
-![image](https://user-images.githubusercontent.com/9353408/139908222-947d4edd-3403-4a1a-99a7-f55c0c650ddf.png)
+<img width="533" alt="Slurry Tab" src="https://user-images.githubusercontent.com/9353408/184931303-00ec8b59-1909-4a34-a0c1-813dab834d29.png">
 
 The viewer allows you to adjust certain properties of the system:
 
-* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way. The roughness is the absolute roughness of new steel pipe in m (per Cameron Hydraulic Data).
+* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way. The roughness is the absolute roughness of new steel pipe in m (per Cameron Hydraulic Data). This does _not_ update the pipeline, but does change the pipe diameter for the velocity graphs.
 * **Fluid**: Allows selection of fresh or salt water at 20&deg;C (68&deg;F). This adjusts the density and viscosity of the carrier fluid.
 * **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075mm).
   * The up and down arrows vary the D50 by 0.1mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction.
