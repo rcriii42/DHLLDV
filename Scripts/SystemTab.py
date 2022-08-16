@@ -85,8 +85,8 @@ unit_label_SI = {'len': 'm',
                  'pressure': 'kPa',
                  'rot speed': 'RPM',}
 
-unit_convs = unit_conv_US
-unit_labels = unit_label_US
+unit_convs = unit_conv_SI
+unit_labels = unit_label_SI
 def select_units(units='SI'):
     global unit_convs, unit_labels
     if units == 'US':

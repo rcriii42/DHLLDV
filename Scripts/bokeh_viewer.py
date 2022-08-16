@@ -439,7 +439,7 @@ def choose_units(event):
     SystemTab.select_units(event.item)
     sys_update(pipeline)
 
-unit_picker = Dropdown(label='US Units', menu=[('SI', 'SI'),
+unit_picker = Dropdown(label='SI Units', menu=[('SI', 'SI'),
                                                ('US', 'US')])
 unit_picker.on_click(choose_units)
 
