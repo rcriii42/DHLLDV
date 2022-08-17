@@ -355,7 +355,7 @@ def system_panel(PL):
                                             names=pipe_names))
     hyd_plot = figure(height=330, width=595, title="Pressure Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
-                      )
+                      y_range=(min(h)*unit_convs['pressure'], max(h)*unit_convs['pressure']*1.01))
     hyd_plot.tools.append(hyd_hover)
     hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
     hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
@@ -420,6 +420,8 @@ def system_panel(PL):
                                names=pipe_names)
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
+        hyd_plot.y_range.start = min(h) * unit_convs['pressure']
+        hyd_plot.y_range.end = max(h) * unit_convs['pressure']*1.01
         hyd_plot.yaxis[1].axis_label = f"Elevation ({unit_labels['len']})"
         hyd_plot.extra_y_ranges['e'].start = min(e) * unit_convs['len']
         hyd_plot.extra_y_ranges['e'].end = (max(e) + (max(e) - min(e)) * 2) * unit_convs['len']
