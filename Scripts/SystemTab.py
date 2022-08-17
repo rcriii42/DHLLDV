@@ -341,18 +341,24 @@ def system_panel(PL):
     ###################################################################
     # The hydraulic gradeline plot
     hyd_hover = HoverTool(tooltips=[('name', "$name"),
+                                    ('Section:', "@names"),
                                     (f"Location ({unit_labels['len']})", "@x{0.0}"),
                                     (f"Elevation ({unit_labels['len']})", "@e{0.0}"),
                                     (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
                                     ])
     x, h, e = pipeline.hydraulic_gradient(qop)
+    pipe_names = [f'Pipe: {p.name}' if isinstance(p, Pipe) else f'Pump: {p.name}' for p in pipeline.pipesections]
+
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
                                             e=convert_list(unit_convs['len'], e),
-                                            h=convert_list(unit_convs['pressure'], h)))
+                                            h=convert_list(unit_convs['pressure'], h),
+                                            names=pipe_names))
     hyd_plot = figure(height=330, width=595, title="Pressure Gradeline",
                       tools="crosshair,pan,reset,save,wheel_zoom",
                       )
     hyd_plot.tools.append(hyd_hover)
+    hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
+    hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
 
     hyd_plot.line('x', 'h', source=hyd_source,
                   color='black',
@@ -368,8 +374,8 @@ def system_panel(PL):
                   line_alpha=0.6,
                   legend_label='Pipeline Elevations',
                   name='Pipeline Elevations')
-    hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
-    hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
+
+
 
     def update_opcol(pipeline):
         """Update the operating point boxes"""
@@ -402,12 +408,15 @@ def system_panel(PL):
                                       f"Production ({unit_labels['vol']}/Hr)",]):
             oppnt_row[i].title = op_label
         x, h, e = pipeline.hydraulic_gradient(qop)
+        pipe_names = [f'Pipe: {p.name}' if isinstance(p, Pipe) else f'Pump: {p.name}' for p in pipeline.pipesections]
         hyd_source.data = dict(x=convert_list(unit_convs['len'], x),
                                e=convert_list(unit_convs['len'], e),
-                               h=convert_list(unit_convs['pressure'], h))
+                               h=convert_list(unit_convs['pressure'], h),
+                               names=pipe_names)
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
         hyd_plot.tools[5].tooltips = [('name', "$name"),
+                                      ('Section:', "@names"),
                                       (f"Location ({unit_labels['len']})", "@x{0.0}"),
                                       (f"Elevation ({unit_labels['len']})", "@e{0.0}"),
                                       (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
