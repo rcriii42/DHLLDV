@@ -38,44 +38,44 @@ Install the requirements:
 Run the tests:
 
 ```
-(venv) PS C:\Users\you\PycharmProjects\DHLLDV>> pytest --cov-report term-missing --cov=DHLLDV
-============================= test session starts =============================
+(venv) PS C:\Users\rcrii\PycharmProjects\DHLLDV> pytest --cov-report term-missing --cov=DHLLDV
+======================================================= test session starts ========================================================
 platform win32 -- Python 3.10.2, pytest-6.2.5, py-1.11.0, pluggy-1.0.0
 rootdir: C:\Users\rcrii\PycharmProjects\DHLLDV
 plugins: cov-3.0.0
 collected 110 items
 
-tests\test_DHLLDV_framework.py ......                                    [  5%]
-tests\test_DHLLDV_framework_graded.py ...............                    [ 19%]
-tests\test_Framework_LDV.py .......                                      [ 25%]
-tests\test_Pipe.py ...............                                       [ 39%]
-tests\test_PumpObj.py ........                                           [ 46%]
-tests\test_SlurryObj.py ..............                                   [ 59%]
-tests\test_Wilson_V50.py .....                                           [ 63%]
-tests\test_Wilson_stratified.py ...s..                                   [ 69%]
-tests\test_heterogeneous.py .....                                        [ 73%]
-tests\test_homogeneous.py ..............                                 [ 86%]
-tests\test_stratified.py ........                                        [ 93%]
-tests\test_utils.py .......                                              [100%]
+tests\test_DHLLDV_framework.py ......                                                                                         [  5%]
+tests\test_DHLLDV_framework_graded.py ...............                                                                         [ 19%]
+tests\test_Framework_LDV.py .......                                                                                           [ 25%]
+tests\test_Pipe.py ...............                                                                                            [ 39%]
+tests\test_PumpObj.py ........                                                                                                [ 46%]
+tests\test_SlurryObj.py ..............                                                                                        [ 59%]
+tests\test_Wilson_V50.py .....                                                                                                [ 63%]
+tests\test_Wilson_stratified.py ...s..                                                                                        [ 69%]
+tests\test_heterogeneous.py .....                                                                                             [ 73%]
+tests\test_homogeneous.py ..............                                                                                      [ 86%]
+tests\test_stratified.py ........                                                                                             [ 93%]
+tests\test_utils.py .......                                                                                                   [100%]
 
 ---------- coverage: platform win32, python 3.10.2-final-0 -----------
 Name                             Stmts   Miss  Cover   Missing
 --------------------------------------------------------------
 src\DHLLDV\DHLLDV_Utils.py          37      0   100%
 src\DHLLDV\DHLLDV_constants.py      12      0   100%
-src\DHLLDV\DHLLDV_framework.py     272     16    94%   138, 199, 286-289, 309-310, 350-358, 470
-src\DHLLDV\PipeObj.py              125      3    98%   48, 84, 176
-src\DHLLDV\PumpObj.py               58      1    98%   41
-src\DHLLDV\SlurryObj.py            168      1    99%   161
+src\DHLLDV\DHLLDV_framework.py     272     17    94%   138, 199, 233, 286-289, 309-310, 350-358, 470
+src\DHLLDV\PipeObj.py              149     23    85%   49, 85, 189-190, 200-201, 209-225
+src\DHLLDV\PumpObj.py              140     42    70%   62, 75, 93, 113, 128-164, 192, 202
+src\DHLLDV\SlurryObj.py            170      2    99%   161, 278
 src\DHLLDV\__init__.py               0      0   100%
 src\DHLLDV\heterogeneous.py         55      1    98%   146
 src\DHLLDV\homogeneous.py           57      0   100%
 src\DHLLDV\stratified.py            80      2    98%   171, 220
 --------------------------------------------------------------
-TOTAL                              864     24    97%
+TOTAL                              972     87    91%
 
 
-======================= 109 passed, 1 skipped in 5.23s ========================
+================================================== 109 passed, 1 skipped in 5.39s =================================================
 ```
 
 # Interactive Viewer
