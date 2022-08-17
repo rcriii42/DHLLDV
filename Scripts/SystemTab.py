@@ -367,14 +367,19 @@ def system_panel(PL):
                   line_alpha=0.6,
                   legend_label='Pressure Gradeline slurry',
                   name='Pressure Gradeline slurry')
+
+    hyd_plot.extra_y_ranges = {"e": Range1d(start=min(e), end=max(e)+(max(e)-min(e))*2)}
+    second_hyd_y_axis = LinearAxis(y_range_name="e")
+    hyd_plot.add_layout(second_hyd_y_axis, 'right')
+    hyd_plot.yaxis[1].axis_label = f"Elevation ({unit_labels['len']})"
     hyd_plot.line('x', 'e', source=hyd_source,
+                  y_range_name='e',
                   color='green',
                   line_dash='solid',
                   line_width=3,
                   line_alpha=0.6,
                   legend_label='Pipeline Elevations',
                   name='Pipeline Elevations')
-
 
 
     def update_opcol(pipeline):
@@ -415,6 +420,9 @@ def system_panel(PL):
                                names=pipe_names)
         hyd_plot.xaxis[0].axis_label = f'Location in pipeline ({unit_labels["len"]})'
         hyd_plot.yaxis[0].axis_label = f'Pressure ({unit_labels["pressure"]})'
+        hyd_plot.yaxis[1].axis_label = f"Elevation ({unit_labels['len']})"
+        hyd_plot.extra_y_ranges['e'].start = min(e) * unit_convs['len']
+        hyd_plot.extra_y_ranges['e'].end = (max(e) + (max(e) - min(e)) * 2) * unit_convs['len']
         hyd_plot.tools[5].tooltips = [('name', "$name"),
                                       ('Section:', "@names"),
                                       (f"Location ({unit_labels['len']})", "@x{0.0}"),
