@@ -1,5 +1,5 @@
 """
-SystemTab: Create the tab with the system (pipeline and pumps) information, in US units
+SystemTab: Create the tab with the system (pipeline and pumps) information, in SI or US units
 
 Added by R. Ramsdell 01 September, 2021
 """
