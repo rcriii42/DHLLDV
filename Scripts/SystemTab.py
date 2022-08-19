@@ -126,6 +126,7 @@ def system_panel(PL):
     def choose_pipeline(event):
         """Change to the chosen pipeline"""
         global pipeline
+        pipeline = setups[event.item]
         pipeline_dropdown.label = "Pipeline: " + pipeline.name
         pipeline = setups[event.item]
         update_all(pipeline)
