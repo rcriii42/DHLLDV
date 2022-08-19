@@ -161,6 +161,19 @@ class Slurry():
             self.generate_curves()
         return self._LDV85_curves
 
+    def __str__(self):
+        """String representation of the slurry"""
+        out_string = [f'Slurry in {self.Dp:0.3f} m pipe',
+                      f'D15/D50/D85 (mm): {self.get_dx(0.15)*1000:0.3f}/{self.get_dx(0.50)*1000:0.3f}/{self.get_dx(0.85)*1000:0.3f}',
+                      f'Solids Concentration (Cvs, -): {self.Cv:0.3f}',
+                      f'Insitu Concentration (Cvi, -): {self.Cvi:0.3f}',
+                      f'Fluid Density (Rhos, ton/m3): {self.rhol:0.3f}',
+                      f'Solids Density (Rhos, ton/m3): {self.rhos:0.3f}',
+                      f'Slurry Density (Rhom, ton/m3): {self.rhom:0.3f}',
+                      f'Insitu Density (Rhoi, ton/m3): {self.rhoi:0.3f}',
+                      ]
+        return "\n".join(out_string)
+
     def generate_GSD(self, d15_ratio=None, d85_ratio=None):
         """Generate the full GSD based on the given D50 and slope
 
