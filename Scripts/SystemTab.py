@@ -128,7 +128,6 @@ def system_panel(PL):
         global pipeline
         pipeline = setups[event.item]
         pipeline_dropdown.label = "Pipeline: " + pipeline.name
-        pipeline = setups[event.item]
         update_all(pipeline)
     pipeline_dropdown = Dropdown(label="Pipeline: "+pipeline.name, menu=[(s, s) for s in setups.keys()])
     pipeline_dropdown.on_click(choose_pipeline)
@@ -252,20 +251,32 @@ def system_panel(PL):
             flow_pipe = Pipe(diameter=pipeline.slurry.Dp)
             flow_list = [flow_pipe.flow(v) for v in pipeline.slurry.vls_list]
             qop = pipeline.find_operating_point(flow_list)
-            locs, heads, _ = pipeline.hydraulic_gradient(qop)
-            _, _, P, n = pipe.point(qop)
+            if qop >= 0:
+                locs, heads, _ = pipeline.hydraulic_gradient(qop)
+                _, _, P, n = pipe.point(qop)
+                op_suction = f"{heads[i-1]*unit_convs['pressure']:0.1f}"
+                op_discharge = f"{heads[i]*unit_convs['pressure']:0.1f}"
+                op_power = f"{P*unit_convs['power']:0.0f}"
+                op_speed = f"{n * unit_convs['rot speed']:0.0f}"
+            else:
+                op_suction = f"N/A"
+                op_discharge = f"N/A"
+                op_power = f"N/A"
+                op_speed = f"N/A"
+
+            # print(f"SystemTab.pipe_panel: pump: {pipe.name} qop:{qop:0.3f} power: {P:0.0f} n:{n:0.3f}")
             row2 = row(TextInput(title="", value="At Operating Point:", width=150, background='lightblue'),
                        TextInput(title=f"Suction ({unit_labels['pressure']})",
-                                 value=f"{heads[i-1]*unit_convs['pressure']:0.1f}",
+                                 value=op_suction,
                                  width=76, background='lightblue'),
                        TextInput(title=f"Discharge ({unit_labels['pressure']})",
-                                 value=f"{heads[i]*unit_convs['pressure']:0.1f}",
+                                 value=op_discharge,
                                  width=76, background='lightblue'),
                        TextInput(title=f"Speed ({unit_labels['rot speed']})",
-                                 value=f"{n * unit_convs['rot speed']:0.0f}",
+                                 value=op_speed,
                                  width=76, background='lightblue'),
                        TextInput(title=f"Power ({unit_labels['power']})",
-                                 value=f"{P*unit_convs['power']:0.0f}",
+                                 value=op_power,
                                  width=76, background='lightblue'),)
             return row(num, column(row1, row2))
         else:
