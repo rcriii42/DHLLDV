@@ -230,6 +230,7 @@ def system_panel(PL):
         [pipecol.children.append(pipe_panel(pipeline, i)) for i, p in enumerate(pipeline.pipesections)]
 
         update_opcol(pipeline)
+        slurry_info.text = f'{pipeline.slurry}'.replace('\n', '<BR>')
 
     def pipe_panel(pipeline, i):
         """Create a Bokeh row with information about the pipe"""
@@ -447,12 +448,17 @@ def system_panel(PL):
                                       (f"Pressure ({unit_labels['pressure']})", "@h{0.1}"),
                                       ]
 
-    return (Panel(title="Pipeline", child = row(column(pipeline_dropdown,
-                                                       totalscol,
-                                                       Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
-                                                       pipecol),
-                                                Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
-                                                column(HQ_plot,
-                                                       opcol,
-                                                       hyd_plot))),
+
+    slurry_info = Div(text=f'{pipeline.slurry}'.replace('\n', '<BR>'))
+
+    return (Panel(title="Pipeline US", child = row(column(pipeline_dropdown,
+                                                          totalscol,
+                                                          Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                          pipecol,
+                                                          Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
+                                                          slurry_info),
+                                                   Spacer(background='lightblue', width=5, margin=(0, 5, 0, 5)),
+                                                   column(HQ_plot,
+                                                          opcol,
+                                                          hyd_plot))),
             update_all)
