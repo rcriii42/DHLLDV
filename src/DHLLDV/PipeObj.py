@@ -145,12 +145,12 @@ class Pipeline():
                 Hpumps_m)                                           # Pump head fluid
 
     def qimin(self, flow_list, precision = 0.02):
-        """Find the minimum friction point in the slurry system
+        """Find the minimum friction point in the slurry system using Newtons method
 
         flow_list is a list of flowrates (m3/sec) to consider
         precision is the flow precision (m3/sec) to use"""
         iters = 1
-        mid =int(len(flow_list)/2)
+        mid = int(len(flow_list)/2)
         q0 = flow_list[mid]
         def imprime(q):
             """Calculate the first derivative of im at the given flow"""
@@ -158,12 +158,46 @@ class Pipeline():
         def imprime2(q):
             """Calculate the second derivative of im at the given flow"""
             return (imprime(q+precision/2) - imprime(q-precision/2))/precision
+
         q1 = q0 - imprime(q0)/imprime2(q0)
         while abs(q1-q0) > precision/10:
+            qp = imprime(q0)
+            qpp = imprime2(q0)
+            if not (flow_list[0] < q1 < flow_list[-1]):
+                print(f"Pipeline.qimin, found no minimum in {iters} iterations, trying bisection")
+                q1 = self.qimin_bisect(flow_list, precision)
+                break
             q0 = q1
             q1 = q0 - imprime(q0) / imprime2(q0)
+
             iters += 1
-        #print(f"Pipeline.vimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
+        # print(f"Pipeline.qimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
+        return q1
+
+    def qimin_bisect(self, flow_list, precision = 0.02):
+        """Find the minimum friction point in the slurry system using bisection
+
+               flow_list is a list of flowrates (m3/sec) to consider
+               precision is the flow precision (m3/sec) to use"""
+        iters = 1
+        q0 = flow_list[-2]  # Positive derivative
+        q1 = flow_list[1]   # Negative
+
+        def imprime(q):
+            """Calculate the first derivative of im at the given flow"""
+            return (self.calc_system_head(q+precision/2)[0] - self.calc_system_head(q-precision/2)[0])/precision
+
+        while abs(q1 - q0) > precision / 10:
+            qnext = (q0 + q1)/2
+            imp = imprime(qnext)
+            if imp < 0:
+                q1 = qnext
+            elif imp > 0:
+                q0 = qnext
+            else:   # Derivative 0, minimum?
+                break
+            iters += 1
+        # print(f"Pipeline.qimin_bisect found minima at {q1:0.3f} m3/sec in {iters} iterations")
         return q1
 
     def find_operating_point(self, flow_list, precision=0.02):
@@ -205,7 +239,13 @@ class Pipeline():
     def hydraulic_gradient(self, Q):
         """Calculate the hydraulic gradient of the pipe at the given flow
 
+        Q: The flow in m3/sec. If Q is <= 0 return the Hydraulic Gradient at Qimin
+
         Returns 3 lists: pipeline locations, slurry head, pipeline elevations at each pipesection boundary"""
+        if Q <= 0:
+            p = Pipe(diameter=self.slurry.Dp)
+            flow_list = [p.flow(v) for v in self.slurry.vls_list]
+            Q = self.qimin(flow_list)
         temp_pl = Pipeline(pipe_list=[copy(p) for p in self.pipesections], slurry=self.slurry)
         loc_list = [temp_pl.total_length]
         elev_list = [temp_pl.total_lift]
