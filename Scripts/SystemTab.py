@@ -188,7 +188,7 @@ def system_panel(PL):
     HQ_plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0]*unit_convs['len'], pipeline.slurry.vls_list[-1]*unit_convs['len'])}
     HQ_plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
     HQ_plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
-    HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f}In pipe)'
+    HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f} {unit_labels["dia"]} pipe)'
     HQ_plot.xaxis[0].formatter=NumeralTickFormatter(format="0.0")
     HQ_plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
     HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]*unit_convs['len']
@@ -209,7 +209,7 @@ def system_panel(PL):
                                            Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
                                            Hpump_m=convert_list(unit_convs['len'], head_lists[3]))
         HQ_plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
-        HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f}({unit_labels["dia"]} pipe)'
+        HQ_plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp*unit_convs["dia"]:0.1f} {unit_labels["dia"]} pipe)'
         HQ_plot.x_range.end=flow_list[-1]*unit_convs['flow']
         HQ_plot.extra_x_ranges['vel_range'].end = pipeline.slurry.vls_list[-1]*unit_convs['len']
         HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3]*unit_convs['len']
