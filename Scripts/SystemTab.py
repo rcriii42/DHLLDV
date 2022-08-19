@@ -88,7 +88,7 @@ unit_label_US = {'len': 'Ft',
                  'pressure': 'psi',
                  'rot speed': 'RPM',}
 unit_conv_SI = {v: 1.0 for v in unit_conv_US.keys()}
-unit_conv_SI['rot_speed'] = unit_conv_US['rot speed']
+unit_conv_SI['rot speed'] = unit_conv_US['rot speed']
 unit_conv_SI['dia'] = 1000
 unit_conv_SI['pressure'] = 9.804139
 unit_label_SI = {'len': 'm',
