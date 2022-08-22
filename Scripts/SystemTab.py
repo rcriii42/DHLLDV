@@ -5,15 +5,14 @@ Added by R. Ramsdell 01 September, 2021
 """
 import copy
 
+from DHLLDV.PipeObj import Pipeline, Pipe
+from DHLLDV.PumpObj import Pump
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, HoverTool
 from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
 from bokeh.plotting import figure
 
-from DHLLDV.PipeObj import Pipeline, Pipe
-from DHLLDV.PumpObj import Pump
 from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
-
 
 # Example of how to handle ladder pump elevations
 # The ladder pump elev, and thus elev_change, varies with dig depth
@@ -119,6 +118,7 @@ def convert_list(conversion, values):
 
 def system_panel(PL):
     """Create a Bokeh Panel with the pipeline and an overall HQ plot
+    pipeline = PL
 
     Return a bokeh Panel and update function"""
     pipeline = PL
@@ -252,7 +252,7 @@ def system_panel(PL):
             flow_pipe = Pipe(diameter=pipeline.slurry.Dp)
             flow_list = [flow_pipe.flow(v) for v in pipeline.slurry.vls_list]
             qop = pipeline.find_operating_point(flow_list)
-            if qop >= 0:
+            if qop > 0:
                 locs, heads, _ = pipeline.hydraulic_gradient(qop)
                 _, _, P, n = pipe.point(qop)
                 op_suction = f"{heads[i-1]*unit_convs['pressure']:0.1f}"
