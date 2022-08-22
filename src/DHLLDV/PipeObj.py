@@ -161,13 +161,12 @@ class Pipeline():
 
         q1 = q0 - imprime(q0)/imprime2(q0)
         while abs(q1-q0) > precision/10:
-            qp = imprime(q0)
-            qpp = imprime2(q0)
             if not (flow_list[0] < q1 < flow_list[-1]):
                 print(f"Pipeline.qimin, found no minimum in {iters} iterations, trying bisection")
                 q1 = self.qimin_bisect(flow_list, precision)
                 break
             q0 = q1
+            # print(f'Pipeline.qimin: iter: {iters} q0: {q0:0.3f} q1: {q1:0.3f}')
             q1 = q0 - imprime(q0) / imprime2(q0)
 
             iters += 1
@@ -230,13 +229,26 @@ class Pipeline():
             q0 = flow_list[int((len(flow_list)+indexmin)/2)]
             q1 = max(q0 - curvediff(q0)/curvediffprime(q0), Qimin)
         delta = abs(q1 - q0)
+        iters = 1
+        min_gap = (q0, q1, delta)
         while delta > precision / 10:
-            q0 = q1
-            q1 = q0 - curvediff(q0)/curvediffprime(q0)
+            if iters > 15:
+                # If too many interations, increase precision and go back to previous best guess
+                precision *= 1.42
+                q0 = min_gap[1]
+                q1 = (min_gap[0] + min_gap[1])/2
+            else:
+                q0 = q1
+                q1 = q0 - curvediff(q0)/curvediffprime(q0)
+            iters += 1
+            # print(f'Pipeline.find_operating_point: iter: {iters} q0: {q0:0.3f} q1: {q1:0.3f} delta: {abs(q1 - q0):0.4f}')
             if q1 <= 0:  # No intersection
                 q1 = 0.0
                 break
             delta = abs(q1 - q0)
+            if delta < min_gap[2]:
+                min_gap = (q0, q1, delta)
+
         return q1
 
     def hydraulic_gradient(self, Q):
