@@ -8,6 +8,8 @@ Created on Oct 8, 2014
 from .DHLLDV_Utils import interpDict
 
 steel_roughness = 4.5e-05   # new steel pipe absolute roughness in m
+pvc_roughness = 1.5e-06
+
 gravity =  9.80665          # m/s2
 musf = 0.415                # Sliding friction coefficient
 Cvb = 0.6                   # The bed concentration
