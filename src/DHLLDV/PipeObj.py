@@ -218,7 +218,10 @@ class Pipeline():
 
         Qimin = self.qimin(flow_list)
         im, _, _, pm = self.calc_system_head(Qimin)
-        if im > pm:
+        if pm == 0:
+            # No pumps
+            return 0
+        elif im > pm:
             # There is no intersection or the intersection is to the left of Qimin
             q0 = Qimin
             q1 = max(q0 - curvediff(q0) / curvediffprime(q0), min(flow_list))
