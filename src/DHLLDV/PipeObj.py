@@ -4,15 +4,14 @@ PipeObj - Holds the pipe and Pipeline objects that manage a pipeline system
 Added by R. Ramsdell 03 September, 2021
 """
 import bisect
-import collections
 from copy import copy
 from dataclasses import dataclass
 from math import pi
 
-from DHLLDV import DHLLDV_framework
+from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
-from DHLLDV.DHLLDV_constants import gravity
+
 
 @dataclass
 class Pipe():
@@ -52,7 +51,7 @@ class Pipeline():
 
     @property
     def num_pipesections(self):
-        """The total length of pipesections"""
+        """The total number of pipesections"""
         return len([p for p in self.pipesections if isinstance(p, Pipe)])
 
     @property
