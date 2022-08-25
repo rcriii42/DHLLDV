@@ -255,8 +255,8 @@ def system_panel(PL):
             if qop > 0:
                 locs, heads, _ = pipeline.hydraulic_gradient(qop)
                 _, _, P, n = pipe.point(qop)
-                op_suction = f"{heads[i-1]*unit_convs['pressure']:0.1f}"
-                op_discharge = f"{heads[i]*unit_convs['pressure']:0.1f}"
+                op_suction = f"{heads[i]*unit_convs['pressure']:0.1f}"
+                op_discharge = f"{heads[i+1]*unit_convs['pressure']:0.1f}"
                 op_power = f"{P*unit_convs['power']:0.0f}"
                 op_speed = f"{n * unit_convs['rot speed']:0.0f}"
             else:
@@ -361,6 +361,7 @@ def system_panel(PL):
                                     ])
     x, h, e = pipeline.hydraulic_gradient(qop)
     pipe_names = [f'Pipe: {p.name}' if isinstance(p, Pipe) else f'Pump: {p.name}' for p in pipeline.pipesections]
+    pipe_names.insert(0, 'Entrance')
 
     hyd_source = ColumnDataSource(data=dict(x=convert_list(unit_convs['len'], x),
                                             e=convert_list(unit_convs['len'], e),
@@ -428,6 +429,7 @@ def system_panel(PL):
             oppnt_row[i].title = op_label
         x, h, e = pipeline.hydraulic_gradient(qop)
         pipe_names = [f'Pipe: {p.name}' if isinstance(p, Pipe) else f'Pump: {p.name}' for p in pipeline.pipesections]
+        pipe_names.insert(0, 'Entrance')
         hyd_source.data = dict(x=convert_list(unit_convs['len'], x),
                                e=convert_list(unit_convs['len'], e),
                                h=convert_list(unit_convs['pressure'], h),
