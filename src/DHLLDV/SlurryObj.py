@@ -4,14 +4,13 @@ SlurryObj - Holds the Slurry object that manages the inoyts and curves for a slu
 Added by R. Ramsdell 30 August, 2021
 """
 
-import bisect
 from math import log10
 
-
-from . import DHLLDV_framework
-from . import DHLLDV_constants
 from . import DHLLDV_Utils
+from . import DHLLDV_constants
+from . import DHLLDV_framework
 from . import homogeneous
+
 
 class Slurry():
     def __init__(self, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
@@ -81,6 +80,10 @@ class Slurry():
         self._D50 = d
         self.GSD_curves_dirty = True
         self.curves_dirty = True
+
+    @property
+    def Dmean(self):
+        return sum([self.get_dx(frac/10) for frac in range(1, 11, 2)])/5
 
     @property
     def GSD(self):
@@ -188,6 +191,7 @@ class Slurry():
                     0.50: self.D50,
                     0.85: self.D50 * d85_ratio,}
         self._GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
+
         self.curves_dirty = True
 
     def get_dx(self, frac):
