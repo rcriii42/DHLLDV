@@ -112,6 +112,8 @@ class Pipeline():
 
         Q is the flow in m3/sec
 
+        If a pipesection after the first has length 0, the elev_change is ignored
+
         returns a tuple: (head slurry, head water) in m water column"""
         rhom = self.slurry.rhom
 
@@ -121,13 +123,14 @@ class Pipeline():
         Hfric_l = 0     # Total system head of water
         Hpumps_m = 0    # Total pump head of slurry
         Hpumps_l = 0    # Total pump head of water
+
         for p in self.pipesections:
             if isinstance(p, Pipe):
                 v = p.velocity(Q)
                 Hv = v ** 2 / (2 * gravity)
                 Hfit += p.total_K*Hv
-                delta_z += p.elev_change
                 if p.length > 0:
+                    delta_z += p.elev_change
                     im = self.slurries[p.diameter].im(v)
                     Hfric_m += im * p.length
                     il = self.slurries[p.diameter].il(v)
@@ -138,8 +141,14 @@ class Pipeline():
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_m += Hp
 
-        return (Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom, # System (pipeline) head losses slurry
-                Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol, # System (pipeline) head losses fluid
+        Htot_m = Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom
+        Htot_l = Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol
+        if self.pipesections[0].length == 0:
+            Htot_m -= self.pipesections[0].elev_change * self.slurry.rhol
+            Htot_l -= self.pipesections[0].elev_change * self.slurry.rhol
+
+        return (Htot_m, # System (pipeline) head losses slurry
+                Htot_l, # System (pipeline) head losses fluid
                 Hpumps_l,                                           # Pump head slurry
                 Hpumps_m)                                           # Pump head fluid
 
