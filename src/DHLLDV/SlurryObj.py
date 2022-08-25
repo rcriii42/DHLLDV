@@ -197,13 +197,17 @@ class Slurry():
     def get_dx(self, frac):
         """Get the grain size associated with the given frac
 
-        TODO: To be fancy, could override self.GSD.__getitem__"""
-        if frac in self.GSD:
+        TODO: To be fancy, could override self._GSD.__getitem__"""
+        if frac <= 0 or frac >= 1.0:
+            raise ValueError(f'Invalid fraction {frac}, must be in the range 0.0<frac<1.0')
+        elif frac in self.GSD:
             return self.GSD[frac]
         else:
             fracs = sorted(self.GSD.keys())
             log10s = [log10(self.GSD[x]) for x in fracs]
-            log10_iterp = DHLLDV_Utils.interpDict(*zip(fracs, log10s), extrapolate_low=True)
+            log10_iterp = DHLLDV_Utils.interpDict(*zip(fracs, log10s),
+                                                  extrapolate_high=True,
+                                                  extrapolate_low=True)
             logdthis = log10_iterp[frac]
         return 10 ** logdthis
 
