@@ -117,10 +117,16 @@ class Pipeline():
         returns a tuple: (head slurry, head water) in m water column"""
         rhom = self.slurry.rhom
 
-        delta_z = 0
-        Hfit = 0
+        Hfit_m = 0
+        Hfit_l = 0
         Hfric_m = 0     # Total system head of slurry
         Hfric_l = 0     # Total system head of water
+        if self.pipesections[0].length == 0:
+            # If the first pipesection has length 0, use the delta_z as the suction elevation
+            # This provides an initial static head
+            Hz_m = Hz_l = self.pipesections[0].elev_change * self.slurry.rhol
+        else:
+            Hz_m = Hz_l = 0
         Hpumps_m = 0    # Total pump head of slurry
         Hpumps_l = 0    # Total pump head of water
 
@@ -128,9 +134,11 @@ class Pipeline():
             if isinstance(p, Pipe):
                 v = p.velocity(Q)
                 Hv = v ** 2 / (2 * gravity)
-                Hfit += p.total_K*Hv
+                Hfit_m += p.total_K*Hv*self.slurry.rhom
+                Hfit_l += p.total_K * Hv * self.slurry.rhol
                 if p.length > 0:
-                    delta_z += p.elev_change
+                    Hz_m += p.elev_change * self.slurry.rhom
+                    Hz_l += p.elev_change * self.slurry.rhol
                     im = self.slurries[p.diameter].im(v)
                     Hfric_m += im * p.length
                     il = self.slurries[p.diameter].il(v)
@@ -141,11 +149,8 @@ class Pipeline():
                 Qp, Hp, Pp, np = p.point(Q)
                 Hpumps_m += Hp
 
-        Htot_m = Hfric_m + (Hfit + delta_z + Hv) * self.slurry.rhom
-        Htot_l = Hfric_l + (Hfit + delta_z + Hv) * self.slurry.rhol
-        if self.pipesections[0].length == 0:
-            Htot_m -= self.pipesections[0].elev_change * self.slurry.rhol
-            Htot_l -= self.pipesections[0].elev_change * self.slurry.rhol
+        Htot_m = Hfric_m + Hfit_m + Hz_m + Hv * self.slurry.rhom
+        Htot_l = Hfric_l + Hfit_l + Hz_l + Hv * self.slurry.rhol
 
         return (Htot_m, # System (pipeline) head losses slurry
                 Htot_l, # System (pipeline) head losses fluid
@@ -167,6 +172,7 @@ class Pipeline():
             """Calculate the second derivative of im at the given flow"""
             return (imprime(q+precision/2) - imprime(q-precision/2))/precision
 
+        # print(f'Pipeline.qimin: iter: {iters} q0: {q0:0.3f}')
         q1 = q0 - imprime(q0)/imprime2(q0)
         while abs(q1-q0) > precision/10:
             if not (flow_list[0] < q1 < flow_list[-1]):
@@ -273,11 +279,13 @@ class Pipeline():
         loc_list = [temp_pl.total_length]
         elev_list = [temp_pl.total_lift]
         hpipe_m, hpipe_l, hpump_l, hpump_m = self.calc_system_head(Q)
+        # print(f'Pump.hydraulic_gradient: {temp_pl.total_length:0.1f} {hpipe_m:0.2f} {hpump_m:0.2f}')
         head_list_m = [hpump_m - hpipe_m]
         head_list_l = [hpump_l - hpipe_l]
         while len(temp_pl.pipesections) > 1:
             p = temp_pl.pipesections.pop()
             hpipe_m, hpipe_l, hpump_l, hpump_m = temp_pl.calc_system_head(Q)
+            # print(f'Pump.hydraulic_gradient: {temp_pl.total_length:0.1f} {hpipe_m:0.2f} {hpump_m:0.2f}')
             loc_list.append(temp_pl.total_length)
             head_list_m.append((hpump_m - hpipe_m))
             head_list_l.append((hpump_l - hpipe_l))
