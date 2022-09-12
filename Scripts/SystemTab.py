@@ -7,12 +7,13 @@ import copy
 
 from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
+from DHLLDV.SlurryObj import Slurry
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, HoverTool
 from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
 from bokeh.plotting import figure
 
-from ExamplePumps import Ladder_Pump, Main_Pump, base_slurry
+from ExamplePumps import Ladder_Pump, Main_Pump, Ladder_Pump600, Main_Pump500, base_slurry
 
 # Example of how to handle ladder pump elevations
 # The ladder pump elev, and thus elev_change, varies with dig depth
@@ -36,6 +37,15 @@ setups = {"CSD Example w/ Ladder Pump": Pipeline(name="CSD with Ladder Pump",
                                                             Pipe('MP Discharge', 0.762, 20.0, 0.2, -1.0),
                                                             Pipe('Discharge', 0.762, 2000.0, 1.0, 5.0)],
                                                  slurry=base_slurry),
+          "Test Pipeline": Pipeline(name="test pipeline",
+                                    pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                               Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                                               Ladder_Pump600,
+                                               Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                               Main_Pump500,
+                                               Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                                               Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
+                                    slurry=Slurry(Dp=0.5, fluid="salt"))
           }
 
 try:
@@ -64,7 +74,7 @@ setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
                                            Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)],
                                 slurry=my_slurry),
           }''')
-    pipeline = setups["CSD Example w/ Ladder Pump"]
+    pipeline = setups["Test Pipeline"]      # This is the pipeline from the tests
 
 
 pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
