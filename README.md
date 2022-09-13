@@ -87,9 +87,10 @@ The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
 ## Top Bar
 
-<img src="https://user-images.githubusercontent.com/9353408/184939978-b944ecba-043a-44a8-a30b-e7653d6c0743.png"  width="125%" alt="Vierwer Top Bar" >
+<img alt="DHLLDV Viewer top bar" src="https://user-images.githubusercontent.com/9353408/189939922-cea8b7e3-a691-407a-8de4-3a2245b1ac56.png" width="200%">
 
 * Two tabs, to show info about the **Slurry** or the **Pipeline**
+* A **Pipeline Picker** to choose among already-defined pipeline setups
 * A **Unit Picker**, that chooses between output in SI (m, m3/sec, kW) or US (Ft, GPM, HP, Psi) units, currently only updates the Pipeline tab
 * A **Stop** button that stops the server. The browser tab will still stay open, but the widgets to adjust the slurry no longer will work.
 
@@ -113,7 +114,6 @@ The viewer allows you to adjust certain properties of the system:
 Shows a particular pipeline, including a CSD dredge with two pumps. 
 
 ### Left Panel
-* The dropdown at the top selects a pipeline from those pre-defined in the System Tab or a CustomSetups.py file.
 * The total length, K, and delta-z for the pipeline
 * The dig depth and final discharge elevation
 * The number of pumps, maximum total head, maximum available power
@@ -125,6 +125,6 @@ Shows a particular pipeline, including a CSD dredge with two pumps.
 * An interactive head-flow-velocity plot of the system (head required) and pump (head available) curves.
 * The system minimum friction point - flow, velocity (in the same pipe diamater as in the plot above), and slurry head requirement.
 * The **Operating Point**, the right-hand intersection of the system and pump curves for slurry - flow, velocity, head requrement, and delivered production.
-* A plot of the pressure gradeline - shows the pressure change along the pipe
+* A plot of the pressure gradeline - shows the pressure change and elevations along the pipe
 
-<img src="https://user-images.githubusercontent.com/9353408/184991580-4b65050c-8f6a-48d2-9310-aad8af93e87f.png" width="125%" alt="Pipeline Tab">
+<img src="https://user-images.githubusercontent.com/9353408/189940930-af14bd12-5aaf-4790-8b1b-928a3b239789.png" width="125%" alt="Pipeline Tab">
