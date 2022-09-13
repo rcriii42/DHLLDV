@@ -277,21 +277,22 @@ roughness_label = TextInput(title="Roughness (m)", value=f"{slurry.epsilon:0.3e}
                             width=95, disabled=True)
 Dp_row = row(Dp_input, Dp_updown, Spacer(width=10), roughness_label)
 
-def update_fluid(index):
-    if index == 0:
+
+def update_fluid(attr, old, new):
+    if new == 0:
         slurry.fluid = 'fresh'
     else:
         slurry.fluid = 'salt'
     update_source_data()
-
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active={'fresh': 0,
                                                                  'salt': 1}[pipeline.slurry.fluid])
-fluid_radio.on_click(update_fluid)
+fluid_radio.on_change('active', update_fluid)
 fluid_viscosity_label = TextInput(title=f"Viscosity \u03BD\u2097 (m\u00b2/sec)", value=f"{slurry.nu:0.4e}",
                                   width=125, disabled=True)
 fluid_density_label = TextInput(title=f"Density \u03C1\u2097 (ton/m\u00b3)", value=f"{slurry.rhol:0.4f}",
                                 width=125, disabled=True)
 fluid_properties = row(fluid_viscosity_label, fluid_density_label)
+
 
 def D50_adjust_proportionate(delta):
     """Adjust the D15 and D85 proportionately when D50 up/down buttons used"""
