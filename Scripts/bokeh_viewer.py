@@ -403,6 +403,19 @@ def update_data(attrname, old, new):
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
 
+def update_wo_callback(widget, value, attribute, callback):
+    """Update the text of the widget without triggering the callback"""
+    widget.remove_on_change(attribute, callback)
+    widget.value = value
+    widget.on_change(attribute, callback)
+
+
+def update_inputs():
+    """Update the input and information boxes"""
+    global slurry
+    update_wo_callback(Dp_input, f"{int(slurry.Dp*1000)}", 'value', update_Dp)
+
+
 for w in [D15_input, D50_input, D85_input, Cv_input]:
     w.on_change('value', update_data)
 
