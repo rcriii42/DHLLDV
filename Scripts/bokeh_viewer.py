@@ -480,8 +480,8 @@ def choose_pipeline(event):
     pipeline = SystemTab.setups[event.item]
     slurry = pipeline.slurry
     pipeline_dropdown.label = "Pipeline: " + pipeline.name
-    update_inputs()
     update_source_data()
+    update_inputs()
 pipeline_dropdown = Dropdown(label="Pipeline: " + pipeline.name, menu=[(s, s) for s in SystemTab.setups.keys()])
 pipeline_dropdown.on_click(choose_pipeline)
 
