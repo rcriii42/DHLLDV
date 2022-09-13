@@ -5,15 +5,17 @@ Added by R. Ramsdell 01 September, 2021
 """
 import copy
 
-from DHLLDV.PipeObj import Pipeline, Pipe
-from DHLLDV.PumpObj import Pump
-from DHLLDV.SlurryObj import Slurry
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, HoverTool
 from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
 from bokeh.plotting import figure
 
+from DHLLDV.PipeObj import Pipeline, Pipe
+from DHLLDV.PumpObj import Pump
+from DHLLDV.SlurryObj import Slurry
+
 from ExamplePumps import Ladder_Pump, Main_Pump, Ladder_Pump600, Main_Pump500, base_slurry
+from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
 
 # Example of how to handle ladder pump elevations
 # The ladder pump elev, and thus elev_change, varies with dig depth
@@ -80,34 +82,6 @@ setups = {"My Dredge": Pipeline(pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
 pipeline.slurry.Dp = pipeline.pipesections[-1].diameter
 pipeline.update_slurries()
 
-# Unit conversions
-unit_conv_US = {'len': 1/0.3048,
-                'dia': 12/0.3048,
-                'vol': (1/.3048)**3/27,
-                'flow': 15850.32,
-                'power': 1/0.7457,
-                'pressure': 1.42,
-                'rot speed': 60}
-unit_label_US = {'len': 'Ft',
-                 'vel': 'Ft/sec',
-                 'dia': 'In',
-                 'vol': 'CY',
-                 'flow': 'GPM',
-                 'power': 'HP',
-                 'pressure': 'psi',
-                 'rot speed': 'RPM',}
-unit_conv_SI = {v: 1.0 for v in unit_conv_US.keys()}
-unit_conv_SI['rot speed'] = unit_conv_US['rot speed']
-unit_conv_SI['dia'] = 1000
-unit_conv_SI['pressure'] = 9.804139
-unit_label_SI = {'len': 'm',
-                 'vel': 'm/sec',
-                 'dia': 'mm',
-                 'vol': 'm\u00b3',
-                 'flow': 'm\u00b3/sec',
-                 'power': 'kW',
-                 'pressure': 'kPa',
-                 'rot speed': 'RPM',}
 
 unit_convs = unit_conv_SI
 unit_labels = unit_label_SI
@@ -119,11 +93,6 @@ def select_units(units='SI'):
     else:
         unit_convs = unit_conv_SI
         unit_labels = unit_label_SI
-
-
-def convert_list(conversion, values):
-    """Covert the values in a list using the given conversion"""
-    return [v*conversion for v in values]
 
 
 def system_panel(PL):
