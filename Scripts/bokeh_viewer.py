@@ -508,7 +508,7 @@ sys_tab, sys_update = SystemTab.system_panel(pipeline)
 
 tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
 tabbed_panels.active = 1
-curdoc().add_root(column(row(pipeline_dropdown, Spacer(width=500), unit_picker, stop_button),
+curdoc().add_root(column(row(Spacer(width=500), pipeline_dropdown, unit_picker, stop_button),
                          tabbed_panels))
 
 curdoc().title = "Visualizing DHLLDV"
