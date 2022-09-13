@@ -254,6 +254,7 @@ GSD_plot.axis.minor_tick_out = 0
 GSD_plot.xgrid.minor_grid_line_color='navy'
 GSD_plot.xgrid.minor_grid_line_alpha=0.1
 
+
 # Set up widgets
 def update_Dp(attrname, old, new):
     """Update the pipe diameter"""
@@ -320,8 +321,6 @@ def D50_up_callback():
     D50_adjust_proportionate(0.1)
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
-
-
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.get_dx(0.85) * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
 D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
@@ -333,16 +332,17 @@ D15_input = TextInput(title="D15 (mm)", value=f"{slurry.get_dx(0.15) * 1000:0.3f
 D50_updown = column(D50_up_button, D50_down_button)
 GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input)
 
+
 def update_rhos(attrname, old, new):
     Cvi = (slurry.rhoi - slurry.rhol) / (slurry.rhos - slurry.rhol)
     slurry.rhos = check_value(rhos_input, 1.5, 7.0, slurry.rhos, "0.3f")
     slurry.rhoi = Cvi *(slurry.rhos - slurry.rhol) + slurry.rhol
     update_source_data()
-
 rhos_input = TextInput(title="Solids Density \u03C1\u209B (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}", width=150)
 rhos_input.on_change('value', update_rhos)
 Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True, width=95)
 rhos_row = row(rhos_input, Rsd_input)
+
 
 def update_rhom(attrname, old, new):
     """Update the Cv based on rhom input"""
@@ -363,6 +363,7 @@ Cvi_input = TextInput(title=f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})', value=f"
 rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=150)
 rhom_input.on_change('value', update_rhom)
 conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
+
 
 def check_value(widget, min, max, prev, fmt):
     """Check and update or reset the value
@@ -386,6 +387,7 @@ def check_value(widget, min, max, prev, fmt):
         widget.value = f"{prev:{fmt}}"
         return prev
 
+
 def update_data(attrname, old, new):
     # Get the current slider values
 
@@ -404,21 +406,51 @@ def update_data(attrname, old, new):
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
 
-def update_wo_callback(widget, value, attribute, callback):
+
+for w in [D15_input, D50_input, D85_input, Cv_input]:
+    w.on_change('value', update_data)
+
+
+def update_value_wo_callback(widget, value, attribute, callback):
     """Update the text of the widget without triggering the callback"""
     widget.remove_on_change(attribute, callback)
-    widget.value = value
+    match attribute:
+        case 'value':
+            widget.value = value
+        case 'active':
+            widget.active = value
     widget.on_change(attribute, callback)
 
 
 def update_inputs():
-    """Update the input and information boxes"""
+    """Update the input and information boxes
+
+    Do this after recalculating on changes"""
     global slurry
-    update_wo_callback(Dp_input, f"{int(slurry.Dp*1000)}", 'value', update_Dp)
+    update_value_wo_callback(Dp_input, f"{int(slurry.Dp*1000)}", 'value', update_Dp)
+    roughness_label.value = f"{slurry.epsilon:0.3e}"
 
+    update_value_wo_callback(fluid_radio,
+                             {'fresh': 0,
+                              'salt': 1}[pipeline.slurry.fluid],
+                             'active',
+                             update_fluid)
+    fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
+    fluid_density_label.value = f"{slurry.rhol:0.4f}"
 
-for w in [D15_input, D50_input, D85_input, Cv_input]:
-    w.on_change('value', update_data)
+    update_value_wo_callback(D15_input, f"{slurry.get_dx(0.15) * 1000:0.3f}", 'value', update_data)
+    update_value_wo_callback(D50_input, f"{slurry.get_dx(0.50) * 1000:0.3f}", 'value', update_data)
+    update_value_wo_callback(D85_input, f"{slurry.get_dx(0.85) * 1000:0.3f}", 'value', update_data)
+
+    update_value_wo_callback(rhos_input, f"{slurry.rhos:0.3f}", 'value', update_rhos)
+    rhos_input.on_change('value', update_rhos)
+    Rsd_input.value = f"{slurry.Rsd:0.3f}"
+
+    update_value_wo_callback(rhom_input, f"{slurry.rhom:0.3f}", 'value', update_rhom)
+    update_value_wo_callback(Cv_input, f"{slurry.Cv:0.3f}", 'value', update_data)
+    Cvi_input.value = f"{slurry.Cvi:0.3f}"
+    Cvi_input.title = f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})'
+
 
 # Set up layouts and add to document
 inputs = column(Div(text="""<B>Pipe</B>"""),
