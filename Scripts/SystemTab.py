@@ -133,15 +133,6 @@ def system_panel(PL):
     Return a bokeh Panel and update function"""
     pipeline = PL
 
-    def choose_pipeline(event):
-        """Change to the chosen pipeline"""
-        global pipeline
-        pipeline = setups[event.item]
-        pipeline_dropdown.label = "Pipeline: " + pipeline.name
-        update_all(pipeline)
-    pipeline_dropdown = Dropdown(label="Pipeline: "+pipeline.name, menu=[(s, s) for s in setups.keys()])
-    pipeline_dropdown.on_click(choose_pipeline)
-
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
     head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
     im_source = ColumnDataSource(data=dict(Q=convert_list(unit_convs['flow'], flow_list),
@@ -463,8 +454,7 @@ def system_panel(PL):
 
     slurry_info = Div(text=f'{pipeline.slurry}'.replace('\n', '<BR>'))
 
-    return (Panel(title="Pipeline US", child = row(column(pipeline_dropdown,
-                                                          totalscol,
+    return (Panel(title="Pipeline US", child = row(column(totalscol,
                                                           Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                           pipecol,
                                                           Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),

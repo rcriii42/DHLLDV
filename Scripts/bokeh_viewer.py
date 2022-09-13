@@ -15,7 +15,6 @@ from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
-from DHLLDV import PipeObj
 
 import SystemTab
 
@@ -426,11 +425,27 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
 plots = column(HQ_plot, Erhg_plot)
 slurry_panel = Panel(child= row(inputs, plots), title="Slurry")
 
+
+# Select a pipeline from the list
+def choose_pipeline(event):
+    """Change to the chosen pipeline"""
+    global pipeline
+    global slurry
+    pipeline = SystemTab.setups[event.item]
+    slurry = pipeline.slurry
+    pipeline_dropdown.label = "Pipeline: " + pipeline.name
+    update_inputs()
+    update_source_data()
+pipeline_dropdown = Dropdown(label="Pipeline: " + pipeline.name, menu=[(s, s) for s in SystemTab.setups.keys()])
+pipeline_dropdown.on_click(choose_pipeline)
+
+
 # Button to stop the server
 def stop_button_callback():
     sys.exit()  # Stop the server
 stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
+
 
 #Dropdown to pick units
 def choose_units(event):
@@ -438,16 +453,16 @@ def choose_units(event):
     unit_picker.label = event.item + " Units"
     SystemTab.select_units(event.item)
     sys_update(pipeline)
-
 unit_picker = Dropdown(label='SI Units', menu=[('SI', 'SI'),
                                                ('US', 'US')])
 unit_picker.on_click(choose_units)
+
 
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
 
 tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
 tabbed_panels.active = 1
-curdoc().add_root(column(row(Spacer(width=900), unit_picker, stop_button),
+curdoc().add_root(column(row(pipeline_dropdown, Spacer(width=500), unit_picker, stop_button),
                          tabbed_panels))
 
 curdoc().title = "Visualizing DHLLDV"
