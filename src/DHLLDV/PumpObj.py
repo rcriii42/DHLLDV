@@ -96,6 +96,21 @@ class Pump():
         P0 = self.design_QP_curve[Q0]
         return P0 * speed_ratio**3 * impeller_ratio**5 * rho
 
+    def power_available(self, n):
+        """Return the available power at the given speed"""
+        driver_speed_ratio = n / self._max_driver_speed
+        match self.limited:
+            case 'torque':
+                return self.avail_power * driver_speed_ratio
+            case 'power':
+                return self.avail_power
+            case 'curve':
+                return self.design_power_curve[driver_speed_ratio]
+            case other:
+                speed_ratio = n / self._max_driver_speed
+                impeller_ratio = self.current_impeller / self.design_impeller
+                return max(self.design_QP_curve.values()) * speed_ratio**3 * impeller_ratio**5 * self.slurry.rhom + 1
+
     def find_torque_limited_speed(self, Q, water=False):
         """Find the pump speed (Hz) at the given flow if torque limited
 
@@ -105,15 +120,14 @@ class Pump():
 
         n_new = self._current_speed
         P = self.power_required(Q, self.current_speed, water=water)
-        Pavail = self.avail_power * self._current_speed / self.design_speed
+        Pavail = self.power_available(n_new)
         if Pavail >= P:
             return n_new
         while not (-0.1 < Pavail - P < 0.1):
             n_new *= (Pavail / P) ** 0.5
             assert n_new > 1/60
-            speed_ratio = n_new / self.design_speed
             P = self.power_required(Q, n_new, water=water)
-            Pavail = self.avail_power * n_new / self.design_speed
+            Pavail = self.power_available(n_new)
         return n_new
 
     def find_power_limited_speed(self, Q, water=False):
@@ -131,7 +145,6 @@ class Pump():
         while not (-0.1 < Pavail - P < 0.1):
             n_new *= (Pavail / P) ** 0.5
             assert n_new > 1 / 60
-            speed_ratio = n_new / self.design_speed
             P = self.power_required(Q, n_new, water=water)
         return n_new
 
@@ -145,7 +158,7 @@ class Pump():
         n_new = self._current_speed
         speed_ratio_new = n_new / self.design_speed
         P = self.power_required(Q, self.current_speed, water=water)
-        Pavail = self.design_power_curve[speed_ratio_new]
+        Pavail = self.power_available(n_new)
         if Pavail >= P:
             return n_new
         speed_ratio_high = False
@@ -155,9 +168,9 @@ class Pump():
                 speed_ratio_high = speed_ratio_low
                 continue
             n_high = speed_ratio_high * self.design_speed
-            gap_high = self.design_power_curve[speed_ratio_high] - self.power_required(Q, n_high, water=water)
+            gap_high = self.power_available(n_new) - self.power_required(Q, n_high, water=water)
             n_low = speed_ratio_low * self.design_speed
-            gap_low = self.design_power_curve[speed_ratio_low] - self.power_required(Q, n_low, water=water)
+            gap_low = self.power_available(n_new) - self.power_required(Q, n_low, water=water)
             gaps.append([n_high, gap_high, gap_low])
             if gap_low >= 0:
                 break
@@ -167,7 +180,7 @@ class Pump():
         n_new = (n_high + n_low) / 2
         speed_ratio_new = n_new / self.design_speed
         P = self.power_required(Q, n_new, water=water)
-        Pavail = self.design_power_curve[speed_ratio_new]
+        Pavail = self.power_available(n_new)
         while not (-0.1 < Pavail - P < 0.1):
             gap_new = Pavail - P
             if gap_new < 0:
@@ -177,7 +190,7 @@ class Pump():
             n_new = (n_high + n_low) / 2
             speed_ratio_new = n_new / self.design_speed
             P = self.power_required(Q, n_new, water=water)
-            Pavail = self.design_power_curve[speed_ratio_new]
+            Pavail = self.power_available(n_new)
         return n_new
 
     def point(self, Q, water=False):
@@ -203,13 +216,7 @@ class Pump():
 
         P = self.power_required(Q, self.current_speed, water=water)
 
-        if self.limited.lower() == 'torque':
-            Pavail = self.avail_power * self._current_speed / self.design_speed
-        elif self.limited.lower() == 'curve':
-            Pavail = self.design_power_curve[self._current_speed / self.design_speed]
-        else:
-            Pavail = self.avail_power
-        if self.limited.lower() == 'none' or P <= Pavail:
+        if self.limited.lower() == 'none' or P <= self.power_available(self._current_speed):
             return (Q, H, P, self._current_speed)
         elif self.limited.lower() == 'torque':
             n_new = self.find_torque_limited_speed(Q, water=water)
