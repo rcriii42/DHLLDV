@@ -2,6 +2,7 @@ import unittest
 
 from DHLLDV import SlurryObj
 
+
 class Test(unittest.TestCase):
     def setUp(self) -> None:
         self.slurry = SlurryObj.Slurry()
@@ -115,6 +116,27 @@ class Test(unittest.TestCase):
         self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating max_index
         self.assertNotEqual(max(self.slurry.vls_list), vmax)  # The maximum velocity is tied to the max_index
 
+    def test_Dmean(self):
+        """Test the Dmean function for the default slurry"""
+        self.assertAlmostEqual(self.slurry.Dmean*1000, 1.407, places=4)
+
+    def test_Dmean_f(self):
+        """Test the Dmean function for Fine sand"""
+        s = SlurryObj.Slurry(D50=0.1/1000)
+        s.generate_GSD(d15_ratio=0.1/0.03, d85_ratio=0.26/0.1)
+        self.assertAlmostEqual(s.Dmean*1000, 0.13, places=2)
+
+    def test_Dmean_m(self):
+        """Test the Dmean function for Medium sand"""
+        s = SlurryObj.Slurry(D50=0.235/1000)
+        s.generate_GSD(d15_ratio=0.235/0.04, d85_ratio=0.37/0.235)
+        self.assertAlmostEqual(s.Dmean*1000, 0.21, places=2)
+
+    def test_Dmean_mc(self):
+        """Test the Dmean function for Medium-Coarse sand"""
+        s = SlurryObj.Slurry(D50=0.3/1000)
+        s.generate_GSD(d15_ratio=0.30/0.08, d85_ratio=1.48/0.30)
+        self.assertAlmostEqual(s.Dmean*1000, 0.63, places=1)
 
 if __name__ == '__main__':
     unittest.main()
