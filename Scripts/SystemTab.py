@@ -5,14 +5,13 @@ Added by R. Ramsdell 01 September, 2021
 """
 import copy
 
-from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, HoverTool
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter, Dropdown
-from bokeh.plotting import figure
-
 from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
+from bokeh.layouts import column, row
+from bokeh.models import ColumnDataSource, TextInput, HoverTool
+from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter
+from bokeh.plotting import figure
 
 from ExamplePumps import Ladder_Pump, Main_Pump, Ladder_Pump600, Main_Pump500, base_slurry
 from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
