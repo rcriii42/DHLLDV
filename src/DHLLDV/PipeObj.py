@@ -98,6 +98,11 @@ class Pipeline():
         self._slurry = s
         self.update_slurries()
 
+    @property
+    def pumps(self):
+        """Return a list of the pumps in line"""
+        return [p for p in self.pipesections if isinstance(p, Pump)]
+
     def update_slurries(self):
         self.slurries = {self._slurry.Dp: self.slurry}
         for p in self.pipesections:
