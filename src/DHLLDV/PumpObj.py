@@ -9,6 +9,7 @@ from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.DHLLDV_Utils import interpDict
 from DHLLDV.SlurryObj import Slurry
 
+
 @dataclass
 class Pump():
     """Model a pump and driver"""
@@ -29,6 +30,7 @@ class Pump():
             self.slurry = Slurry()
         self._current_speed = self.design_speed
         self._current_impeller = self.design_impeller
+        self._max_driver_speed = self.design_speed  # The speed at max power or the power curve basis
         self.design_QH_curve.extrapolate_high = True
         self.design_QP_curve.extrapolate_high = True
 
@@ -47,7 +49,22 @@ class Pump():
         """Set the current speed
 
         N: New speed in Hz"""
+        if N > self._max_driver_speed:
+            print(f'WARNING: Setting current speed of {N:0.4f} to greater than max_driver_speed of {self._max_driver_speed:0.4f}')
         self._current_speed = N
+
+    @property
+    def max_driver_speed(self):
+        """Get the max driver speed in Hz"""
+        return self._max_driver_speed
+
+    @max_driver_speed.setter
+    def max_driver_speed(self, N):
+        """Set the max_driver speed
+
+        N: New speed in Hz"""
+        self._max_driver_speed = N
+        self._current_speed = self._max_driver_speed
 
     @property
     def current_impeller(self):
