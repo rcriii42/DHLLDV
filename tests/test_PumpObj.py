@@ -7,6 +7,7 @@ import unittest
 from DHLLDV.DHLLDV_Utils import interpDict
 from DHLLDV.PumpObj import Pump
 
+
 class MyTestCase(unittest.TestCase):
     def setUp(self) -> None:
         H = interpDict({0.3567568: 30.093008,
@@ -65,8 +66,8 @@ class MyTestCase(unittest.TestCase):
         Q, H, P, N = self.pump.point(2.957377)
         self.assertAlmostEqual(H, 26.82003*self.pump.slurry.rhom, places=2)
 
-    def test_Power(self):
-        """Test the power for the design speed on water"""
+    def test_power_required(self):
+        """Test the power required for the design speed on water"""
         Q, H, P, N = self.pump.point(2.957377)
         self.assertAlmostEqual(P, 989.9113*self.pump.slurry.rhom, places=0)
 
@@ -109,6 +110,39 @@ class MyTestCase(unittest.TestCase):
             self.assertAlmostEqual(P, 805.0921, places=2)
         with self.subTest(msg='Test the torque limited head'):
             self.assertAlmostEqual(H, 20.928, places=3)
+
+    def test_power_avail_power_limited(self):
+        """Test the right result for the power limited case"""
+        self.pump.limited = 'power'
+        self.assertAlmostEqual(self.pump.power_available(3.0), 895)
+
+    def test_power_avail_torque_limited(self):
+        """Test the right result for the torque limited case"""
+        self.pump.limited = 'torque'
+        self.assertAlmostEqual(self.pump.power_available(3.0), 767.1428571)
+
+    def test_power_avail_torque_limited2(self):
+        """Test the right result for the torque limited case, with a varied max_driver_speed"""
+        self.pump.limited = 'torque'
+        self.pump.max_driver_speed = 4.0
+        self.assertAlmostEqual(self.pump.power_available(3.0), 671.25)
+
+    def test_power_avail_curve_limited(self):
+        """Test the right result for the curve limited case"""
+        self.pump.limited = 'curve'
+        self.pump.design_power_curve = interpDict({0.5: 500.0,
+                                                   0.6: 600.0,
+                                                   0.75: 750.0,
+                                                   0.85: 825.0,
+                                                   0.95: 852.0,
+                                                   1.00: 895.0,
+                                                   })
+        self.assertAlmostEqual(self.pump.power_available(3.0), 826.9285714)
+
+    def test_power_avail_none_limited(self):
+        """Test the right result for the non-limited case"""
+        self.pump.limited = None
+        self.assertAlmostEqual(self.pump.power_available(3.0), 1915.670989* (3/3.5)**3 * self.pump.slurry.rhom+1)
 
 if __name__ == '__main__':
     unittest.main()
