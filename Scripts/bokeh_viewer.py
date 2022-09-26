@@ -46,6 +46,7 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
 
 def update_source_data():
+    """Update the source data for the various plots"""
     im_source.data = dict(v=slurry.vls_list,
                           graded_Cvt_im=slurry.im_curves['graded_Cvt_im'],
                           Cvs_im=slurry.im_curves['Cvs_im'],
@@ -67,16 +68,10 @@ def update_source_data():
                             Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                             Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                             regime=slurry.Erhg_curves['Cvs_regime'])
-    roughness_label.value = f"{slurry.epsilon:0.3e}"
-    fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
-    fluid_density_label.value = f"{slurry.rhol:0.4f}"
-    Cvi_input.title = f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})'
-    Cvi_input.value = f"{slurry.Cvi:0.3f}"
-    Rsd_input.value=f"{slurry.Rsd:0.3f}"
-    rhom_input.value = f"{slurry.rhom:0.3f}"
     percents = sorted(list(slurry.GSD.keys()))
     GSD_source.data = dict(p=percents, dia=[slurry.GSD[pct] * 1000 for pct in percents])
     HQ_plot.xaxis[0].axis_label = f'Velocity (m/sec in {slurry.Dp:0.3f}m pipe)'
+    update_inputs()
     sys_update(pipeline)
 
 
@@ -300,9 +295,9 @@ def D50_adjust_proportionate(delta):
     if DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000 <\
             slurry.D50*1000 + delta <=\
             slurry.Dp * 1000 * 0.25:
-        D85_input.remove_on_change('value', update_data)
-        D50_input.remove_on_change('value', update_data)
-        D15_input.remove_on_change('value', update_data)
+        D85_input.remove_on_change('value', update_D85)
+        D50_input.remove_on_change('value', update_D50)
+        D15_input.remove_on_change('value', update_D15)
         slurry.D50 += delta / 1000
         D15_ratio = slurry.get_dx(0.50) / slurry.get_dx(0.15)
         if slurry.D50 / D15_ratio < 0.04/1000:
@@ -313,9 +308,9 @@ def D50_adjust_proportionate(delta):
         D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
         D15_input.value = f"{slurry.get_dx(0.15) * 1000:0.3f}"
 
-        D15_input.on_change('value', update_data)
-        D50_input.on_change('value', update_data)
-        D85_input.on_change('value', update_data)
+        D15_input.on_change('value', update_D15)
+        D50_input.on_change('value', update_D50)
+        D85_input.on_change('value', update_D85)
 
 def D50_up_callback():
     D50_adjust_proportionate(0.1)
@@ -388,27 +383,43 @@ def check_value(widget, min, max, prev, fmt):
         return prev
 
 
-def update_data(attrname, old, new):
-    # Get the current slider values
+def update_D15(attrname, old, new):
+    """Check and update the D15"""
+    d15 = check_value(D15_input, 0.04, slurry.D50 * 1000, slurry.get_dx(0.15) * 1000, '0.3f') / 1000
+    slurry.generate_GSD(d15_ratio=slurry.D50 / d15)
+    update_source_data()
+D15_input.on_change('value', update_D15)
 
-    d85 = check_value(D85_input,
-                      slurry.D50*1000+0.01,
-                      slurry.Dp * 1000 * 0.50,
-                      slurry.get_dx(.85)*1000, '0.3f') / 1000
+
+def update_D50(attrname, old, new):
+    """Check and update the D50"""
     slurry.D50 = check_value(D50_input,
-                             max(slurry.get_dx(0.15)*1000+0.01,
-                                 DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000),
-                             min(slurry.get_dx(0.85)*1000-0.01,
+                             max(slurry.get_dx(0.15) * 1000 + 0.01,
+                                 DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos) * 1000),
+                             min(slurry.get_dx(0.85) * 1000 - 0.01,
                                  slurry.Dp * 1000 * 0.25),
                              slurry.D50 * 1000, '0.3f') / 1000
-    d15 = check_value(D15_input, 0.04, slurry.D50 * 1000, slurry.get_dx(0.15)*1000, '0.3f') / 1000
-    slurry.generate_GSD(d15_ratio=slurry.D50/d15, d85_ratio=d85/slurry.D50)
+    slurry.generate_GSD()
+    update_source_data()
+D50_input.on_change('value', update_D50)
+
+
+def update_D85(attrname, old, new):
+    """Check and update the D85"""
+    d85 = check_value(D85_input,
+                      slurry.D50 * 1000 + 0.01,
+                      slurry.Dp * 1000 * 0.50,
+                      slurry.get_dx(.85) * 1000, '0.3f') / 1000
+    slurry.generate_GSD(d85_ratio=d85/slurry.D50)
+    update_source_data()
+D85_input.on_change('value', update_D85)
+
+
+def update_Cv(attrname, old, new):
+    """Check and update the Cv"""
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
-
-
-for w in [D15_input, D50_input, D85_input, Cv_input]:
-    w.on_change('value', update_data)
+Cv_input.on_change('value', update_Cv)
 
 
 def update_value_wo_callback(widget, value, attribute, callback):
@@ -438,16 +449,15 @@ def update_inputs():
     fluid_viscosity_label.value = f"{slurry.nu:0.4e}"
     fluid_density_label.value = f"{slurry.rhol:0.4f}"
 
-    update_value_wo_callback(D15_input, f"{slurry.get_dx(0.15) * 1000:0.3f}", 'value', update_data)
-    update_value_wo_callback(D50_input, f"{slurry.get_dx(0.50) * 1000:0.3f}", 'value', update_data)
-    update_value_wo_callback(D85_input, f"{slurry.get_dx(0.85) * 1000:0.3f}", 'value', update_data)
+    update_value_wo_callback(D15_input, f"{slurry.get_dx(0.15) * 1000:0.3f}", 'value', update_D15)
+    update_value_wo_callback(D50_input, f"{slurry.get_dx(0.50) * 1000:0.3f}", 'value', update_D50)
+    update_value_wo_callback(D85_input, f"{slurry.get_dx(0.85) * 1000:0.3f}", 'value', update_D85)
 
     update_value_wo_callback(rhos_input, f"{slurry.rhos:0.3f}", 'value', update_rhos)
-    rhos_input.on_change('value', update_rhos)
     Rsd_input.value = f"{slurry.Rsd:0.3f}"
 
     update_value_wo_callback(rhom_input, f"{slurry.rhom:0.3f}", 'value', update_rhom)
-    update_value_wo_callback(Cv_input, f"{slurry.Cv:0.3f}", 'value', update_data)
+    update_value_wo_callback(Cv_input, f"{slurry.Cv:0.3f}", 'value', update_Cv)
     Cvi_input.value = f"{slurry.Cvi:0.3f}"
     Cvi_input.title = f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})'
 
@@ -481,7 +491,6 @@ def choose_pipeline(event):
     slurry = pipeline.slurry
     pipeline_dropdown.label = "Pipeline: " + pipeline.name
     update_source_data()
-    update_inputs()
 pipeline_dropdown = Dropdown(label="Pipeline: " + pipeline.name, menu=[(s, s) for s in SystemTab.setups.keys()])
 pipeline_dropdown.on_click(choose_pipeline)
 
