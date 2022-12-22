@@ -13,7 +13,8 @@ from . import homogeneous
 
 
 class Slurry():
-    def __init__(self, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
+    def __init__(self, name=None, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
+        self._name = name
         self._max_index = max_index
         self._Dp = Dp
         self._epsilon = DHLLDV_constants.steel_roughness
@@ -37,6 +38,17 @@ class Slurry():
         self._LDV_curves = None
         self._LDV85_curves = None
         self.curves_dirty = True
+
+    @property
+    def name(self):
+        if self._name is None:
+            return self.__repr__()
+        else:
+            return self._name
+
+    @name.setter
+    def name(self, new_name):
+        self._name = new_name
 
     @property
     def fluid(self):
