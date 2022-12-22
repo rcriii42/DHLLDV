@@ -10,7 +10,7 @@ from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, HoverTool
-from bokeh.models import Spacer, Panel, LinearAxis, Range1d, Div, NumeralTickFormatter
+from bokeh.models import Spacer, TabPanel, LinearAxis, Range1d, Div, NumeralTickFormatter
 from bokeh.plotting import figure
 
 from ExamplePumps import Ladder_Pump, Main_Pump, Ladder_Pump600, Main_Pump500, base_slurry
@@ -422,7 +422,7 @@ def system_panel(PL):
 
     slurry_info = Div(text=f'{pipeline.slurry}'.replace('\n', '<BR>'))
 
-    return (Panel(title="Pipeline US", child = row(column(totalscol,
+    return (TabPanel(title="Pipeline US", child = row(column(totalscol,
                                                           Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                                                           pipecol,
                                                           Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
