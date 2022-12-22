@@ -10,7 +10,7 @@ import sys
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div, Panel, Tabs, Dropdown
+from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.plotting import figure
 
@@ -44,6 +44,7 @@ Erhg_source = ColumnDataSource(data=dict(il=slurry.Erhg_curves['il'],
                                          Cvs=slurry.Erhg_curves['Cvs_Erhg'],
                                          Cvt=slurry.Erhg_curves['Cvt_Erhg'],
                                          regime=slurry.Erhg_curves['Cvs_regime']))
+
 
 def update_source_data():
     """Update the source data for the various plots"""
@@ -470,7 +471,7 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
                 conc_row,           # A row of text boxes
                 )
 plots = column(HQ_plot, Erhg_plot)
-slurry_panel = Panel(child= row(inputs, plots), title="Slurry")
+slurry_panel = TabPanel(child= row(inputs, plots), title="Slurry")
 
 
 # Select a pipeline from the list
