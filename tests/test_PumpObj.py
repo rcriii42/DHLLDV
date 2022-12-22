@@ -6,6 +6,7 @@ import unittest
 
 from DHLLDV.DHLLDV_Utils import interpDict
 from DHLLDV.PumpObj import Pump
+from DHLLDV.DriverObj import Driver
 
 
 class MyTestCase(unittest.TestCase):
@@ -130,19 +131,21 @@ class MyTestCase(unittest.TestCase):
     def test_power_avail_curve_limited(self):
         """Test the right result for the curve limited case"""
         self.pump.limited = 'curve'
-        self.pump.design_power_curve = interpDict({0.5: 500.0,
-                                                   0.6: 600.0,
-                                                   0.75: 750.0,
-                                                   0.85: 825.0,
-                                                   0.95: 852.0,
-                                                   1.00: 895.0,
-                                                   })
+        self.pump.driver = Driver("test driver", interpDict({0.5: 500.0,
+                                                             0.6: 600.0,
+                                                             0.75: 750.0,
+                                                             0.85: 825.0,
+                                                             0.95: 852.0,
+                                                             1.00: 895.0,
+                                                             }))
+        self.pump.gear_ratio = 1/self.pump.design_speed
         self.assertAlmostEqual(self.pump.power_available(3.0), 826.9285714)
 
     def test_power_avail_none_limited(self):
         """Test the right result for the non-limited case"""
         self.pump.limited = None
-        self.assertAlmostEqual(self.pump.power_available(3.0), 1915.670989* (3/3.5)**3 * self.pump.slurry.rhom+1)
+        self.assertAlmostEqual(self.pump.power_available(3.0), 1915.670989 * (3/3.5)**3 * self.pump.slurry.rhom+1)
+
 
 if __name__ == '__main__':
     unittest.main()
