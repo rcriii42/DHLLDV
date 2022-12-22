@@ -1,5 +1,4 @@
 attrs:
     Figure:
         background_fill_color: "whitesmoke"
-        background_filipython
-        l_alpha: 0.5
+        background_fill_alpha: 0.5
