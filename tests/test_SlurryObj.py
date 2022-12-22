@@ -1,3 +1,4 @@
+import datetime
 import unittest
 
 from DHLLDV import SlurryObj
@@ -94,7 +95,6 @@ class Test(unittest.TestCase):
         self.assertTrue(self.slurry.curves_dirty)   # Curves should be dirty after updating epsilon
         self.assertNotEqual(self.slurry.im_curves['il'][42], il)    # The value of il for that velocity
                                                                     # should have changed
-
     def test_rhos_changed(self):
         """Test that the curves are regenerated after changing rhos
 
@@ -137,6 +137,17 @@ class Test(unittest.TestCase):
         s = SlurryObj.Slurry(D50=0.3/1000)
         s.generate_GSD(d15_ratio=0.30/0.08, d85_ratio=1.48/0.30)
         self.assertAlmostEqual(s.Dmean*1000, 0.63, places=1)
+
+    def test_no_name(self):
+        """Test the auto-generated name matches the __repr__"""
+        self.assertTrue('<DHLLDV.SlurryObj.Slurry object at' in self.slurry.name)
+        self.assertEqual(self.slurry.name, self.slurry.__repr__())
+
+    def test_name(self):
+        """Test a slurry with a defined name"""
+        new_name = f'Test slurry created at {datetime.datetime.now()}'
+        s = SlurryObj.Slurry(name=new_name)
+        self.assertEqual(s.name, new_name)
 
 if __name__ == '__main__':
     unittest.main()
