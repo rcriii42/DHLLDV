@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.DHLLDV_Utils import interpDict
+from DHLLDV.DriverObj import Driver
 from DHLLDV.SlurryObj import Slurry
 
 
@@ -22,7 +23,9 @@ class Pump():
     design_QP_curve: interpDict    # dict {flow (m/sec): power (kW}
     avail_power: float            # kW
     limited: str = 'torque'       # 'torque', 'power', 'curve', 'None'
-    design_power_curve: interpDict or None = None   # dict {design_speed/n (-): power (kW)
+    driver: Driver or None = None   # dict {design_speed/n (-): power (kW)
+    driver_name: str or None = None
+    gear_ratio: float = 1.0
     slurry: Slurry = None
 
     def __post_init__(self):
@@ -98,14 +101,13 @@ class Pump():
 
     def power_available(self, n):
         """Return the available power at the given speed"""
-        driver_speed_ratio = n / self._max_driver_speed
         match self.limited:
             case 'torque':
-                return self.avail_power * driver_speed_ratio
+                return self.avail_power * n / self._max_driver_speed
             case 'power':
                 return self.avail_power
             case 'curve':
-                return self.design_power_curve[driver_speed_ratio]
+                return self.driver.power(n*self.gear_ratio)
             case other:
                 speed_ratio = n / self._max_driver_speed
                 impeller_ratio = self.current_impeller / self.design_impeller
@@ -158,39 +160,40 @@ class Pump():
         n_new = self._current_speed
         speed_ratio_new = n_new / self.design_speed
         P = self.power_required(Q, self.current_speed, water=water)
-        Pavail = self.power_available(n_new)
+        Pavail = self.driver.power(n_new * self.gear_ratio)
         if Pavail >= P:
             return n_new
-        speed_ratio_high = False
+        n_low = False
         gaps = []
-        for speed_ratio_low in self.design_power_curve.keys():
-            if not speed_ratio_high:
-                speed_ratio_high = speed_ratio_low
+        for n_high in self.driver.design_power_curve.keys():
+            n_high /= self.gear_ratio
+            if not n_low:
+                n_low = n_high
                 continue
-            n_high = speed_ratio_high * self.design_speed
-            gap_high = self.power_available(n_new) - self.power_required(Q, n_high, water=water)
-            n_low = speed_ratio_low * self.design_speed
-            gap_low = self.power_available(n_new) - self.power_required(Q, n_low, water=water)
-            gaps.append([n_high, gap_high, gap_low])
+            gap_high = self.driver.power(n_high*self.gear_ratio) - self.power_required(Q, n_high, water=water)
+            gap_low = self.driver.power(n_low*self.gear_ratio) - self.power_required(Q, n_low, water=water)
+            gaps.append([n_low, n_high, gap_low, gap_high])
             if gap_low >= 0:
                 break
-            speed_ratio_high = speed_ratio_low
-        if speed_ratio_high == speed_ratio_low: # There was no intersection
+            n_high = n_low
+        if n_high == n_low: # There was no intersection
             return n_low
         n_new = (n_high + n_low) / 2
-        speed_ratio_new = n_new / self.design_speed
+        # speed_ratio_new = n_new / self.design_speed
         P = self.power_required(Q, n_new, water=water)
-        Pavail = self.power_available(n_new)
+        Pavail = self.driver.power(n_new * self.gear_ratio)
         while not (-0.1 < Pavail - P < 0.1):
             gap_new = Pavail - P
             if gap_new < 0:
-                n_high = n_new
-            else:
                 n_low = n_new
+            else:
+                n_high = n_new
             n_new = (n_high + n_low) / 2
-            speed_ratio_new = n_new / self.design_speed
+            # speed_ratio_new = n_new / self.design_speed
             P = self.power_required(Q, n_new, water=water)
-            Pavail = self.power_available(n_new)
+            Pavail = self.driver.power(n_new * self.gear_ratio)
+            if n_low/n_high > 0.999:
+                break
         return n_new
 
     def point(self, Q, water=False):
