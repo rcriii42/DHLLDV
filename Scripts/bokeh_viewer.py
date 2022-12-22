@@ -295,22 +295,13 @@ def D50_adjust_proportionate(delta):
     if DHLLDV_framework.pseudo_dlim(slurry.Dp, slurry.nu, slurry.rhol, slurry.rhos)*1000 <\
             slurry.D50*1000 + delta <=\
             slurry.Dp * 1000 * 0.25:
-        D85_input.remove_on_change('value', update_D85)
-        D50_input.remove_on_change('value', update_D50)
-        D15_input.remove_on_change('value', update_D15)
         slurry.D50 += delta / 1000
         D15_ratio = slurry.get_dx(0.50) / slurry.get_dx(0.15)
         if slurry.D50 / D15_ratio < 0.04/1000:
             D15_ratio = slurry.D50 / (0.04/1000)
         slurry.generate_GSD(D15_ratio)
         update_source_data()
-        D85_input.value = f"{slurry.get_dx(0.85) * 1000:0.3f}"
-        D50_input.value = f"{slurry.get_dx(0.50) * 1000:0.3f}"
-        D15_input.value = f"{slurry.get_dx(0.15) * 1000:0.3f}"
 
-        D15_input.on_change('value', update_D15)
-        D50_input.on_change('value', update_D50)
-        D85_input.on_change('value', update_D85)
 
 def D50_up_callback():
     D50_adjust_proportionate(0.1)
