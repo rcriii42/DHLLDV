@@ -210,6 +210,8 @@ class Slurry():
         """Get the grain size associated with the given frac
 
         TODO: To be fancy, could override self._GSD.__getitem__"""
+        if self.GSD_curves_dirty:
+            self.generate_GSD()
         if frac <= 0 or frac >= 1.0:
             raise ValueError(f'Invalid fraction {frac}, must be in the range 0.0<frac<1.0')
         elif frac in self.GSD:
