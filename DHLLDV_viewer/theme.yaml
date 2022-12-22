@@ -1,4 +1,4 @@
 attrs:
-    Figure:
+    figure:
         background_fill_color: "whitesmoke"
         background_fill_alpha: 0.5
