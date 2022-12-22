@@ -104,13 +104,21 @@ class Pipeline():
         return [p for p in self.pipesections if isinstance(p, Pump)]
 
     def update_slurries(self):
+        """Update the dictionary of slurries by pipe diameter
+
+        If self._slurry.Dp is not in the pipeline, set it to the last pipe diameter"""
         self.slurries = {self._slurry.Dp: self.slurry}
+        count = 0
         for p in self.pipesections:
             if isinstance(p, Pipe) and p.diameter not in self.slurries:
                 self.slurries[p.diameter] = copy(self._slurry)
                 self.slurries[p.diameter].Dp = p.diameter
+            elif isinstance(p, Pipe) and p.diameter == self._slurry.Dp:
+                count += 1
             elif isinstance(p, Pump):
                 p.slurry = self.slurry
+        if count == 0:
+            self._slurry.Dp = self.pipesections[-1].diameter
 
     def calc_system_head(self, Q):
         """Calculate the system head for a pipeline
@@ -228,8 +236,8 @@ class Pipeline():
 
         def curvediff(q):
             """Return the difference in the curves at the given flow"""
-            im, _, _, pm = self.calc_system_head(q)
-            return im - pm
+            pipe_H, _, _, pump_H = self.calc_system_head(q)
+            return pipe_H - pump_H
         def curvediffprime(q):
             """Calculate the first derivative of the difference in curves"""
             return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
@@ -264,6 +272,8 @@ class Pipeline():
             if q1 <= 0:  # No intersection
                 q1 = 0.0
                 break
+            if q1 < min(flow_list) or q1 > max(flow_list):
+                raise ValueError("No operating point")
             delta = abs(q1 - q0)
             if delta < min_gap[2]:
                 min_gap = (q0, q1, delta)
