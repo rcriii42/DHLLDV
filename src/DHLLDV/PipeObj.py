@@ -192,58 +192,23 @@ class Pipeline():
         return result.x
 
     def find_operating_point(self, flow_list, precision=0.02):
-        """Find the operating point (intersection above qimin)
+        """Find the operating point (intersection above qimin) using scipy.optimize
 
-        flow_list is a list of flowrates (m3/sec) to consider
-        precision is the flow precision (m3/sec) to use
-        Return the operating point flow (m3/sec) or 0.0 if no intersection
-        """
-
-        def curvediff(q):
-            """Return the difference in the curves at the given flow"""
-            pipe_H, _, _, pump_H = self.calc_system_head(q)
-            return pipe_H - pump_H
-        def curvediffprime(q):
-            """Calculate the first derivative of the difference in curves"""
-            return (curvediff(q+precision/2) - curvediff(q-precision/2))/precision
-
-        Qimin = self.qimin(flow_list)
-        im, _, _, pm = self.calc_system_head(Qimin)
-        if pm == 0:
-            # No pumps
-            return 0
-        elif im > pm:
-            # There is no intersection or the intersection is to the left of Qimin
-            q0 = Qimin
-            q1 = max(q0 - curvediff(q0) / curvediffprime(q0), min(flow_list))
-        else:
-            indexmin = bisect.bisect_right(flow_list, Qimin)
-            q0 = flow_list[int((len(flow_list)+indexmin)/2)]
-            q1 = max(q0 - curvediff(q0)/curvediffprime(q0), Qimin)
-        delta = abs(q1 - q0)
-        iters = 1
-        min_gap = (q0, q1, delta)
-        while delta > precision / 10:
-            if iters > 15:
-                # If too many interations, increase precision and go back to previous best guess
-                precision *= 1.42
-                q0 = min_gap[1]
-                q1 = (min_gap[0] + min_gap[1])/2
-            else:
-                q0 = q1
-                q1 = q0 - curvediff(q0)/curvediffprime(q0)
-            iters += 1
-            # print(f'Pipeline.find_operating_point: iter: {iters} q0: {q0:0.3f} q1: {q1:0.3f} delta: {abs(q1 - q0):0.4f}')
-            if q1 <= 0:  # No intersection
-                q1 = 0.0
-                break
-            if q1 < min(flow_list) or q1 > max(flow_list):
-                raise ValueError("No operating point")
-            delta = abs(q1 - q0)
-            if delta < min_gap[2]:
-                min_gap = (q0, q1, delta)
-
-        return q1
+                flow_list is a list of flowrates (m3/sec) to consider
+                precision is the flow precision (m3/sec) to use
+                Return the operating point flow (m3/sec) or qimin if no intersection
+                """
+        qimin = self.qimin(flow_list)
+        imins = self.calc_system_head(qimin)
+        if imins[0] > imins[3]:
+            return qimin
+        def _head_gap(q):
+            """Wrapper to return the pipe - pump head gap at a certain flow"""
+            Htot_m, _, _, Hpumps_m = self.calc_system_head(q)
+            return Htot_m - Hpumps_m
+        result = scipy.optimize.root_scalar(_head_gap, x0=qimin, x1=(qimin + flow_list[-1])/2)
+        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
+        return result.root
 
     def hydraulic_gradient(self, Q):
         """Calculate the hydraulic gradient of the pipe at the given flow
