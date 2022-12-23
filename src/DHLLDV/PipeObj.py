@@ -186,7 +186,7 @@ class Pipeline():
             """Wrapper that returns only the slurry system head"""
             return self.calc_system_head(Q)[0]
         result = scipy.optimize.minimize_scalar(_system_head,
-                                              bounds=[lower_bound, flow_list[-1]*2],
+                                              bounds=[lower_bound, flow_list[-1]],
                                               method='Bounded')
         print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters')
         return result.x
