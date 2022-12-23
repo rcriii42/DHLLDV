@@ -8,6 +8,7 @@ from copy import copy
 from dataclasses import dataclass
 from math import pi
 
+import scipy.optimize
 from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
@@ -170,61 +171,25 @@ class Pipeline():
                 Hpumps_l,                                           # Pump head slurry
                 Hpumps_m)                                           # Pump head fluid
 
+
     def qimin(self, flow_list, precision = 0.02):
-        """Find the minimum friction point in the slurry system using Newtons method
+        """Find the minimum friction point in the slurry system using scipy.optimize.minimize_scalar
 
         flow_list is a list of flowrates (m3/sec) to consider
         precision is the flow precision (m3/sec) to use"""
-        iters = 1
-        mid = int(len(flow_list)/2)
-        q0 = flow_list[mid]
-        def imprime(q):
-            """Calculate the first derivative of im at the given flow"""
-            return (self.calc_system_head(q+precision/2)[0] - self.calc_system_head(q-precision/2)[0])/precision
-        def imprime2(q):
-            """Calculate the second derivative of im at the given flow"""
-            return (imprime(q+precision/2) - imprime(q-precision/2))/precision
-
-        # print(f'Pipeline.qimin: iter: {iters} q0: {q0:0.3f}')
-        q1 = q0 - imprime(q0)/imprime2(q0)
-        while abs(q1-q0) > precision/10:
-            if not (flow_list[0] < q1 < flow_list[-1]):
-                print(f"Pipeline.qimin, found no minimum in {iters} iterations, trying bisection")
-                q1 = self.qimin_bisect(flow_list, precision)
-                break
-            q0 = q1
-            # print(f'Pipeline.qimin: iter: {iters} q0: {q0:0.3f} q1: {q1:0.3f}')
-            q1 = q0 - imprime(q0) / imprime2(q0)
-
-            iters += 1
-        # print(f"Pipeline.qimin found minima at {q1:0.3f} m3/sec in {iters} iterations")
-        return q1
-
-    def qimin_bisect(self, flow_list, precision = 0.02):
-        """Find the minimum friction point in the slurry system using bisection
-
-               flow_list is a list of flowrates (m3/sec) to consider
-               precision is the flow precision (m3/sec) to use"""
-        iters = 1
-        q0 = flow_list[-2]  # Positive derivative
-        q1 = flow_list[1]   # Negative
-
-        def imprime(q):
-            """Calculate the first derivative of im at the given flow"""
-            return (self.calc_system_head(q+precision/2)[0] - self.calc_system_head(q-precision/2)[0])/precision
-
-        while abs(q1 - q0) > precision / 10:
-            qnext = (q0 + q1)/2
-            imp = imprime(qnext)
-            if imp < 0:
-                q1 = qnext
-            elif imp > 0:
-                q0 = qnext
-            else:   # Derivative 0, minimum?
-                break
-            iters += 1
-        # print(f"Pipeline.qimin_bisect found minima at {q1:0.3f} m3/sec in {iters} iterations")
-        return q1
+        if flow_list[0] <= 0:
+            lower_bound = flow_list[1] * 0.1
+        else:
+            lower_bound = flow_list[0] * 0.1
+        bounds = [lower_bound, flow_list[-1]*2]
+        def _system_head(Q):
+            """Wrapper that returns only the slurry system head"""
+            return self.calc_system_head(Q)[0]
+        result = scipy.optimize.minimize_scalar(_system_head,
+                                              bounds=[lower_bound, flow_list[-1]*2],
+                                              method='Bounded')
+        print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters')
+        return result.x
 
     def find_operating_point(self, flow_list, precision=0.02):
         """Find the operating point (intersection above qimin)
