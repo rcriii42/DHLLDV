@@ -184,14 +184,15 @@ class Pipeline():
             lower_bound = flow_list[1] * 0.1
         else:
             lower_bound = flow_list[0] * 0.1
-        bounds = [lower_bound, flow_list[-1]*2]
+        bounds = [lower_bound, flow_list[-1]]
         def _system_head(Q):
             """Wrapper that returns only the slurry system head"""
             return self.calc_system_head(Q)[0]
         result = scipy.optimize.minimize_scalar(_system_head,
                                               bounds=[lower_bound, flow_list[-1]],
                                               method='Bounded')
-        # print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters')
+        print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters. '
+              f'Message: {result.message}')
         return result.x
 
     def find_operating_point(self, flow_list, precision=0.02):

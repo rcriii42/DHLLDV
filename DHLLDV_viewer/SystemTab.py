@@ -370,6 +370,7 @@ def system_panel(PL):
 
     def update_opcol(pipeline):
         """Update the operating point boxes"""
+        flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
         qimin = pipeline.qimin(flow_list)
         imin_row = opcol.children[2].children
         imin_row[0].title = f"Q ({unit_labels['flow']})"
