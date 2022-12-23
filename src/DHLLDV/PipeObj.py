@@ -191,8 +191,8 @@ class Pipeline():
         result = scipy.optimize.minimize_scalar(_system_head,
                                               bounds=[lower_bound, flow_list[-1]],
                                               method='Bounded')
-        print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters. '
-              f'Message: {result.message}')
+        # print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters. '
+        #       f'Message: {result.message}')
         return result.x
 
     def find_operating_point(self, flow_list, precision=0.02):
