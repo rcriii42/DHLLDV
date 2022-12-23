@@ -166,10 +166,10 @@ class Pipeline():
         Htot_m = Hfric_m + Hfit_m + Hz_m + Hv * self.slurry.rhom
         Htot_l = Hfric_l + Hfit_l + Hz_l + Hv * self.slurry.rhol
 
-        return (Htot_m, # System (pipeline) head losses slurry
-                Htot_l, # System (pipeline) head losses fluid
-                Hpumps_l,                                           # Pump head slurry
-                Hpumps_m)                                           # Pump head fluid
+        return (Htot_m,     # System (pipeline) head losses slurry
+                Htot_l,     # System (pipeline) head losses fluid
+                Hpumps_l,   # Pump head slurry
+                Hpumps_m)   # Pump head fluid
 
 
     def qimin(self, flow_list, precision = 0.02):
@@ -188,7 +188,7 @@ class Pipeline():
         result = scipy.optimize.minimize_scalar(_system_head,
                                               bounds=[lower_bound, flow_list[-1]],
                                               method='Bounded')
-        print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters')
+        # print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters')
         return result.x
 
     def find_operating_point(self, flow_list, precision=0.02):
