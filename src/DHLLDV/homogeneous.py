@@ -14,6 +14,7 @@ from .DHLLDV_constants import gravity, musf, particle_ratio
 Acv = 3.0   # coefficient homogeneous regime, see note after Eqn 8.7-8
 kvK = 0.4   # von Karman constant
 
+@functools.lru_cache(maxsize=1200)
 def pipe_reynolds_number(vls, Dp, nu):
     """
     Return the reynolds number for the given velocity, fluid & pipe
