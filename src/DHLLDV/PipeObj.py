@@ -13,6 +13,9 @@ from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 
+class OperatingPointError(Exception):
+    """The pipeline has no operating point"""
+
 
 @dataclass
 class Pipe():
@@ -201,14 +204,17 @@ class Pipeline():
         qimin = self.qimin(flow_list)
         imins = self.calc_system_head(qimin)
         if imins[0] > imins[3]:
-            return qimin
+            raise OperatingPointError('Pump curve below system curve at qimin')
         def _head_gap(q):
             """Wrapper to return the pipe - pump head gap at a certain flow"""
             Htot_m, _, _, Hpumps_m = self.calc_system_head(q)
             return Htot_m - Hpumps_m
         result = scipy.optimize.root_scalar(_head_gap, x0=qimin, x1=(qimin + flow_list[-1])/2)
         # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
-        return result.root
+        if result.converged:
+            return result.root
+        else:
+            raise OperatingPointError(f'{result.root:0.3e} is not an operating point. Flag: {result.flag}')
 
     def hydraulic_gradient(self, Q):
         """Calculate the hydraulic gradient of the pipe at the given flow
