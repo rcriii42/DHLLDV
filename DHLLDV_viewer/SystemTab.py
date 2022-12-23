@@ -5,7 +5,7 @@ Added by R. Ramsdell 01 September, 2021
 """
 import copy
 
-from DHLLDV.PipeObj import Pipeline, Pipe
+from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 from bokeh.layouts import column, row
@@ -220,15 +220,16 @@ def system_panel(PL):
                        TextInput(title=f"Power ({unit_labels['power']})", value=f"{pipe.avail_power*unit_convs['power']:0.0f}", width=76, background='lightblue'),)
             flow_pipe = Pipe(diameter=pipeline.slurry.Dp)
             flow_list = [flow_pipe.flow(v) for v in pipeline.slurry.vls_list]
-            qop = pipeline.find_operating_point(flow_list)
-            if qop > 0:
+            try:
+                qop = pipeline.find_operating_point(flow_list)
                 locs, heads, _ = pipeline.hydraulic_gradient(qop)
                 _, _, P, n = pipe.point(qop)
-                op_suction = f"{heads[i]*unit_convs['pressure']:0.1f}"
-                op_discharge = f"{heads[i+1]*unit_convs['pressure']:0.1f}"
-                op_power = f"{P*unit_convs['power']:0.0f}"
+                op_suction = f"{heads[i] * unit_convs['pressure']:0.1f}"
+                op_discharge = f"{heads[i + 1] * unit_convs['pressure']:0.1f}"
+                op_power = f"{P * unit_convs['power']:0.0f}"
                 op_speed = f"{n * unit_convs['rot speed']:0.0f}"
-            else:
+            except OperatingPointError as e:
+                print(f'pipe_panel: OperatingPointError: {e} for pipeline {pipeline.name}')
                 op_suction = f"N/A"
                 op_discharge = f"N/A"
                 op_power = f"N/A"
@@ -293,7 +294,8 @@ def system_panel(PL):
         vop = f'{pipeline.pipesections[-1].velocity(qop)*unit_convs["len"]:0.1f}'
         hop = f'{pipeline.calc_system_head(qop)[0]*unit_convs["len"]:0.1f}'
         prod = f'{pipeline.slurry.Cvi*qop*60*60*unit_convs["vol"]:0.0f}'
-    except ZeroDivisionError:
+    except OperatingPointError as e:
+        print(f'Creating pipline toals: OperatingPointError: {e} for pipeline {pipeline.name}')
         qop = qimin
         qop_str = "None"
         vop = "None"
@@ -382,7 +384,8 @@ def system_panel(PL):
             vop = f'{pipeline.pipesections[-1].velocity(qop)*unit_convs["len"]:0.1f}'
             hop = f'{pipeline.calc_system_head(qop)[0]*unit_convs["len"]:0.1f}'
             prod = f'{pipeline.slurry.Cvi * qop * 60 * 60 * unit_convs["vol"]:0.0f}'
-        except ZeroDivisionError:
+        except OperatingPointError as e:
+            print(f'update_opcol: OperatingPointError: {e} for pipeline {pipeline.name}')
             qop = qimin
             qop_str = "None"
             vop = "None"
