@@ -13,3 +13,5 @@ htmlcov/
 .idea/
 Book1.xls
 The Delft Head Loss & Limit Deposit Velocity Model.pdf
+/dist
+/build
