@@ -19,9 +19,8 @@ The spreadsheet should have sheets with the following properties:
         - flow is in m3/sec
         - head is in m.w.c
         - power is in kW
-- One or more worksheets matching a pump sheet, with the pump name followed by a space and the word 'driver' (not
-  case-sensitive)in the sheet name. For example, if the pump tab is named "SomePump", then the driver will be
-  'SomePump Driver'.
+- One or more worksheets matching a pump sheet, with the word pump replaced by the word 'driver' (not case-sensitive)
+  in the sheet name. For example, if the pump tab is named "SomePump", then the driver will be 'SomeDriver'.
     - Has named ranges 'SomePump Driver'!['driver_name', 'gear_ratio', 'power_curve']
     - driver_name is any valid python string (be careful of escape sequences)
     - gear_ratio is the pump speed divided by the maximum/rated engine speed
@@ -32,10 +31,19 @@ The spreadsheet should have sheets with the following properties:
 """
 import openpyxl
 
+from DHLLDV.PumpObj import Pump
 
-def load_pump_from_worksheet(wb, sheet_id):
-    """Create a pump object from a pump worksheet"""
-    ...
+
+def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
+    """Create a pump object from a pump worksheet
+    wb: The workbook to load
+    sheet_id: The id of the pump sheet in the sheet list
+    """
+    sheet_name = wb.sheetnames[sheet_id]
+    print(f'load_pump_from_worksheet: {sheet_name}')
+    name_cell = wb.defined_names.get('pump_name', sheet_id).value.split("!")[1]
+    pump_name = wb[sheet_name][name_cell].value
+    return pump_name
 
 
 if __name__ == "__main__":
@@ -45,14 +53,17 @@ if __name__ == "__main__":
     print(wb.sheetnames)                        # Names of worksheets
     for ws_name in wb.sheetnames:
         sheet_id = wb.sheetnames.index(ws_name)       # The id / index of a worksheet
+        ret_val = ''
         if 'pipeline' in ws_name.lower():
             input_type = 'pipeline'
 
         elif 'pump' in ws_name.lower():
             input_type = 'pump'
+            ret_val = load_pump_from_worksheet(wb, sheet_id)
         elif 'driver' in ws_name.lower():
             input_type = 'driver'
         else:
             input_type = ws_name
         print(f'{sheet_id} {input_type}: {wb[ws_name]}')        # Accessing individual worksheets
         print(wb.defined_names.localnames(sheet_id))  # Range names in a worksheet
+        print(ret_val)
