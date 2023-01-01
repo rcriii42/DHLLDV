@@ -34,6 +34,13 @@ import openpyxl
 from DHLLDV.PumpObj import Pump
 
 
+def get_range_value(wb: openpyxl.Workbook, sheet_id: int, range_name: str):
+    """Get the value from the given range on the given sheet"""
+    sheet_name = wb.sheetnames[sheet_id]
+    name_cell = wb.defined_names.get(range_name, sheet_id).value.split("!")[1]
+    return wb[sheet_name][name_cell].value
+
+
 def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     """Create a pump object from a pump worksheet
     wb: The workbook to load
