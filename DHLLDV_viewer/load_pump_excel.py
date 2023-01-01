@@ -46,17 +46,19 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     wb: The workbook to load
     sheet_id: The id of the pump sheet in the sheet list
     """
-    sheet_name = wb.sheetnames[sheet_id]
-    print(f'load_pump_from_worksheet: {sheet_name}')
-    name_cell = wb.defined_names.get('pump_name', sheet_id).value.split("!")[1]
-    pump_name = wb[sheet_name][name_cell].value
-    return pump_name
+    single_values = {'pump_name': str,
+                     'impeller': float,
+                     'suction': float,
+                     'discharge': float,
+                     'limited': str,
+                     'avail_power': float,}
+    return {(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()}
 
 
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
 
-    wb = openpyxl.load_workbook(filename=fname) # Loading a workbook
+    wb = openpyxl.load_workbook(filename=fname, data_only=True) # Loading a workbook
     print(wb.sheetnames)                        # Names of worksheets
     for ws_name in wb.sheetnames:
         sheet_id = wb.sheetnames.index(ws_name)       # The id / index of a worksheet
