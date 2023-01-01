@@ -6,14 +6,16 @@ The spreadsheet should have sheets with the following properties:
 - All values are in metric units (m, Hz, kW, m3/sec)
 - Sheets without 'pipeline', 'pump, 'driver' in the name are ignored
 - One worksheet named 'Pipeline'
-    - Have a named range 'Pipeline!pipeline_name
+    - Have a named range 'Pipeline!name
 - One or more worksheets with the word 'pump' in the name
-    - Have named ranges SomePump!['pump_name', 'impeller', 'suction', 'discharge','speed', 'limited', 'avail_power',
-      'pump_curve']
-    - pump_name is any valid python string (be careful of escape sequences)
-    - impeller, suction, and discharge are in m
+    - Have named ranges SomePump!['name', 'design_impeller', 'suction_dia', 'disch_dia','design_speed', 'limited',
+    'gear_ratio', 'avail_power','pump_curve']
+    - name is any valid python string (be careful of escape sequences)
+    - design_impeller, suction_dia, and disch_dia are in m
     - speed is in Hz
     - The limited range can contain the value 'torque', 'power', or 'curve'
+    - avail_power is in kW
+    - gear_ratio is the pump speed divided by the maximum/rated engine speed
     - The pump_curve range has at least three columns and a header row:
         - Three of the columns have the word 'flow', 'head', or 'power' (not case sensitive) in the first row
         - flow is in m3/sec
@@ -21,9 +23,8 @@ The spreadsheet should have sheets with the following properties:
         - power is in kW
 - One or more worksheets matching a pump sheet, with the word pump replaced by the word 'driver' (not case-sensitive)
   in the sheet name. For example, if the pump tab is named "SomePump", then the driver will be 'SomeDriver'.
-    - Has named ranges 'SomePump Driver'!['driver_name', 'gear_ratio', 'power_curve']
-    - driver_name is any valid python string (be careful of escape sequences)
-    - gear_ratio is the pump speed divided by the maximum/rated engine speed
+    - Has named ranges 'SomePump Driver'![name', 'power_curve']
+    - name is any valid python string (be careful of escape sequences)
     - power_curve has at least two columns and a header row
         - Two of the columns have the word 'speed' and 'power' in the first row
         - speed is in Hz
@@ -32,13 +33,14 @@ The spreadsheet should have sheets with the following properties:
 import openpyxl
 
 from DHLLDV.PumpObj import Pump
+from DHLLDV.DHLLDV_Utils import interpDict
 
 
 def get_range_value(wb: openpyxl.Workbook, sheet_id: int, range_name: str):
     """Get the value from the given range on the given sheet"""
     sheet_name = wb.sheetnames[sheet_id]
-    name_cell = wb.defined_names.get(range_name, sheet_id).value.split("!")[1]
-    return wb[sheet_name][name_cell].value
+    sheet_addr = wb.defined_names.get(range_name, sheet_id).value.split("!")[1]
+    return wb[sheet_name][sheet_addr].value
 
 
 def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
@@ -46,26 +48,52 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     wb: The workbook to load
     sheet_id: The id of the pump sheet in the sheet list
     """
-    single_values = {'pump_name': str,
-                     'impeller': float,
-                     'suction': float,
-                     'discharge': float,
+    single_values = {'name': str,
+                     'design_impeller': float,
+                     'suction_dia': float,
+                     'disch_dia': float,
+                     'design_speed': float,
                      'limited': str,
-                     'avail_power': float,}
-    return {(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()}
+                     'gear_ratio': float,
+                     'avail_power': float,
+                     }
+
+    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()])
+    my_range = wb.defined_names.get('pump_curve', sheet_id)
+    sheet_name = wb.sheetnames[sheet_id]
+    flow_col = None
+    head_col = None
+    power_col = None
+    cell_range = next(my_range.destinations)  # returns a generator of (worksheet title, cell range) tuples
+    rows = wb[sheet_name][cell_range[1]]
+    QH = {}
+    QP = {}
+    for row in rows:
+        vals = [c.value for c in row]
+        if flow_col is None:    # Assume the first row is a header
+            flow_col = next(i for i, c in enumerate(vals) if 'flow' in c.lower())
+            head_col = next(i for i, c in enumerate(vals) if 'head' in c.lower())
+            power_col = next(i for i, c in enumerate(vals) if 'power' in c.lower())
+            print(flow_col, head_col, power_col)
+        else:
+            QH[float(vals[flow_col])] = float(vals[head_col])
+            QP[float(vals[flow_col])] = float(vals[power_col])
+    params['design_QH_curve'] = interpDict(QH)
+    params['design_QP_curve'] = interpDict(QP)
+    return Pump(**params)
 
 
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
 
-    wb = openpyxl.load_workbook(filename=fname, data_only=True) # Loading a workbook
-    print(wb.sheetnames)                        # Names of worksheets
+    wb = openpyxl.load_workbook(filename=fname, data_only=True) # Loading a workbook, data_only takes the stored values
     for ws_name in wb.sheetnames:
         sheet_id = wb.sheetnames.index(ws_name)       # The id / index of a worksheet
         ret_val = ''
         if 'pipeline' in ws_name.lower():
             input_type = 'pipeline'
-
+            pipeline_name = get_range_value(wb, sheet_id, 'name')
+            print(f'Pipeline: {pipeline_name}')
         elif 'pump' in ws_name.lower():
             input_type = 'pump'
             ret_val = load_pump_from_worksheet(wb, sheet_id)
