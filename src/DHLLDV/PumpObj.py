@@ -36,6 +36,8 @@ class Pump():
         self._max_driver_speed = self.design_speed  # The speed at max power or the power curve basis
         self.design_QH_curve.extrapolate_high = True
         self.design_QP_curve.extrapolate_high = True
+        if self.limited != 'curve':
+            self.driver_name = f'{self.limited} driver {self.avail_power:0.1f} at {self.design_speed:0.3f}'
 
     def efficiency(self, q):
         """Return the efficiency of the pump based on the current speed"""
