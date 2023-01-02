@@ -5,18 +5,24 @@ Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab 
 
 Added by R. Ramsdell 19 August, 2021
 """
+import base64
+import io
 import sys
+
+import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
+from bokeh.models.widgets import FileInput
 from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
 
 import SystemTab
+import load_pump_excel
 
 # Set up data
 
@@ -505,11 +511,26 @@ unit_picker = Dropdown(label='SI Units', menu=[('SI', 'SI'),
 unit_picker.on_click(choose_units)
 
 
+def upload_xl_data(attr, old, new):
+    print(f"Uploaded: {file_input} {file_input.filename}")
+    global pipeline
+    global slurry
+    excel = io.BytesIO(base64.b64decode(file_input.value))
+    pipeline = load_pump_excel.load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
+    slurry = pipeline.slurry
+    pipeline_dropdown.label = "Pipeline: " + pipeline.name
+    SystemTab.setups[pipeline.name] = pipeline
+    pipeline_dropdown.menu=[(s, s) for s in SystemTab.setups.keys()]
+    update_source_data()
+file_input = FileInput(accept=".xls, .xlsm, .xlsx")
+file_input.on_change('filename', upload_xl_data)
+
+
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
 
 tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
 tabbed_panels.active = 1
-top_row = row(pipeline_dropdown, unit_picker, stop_button)
+top_row = row(pipeline_dropdown, unit_picker, file_input, stop_button)
 curdoc().add_root(column(top_row,
                          tabbed_panels))
 
