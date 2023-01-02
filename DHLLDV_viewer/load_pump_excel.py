@@ -15,6 +15,13 @@ The spreadsheet should have sheets with the following properties:
         - Length: The pipe length in m
         - Total K: The total of fitting k-factors for this section of pipe
         - Elev Change: The change in elevation for this section of pipe, in m
+- One worksheet named 'Slurry'
+    - Have named ranges Slurry!['name', 'Cv', 'd_15', 'd_50', 'd_85', 'fluid', 'pipe_dia', 'rhoi', 'rhos']
+    - d_15, d_50, d_85 are diameters in mm
+    - pipe_dia is in m
+    - fluid is 'salt' or 'fresh'
+    - rhos is the solids density in ton/m3
+    - rhoi is the insitu density in ton/m3
 - One or more worksheets whose name ends in the word 'pump'
     - Have named ranges SomePump!['name', 'design_impeller', 'suction_dia', 'disch_dia','design_speed', 'limited',
     'gear_ratio', 'avail_power','pump_curve']
@@ -43,6 +50,7 @@ import openpyxl
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
 from DHLLDV.PipeObj import Pipe, Pipeline
+from DHLLDV.SlurryObj import Slurry
 from DHLLDV.DHLLDV_Utils import interpDict
 
 
@@ -134,6 +142,8 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
             pump_sheets[ws_name.lower().removesuffix('pump')] = sheet_id
         elif 'driver' in ws_name.lower():
             driver_sheets[ws_name.lower().removesuffix('driver')] = sheet_id
+        elif 'slurry' in ws_name.lower():
+            slurry = load_slurry_from_workbook(wb, sheet_id)
         else:
             ...
     pumps = {}
@@ -169,7 +179,37 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
                               length=float(vals[len_col]),
                               total_K=float(vals[k_col]),
                               elev_change=float(vals[dz_col])))
-    return Pipeline(name=pipeline_name)
+    return Pipeline(name=pipeline_name, slurry=slurry)
+
+
+def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
+    """Load the slurry defined on the 'Slurry' tab of the given workbook
+
+    wb: The workbook with the data
+    sheet_id: The id of the Slurry tab"""
+    single_values = {'name': str,
+                     'pipe_dia': float,
+                     'd_15': float,
+                     'd_50': float,
+                     'd_85': float,
+                     'fluid': str,
+                     'Cv': float,
+                     'rhos': float,
+                     'rhoi': float
+                     }
+
+    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()])
+    s = Slurry(name=params['name'],
+               Dp=params['pipe_dia'],
+               D50=params['d_50']/1000,
+               fluid=params['fluid'],
+               Cv=params['Cv'],
+               )
+    s.generate_GSD(d15_ratio=params['d_50']/params['d_15'],
+                   d85_ratio=params['d_85']/params['d_50'])
+    s.rhos = params['rhos']
+    s.rhoi = params['rhoi']
+    return s
 
 
 if __name__ == "__main__":
@@ -191,6 +231,9 @@ if __name__ == "__main__":
         elif 'driver' in ws_name.lower():
             input_type = 'driver'
             drivers[ws_name.lower().removesuffix('driver')] = sheet_id
+        elif 'slurry'in ws_name.lower():
+            input_type = 'slurry'
+            ret_val = load_slurry_from_workbook(wb, sheet_id)
         else:
             input_type = ws_name
         print(f'{sheet_id} {input_type}: {wb[ws_name]}')        # Accessing individual worksheets
