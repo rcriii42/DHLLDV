@@ -225,19 +225,63 @@ if __name__ == "__main__":
         if 'pipeline' in ws_name.lower():
             input_type = 'pipeline'
             pipeline_name = get_range_value(wb, sheet_id, 'name')
-            ret_val = load_pipeline_from_workbook(wb)
-        elif 'pump' in ws_name.lower():
-            input_type = 'pump'
-            pumps[ws_name.lower().removesuffix('pump')] = sheet_id
-        elif 'driver' in ws_name.lower():
-            input_type = 'driver'
-            drivers[ws_name.lower().removesuffix('driver')] = sheet_id
-        elif 'slurry'in ws_name.lower():
-            input_type = 'slurry'
-            ret_val = load_slurry_from_workbook(wb, sheet_id)
-        else:
-            input_type = ws_name
-        print(f'{sheet_id} {input_type}: {wb[ws_name]}')        # Accessing individual worksheets
-        print(wb.defined_names.localnames(sheet_id))  # Range names in a worksheet
-        print(ret_val)
+            pipeline = load_pipeline_from_workbook(wb)
 
+
+    print(pipeline)
+
+    try:
+        import sys
+        import matplotlib.pyplot as plt
+    except:
+        print('matplotlib not found')
+        plt = None
+        sys.exit()
+
+
+    fig = plt.figure(figsize=(11, 7.5))
+    flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+    flow = 4.0
+    for i, pl in enumerate([pipeline]):
+        s = pl.slurry
+        sp_num = (len(pl.pumps)+1)*100 + 10 + (i + 1)
+        head_lists = list(zip(*[pl.calc_system_head(Q) for Q in flow_list]))
+
+        HQ_title = f'{pl.name}: length = {pl.total_length:0.0f} Dp={s.Dp*1000:0.0f}mm, d50={s.D50*1000:0.2f}mm, ' \
+                   f'Rsd={s.Rsd:0.3f}, Cv={s.Cv:0.3f}, rhom={s.rhom:0.3f}'
+        HQ_plot = fig.add_subplot(sp_num, title=HQ_title, xlim=(0,flow_list[-1]), ylim=(0,head_lists[0][-1]))
+        HQ_plot.plot(flow_list, head_lists[0], linewidth=2, linestyle='--', color='black', label="System Cvt=c")
+        HQ_plot.plot(flow_list, head_lists[1], linewidth=1, linestyle='--', color='blue', label="System Fluid")
+        HQ_plot.plot(flow_list, head_lists[2], linewidth=1, linestyle='-', color='blue', label="Pump Fluid")
+        HQ_plot.plot(flow_list, head_lists[3], linewidth=2, linestyle='-', color='black', label="Pump Cvt=c")
+        HQ_plot.grid(visible=True, which='both')
+        legend = HQ_plot.legend()
+        for label in legend.get_texts():
+            label.set_fontsize('small')
+        for j, pump in enumerate(pl.pumps):
+            print(pump.name)
+            sp_num += 1
+            if pump.limited == 'curve':
+                speed_list = [k/pump.gear_ratio for k in pump.driver.design_power_curve.keys()]
+            else:
+                speed_list = [pump.design_speed*x/10 for x in range(2, 11)]
+
+            req_list = [pump.power_required(flow, n) for n in speed_list]
+            avail_list = [pump.power_available(n) for n in speed_list]
+            PN_title = f'{pump.driver_name} at Q = {flow:0.3f} m3/sec'
+            PN_plot = fig.add_subplot(sp_num, title=PN_title, xlim=(0, speed_list[-1]*1.1))
+            PN_plot.plot(speed_list, req_list, linewidth=2, linestyle='--', color='black', label="Power required")
+            PN_plot.plot(speed_list, avail_list, linewidth=2, linestyle='-', color='black', label="Pump available")
+            PN_plot.grid(visible=True, which='both')
+            legend = PN_plot.legend()
+            for label in legend.get_texts():
+                label.set_fontsize('small')
+
+
+
+
+    plt.tight_layout()
+    plt.show()
+
+    print(pipeline.calc_system_head(flow))
+    print(pipeline.pumps[1].point(flow))
