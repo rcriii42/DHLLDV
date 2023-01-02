@@ -53,6 +53,13 @@ class Pipeline():
                                  Pipe('Discharge', slurry.Dp, 1000, 1.0, 1.5)]
         self.slurry = slurry
 
+    def __str__(self):
+        s = [f'Pipeline: {self.name}',
+             f'Length: {self.total_length:0.0f}',
+             f'Number of Pumps: {self.num_pumps}']
+        s.extend([f'{p}' for p in self.pipesections])
+        return '\n'.join(s)
+
     @property
     def num_pipesections(self):
         """The total number of pipesections"""
@@ -76,7 +83,7 @@ class Pipeline():
     @property
     def num_pumps(self):
         """The total length of pipesections"""
-        return len([p for p in self.pipesections if isinstance(p, Pump)])
+        return len(self.pumps)
 
     @property
     def total_power(self):
