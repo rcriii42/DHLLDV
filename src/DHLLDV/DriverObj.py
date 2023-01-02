@@ -26,3 +26,8 @@ class Driver():
     def design_power(self):
         """Return the power (kW) at the maximum speed"""
         return self.power(self.design_speed)
+
+    @property
+    def minimum_speed(self):
+        """Return the minimum speed of the driver"""
+        return min(self.design_power_curve.keys())
