@@ -81,7 +81,7 @@ def load_driver_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
             power_col = next(i for i, c in enumerate(vals) if 'power' in c.lower())
         else:
             curve[float(vals[speed_col])] = float(vals[power_col])
-    params['design_power_curve'] = curve
+    params['design_power_curve'] = interpDict(curve)
     return Driver(**params)
 
 
