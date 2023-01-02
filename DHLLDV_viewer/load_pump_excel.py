@@ -45,6 +45,7 @@ The spreadsheet should have sheets with the following properties:
         - speed is in Hz
         - power is in kW
 """
+import copy
 import openpyxl
 
 from DHLLDV.DriverObj import Driver
@@ -172,14 +173,14 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
                                                               'change' in c.lower()]))
         elif 'pump' in vals[name_col].lower():
             pump_name = vals[name_col].lower().removesuffix('pump')
-            pipes.append(pumps[pump_name])
+            pipes.append(copy.copy(pumps[pump_name]))
         else:
             pipes.append(Pipe(name=vals[name_col],
                               diameter=float(vals[dia_col]),
                               length=float(vals[len_col]),
                               total_K=float(vals[k_col]),
                               elev_change=float(vals[dz_col])))
-    return Pipeline(name=pipeline_name, slurry=slurry)
+    return Pipeline(name=pipeline_name, pipe_list=pipes, slurry=slurry)
 
 
 def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
