@@ -164,11 +164,25 @@ class Pump():
         water is True if calculating for the carrier fluid, False if for slurry
         """
         def _power_gap(n):
-            """Wrapper to return the req - avail power gap at a certain speed"""
+            """Wrapper to return the avail - required power gap at a certain speed"""
             return self.power_required(Q, n, water=water) - self.power_available(n)
+            return self.power_available(n) - self.power_required(Q, n, water=water)
+
+        if _power_gap(self.design_speed) >= 0:
+            return self.design_speed
 
         result = scipy.optimize.root_scalar(_power_gap, bracket=[self.driver.minimum_speed/self.gear_ratio,
                                                                  self.design_speed])
+        speeds = reversed([p/self.gear_ratio for p in self.driver.design_power_curve.keys()])
+
+        n_high = next(speeds)
+        n_low = next(speeds)
+        while _power_gap(n_low) < 0:
+            n_high = n_low
+            n_low = next(speeds)
+
+        result = scipy.optimize.root_scalar(_power_gap,
+                                            bracket=[n_low, n_high])
         # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
         if result.converged:
             return result.root
