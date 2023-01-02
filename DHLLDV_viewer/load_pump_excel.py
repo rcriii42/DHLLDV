@@ -6,7 +6,15 @@ The spreadsheet should have sheets with the following properties:
 - All values are in metric units (m, Hz, kW, m3/sec)
 - Sheets without 'pipeline', 'pump, 'driver' in the name are ignored
 - One worksheet named 'Pipeline'
-    - Have a named range 'Pipeline!name
+    - Have a named range Pipeline!name
+    - Have a named range Pipeline!pipe_table with a header row and the following columns:
+        - Pipe Name: The name of the pipesection or pump
+            - If this is a pipesection, any valid string not containing the word 'pump'
+            - If a pump, the name of the tab defining the pump (for pumps the other columns are ignored)
+        - Diameter: The pipe diameter in m
+        - Length: The pipe length in m
+        - Total K: The total of fitting k-factors for this section of pipe
+        - Elev Change: The change in elevation for this section of pipe, in m
 - One or more worksheets whose name ends in the word 'pump'
     - Have named ranges SomePump!['name', 'design_impeller', 'suction_dia', 'disch_dia','design_speed', 'limited',
     'gear_ratio', 'avail_power','pump_curve']
@@ -32,8 +40,9 @@ The spreadsheet should have sheets with the following properties:
 """
 import openpyxl
 
-from DHLLDV.PumpObj import Pump
 from DHLLDV.DriverObj import Driver
+from DHLLDV.PumpObj import Pump
+from DHLLDV.PipeObj import Pipe, Pipeline
 from DHLLDV.DHLLDV_Utils import interpDict
 
 
@@ -89,8 +98,8 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     flow_col = None
     head_col = None
     power_col = None
-    cell_range = next(my_range.destinations)  # returns a generator of (worksheet title, cell range) tuples
-    rows = wb[sheet_name][cell_range[1]]
+    cell_range = next(my_range.destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    rows = wb[sheet_name][cell_range]
     QH = {}
     QP = {}
     for row in rows:
@@ -110,6 +119,59 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     return Pump(**params)
 
 
+def load_pipeline_from_workbook(wb: openpyxl.Workbook):
+    """Create a pipeline object from a workbook
+    wb: The workbook to load
+    """
+    pump_sheets = {}
+    driver_sheets = {}
+    for ws_name in wb.sheetnames:
+        sheet_id = wb.sheetnames.index(ws_name)  # The id / index of a worksheet
+        if 'pipeline' in ws_name.lower():
+            pipeline_name = get_range_value(wb, sheet_id, 'name')
+            pipesheet_id = sheet_id
+        elif 'pump' in ws_name.lower():
+            pump_sheets[ws_name.lower().removesuffix('pump')] = sheet_id
+        elif 'driver' in ws_name.lower():
+            driver_sheets[ws_name.lower().removesuffix('driver')] = sheet_id
+        else:
+            ...
+    pumps = {}
+    for pump_name in pump_sheets:
+        pumps[pump_name] = load_pump_from_worksheet(wb, pump_sheets[pump_name], driver_sheets.get(pump_name))
+
+    my_range = wb.defined_names.get('pipe_table', pipesheet_id)
+    sheet_name = wb.sheetnames[pipesheet_id]
+    name_col = None
+    dia_col = None
+    len_col = None
+    k_col = None
+    dz_col = None
+    cell_range = next(my_range.destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    rows = wb[sheet_name][cell_range]
+    pipes = []
+    for row in rows:
+        vals = [c.value for c in row]
+        if name_col is None:  # Assume the first row is a header
+            name_col = next(i for i, c in enumerate(vals) if 'name' in c.lower())
+            dia_col = next(i for i, c in enumerate(vals) if 'dia' in c.lower())
+            len_col = next(i for i, c in enumerate(vals) if 'length' in c.lower())
+            k_col = next(i for i, c in enumerate(vals) if all(['total' in c.lower(),
+                                                              'k' in c.lower()]))
+            dz_col = next(i for i, c in enumerate(vals) if all(['elev' in c.lower(),
+                                                              'change' in c.lower()]))
+        elif 'pump' in vals[name_col].lower():
+            pump_name = vals[name_col].lower().removesuffix('pump')
+            pipes.append(pumps[pump_name])
+        else:
+            pipes.append(Pipe(name=vals[name_col],
+                              diameter=float(vals[dia_col]),
+                              length=float(vals[len_col]),
+                              total_K=float(vals[k_col]),
+                              elev_change=float(vals[dz_col])))
+    return Pipeline(name=pipeline_name)
+
+
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
 
@@ -122,7 +184,7 @@ if __name__ == "__main__":
         if 'pipeline' in ws_name.lower():
             input_type = 'pipeline'
             pipeline_name = get_range_value(wb, sheet_id, 'name')
-            print(f'Pipeline: {pipeline_name}')
+            ret_val = load_pipeline_from_workbook(wb)
         elif 'pump' in ws_name.lower():
             input_type = 'pump'
             pumps[ws_name.lower().removesuffix('pump')] = sheet_id
@@ -134,9 +196,4 @@ if __name__ == "__main__":
         print(f'{sheet_id} {input_type}: {wb[ws_name]}')        # Accessing individual worksheets
         print(wb.defined_names.localnames(sheet_id))  # Range names in a worksheet
         print(ret_val)
-    for pump_name in pumps:
-        print(pump_name)
-        if pump_name in drivers:
-            print(load_pump_from_worksheet(wb, pumps[pump_name], drivers[pump_name]))
-        else:
-            print(load_pump_from_worksheet(wb, pumps[pump_name], None))
+
