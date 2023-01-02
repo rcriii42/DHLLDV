@@ -5,6 +5,8 @@ Added by R. Ramsdell 03 September, 2021
 """
 from dataclasses import dataclass
 
+import scipy.optimize
+
 from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.DHLLDV_Utils import interpDict
 from DHLLDV.DriverObj import Driver
@@ -153,6 +155,26 @@ class Pump():
         return n_new
 
     def find_curve_limited_speed(self, Q, water=False):
+        return self.find_curve_limited_speed_root_scalar(Q, water)
+
+    def find_curve_limited_speed_root_scalar(self, Q, water=False):
+        """Find the pump speed (Hz) at the given flow if there is a power curve
+
+        Q is the flow rate in m3/sec
+        water is True if calculating for the carrier fluid, False if for slurry
+        """
+        def _power_gap(n):
+            """Wrapper to return the req - avail power gap at a certain speed"""
+            return self.power_required(Q, n, water=water) - self.power_available(n)
+
+        result = scipy.optimize.root_scalar(_power_gap, bracket=[self.driver.minimum_speed/self.gear_ratio,
+                                                                 self.design_speed])
+        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
+        if result.converged:
+            return result.root
+
+
+    def find_curve_limited_speed_old(self, Q, water=False):
         """Find the pump speed (Hz) at the given flow if there is a power curve
 
         Q is the flow rate in m3/sec
