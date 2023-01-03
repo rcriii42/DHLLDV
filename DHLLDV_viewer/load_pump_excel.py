@@ -4,31 +4,32 @@ The spreadsheet should have sheets with the following properties:
 - Names are _not_ case sensitive
 - All named ranges have worksheet scope
 - All values are in metric units (m, Hz, kW, m3/sec)
-- Sheets without 'pipeline', 'pump, 'driver' in the name are ignored
+- Sheets without 'pipeline', 'pump, 'driver', or 'slurry' in the name are ignored
 - One worksheet named 'Pipeline'
-    - Have a named range Pipeline!name
-    - Have a named range Pipeline!pipe_table with a header row and the following columns:
+    - Has a named range Pipeline!name
+    - Has a named range Pipeline!pipe_table with a header row and the following columns:
         - Pipe Name: The name of the pipesection or pump
             - If this is a pipesection, any valid string not containing the word 'pump'
-            - If a pump, the name of the tab defining the pump (for pumps the other columns are ignored)
+            - If a pump, the name of the tab defining the pump (for pumps the other columns are ignored). Note that if you
+              list a pump more than once, the proram will make copies, so you can reuse pump definitions.
         - Diameter: The pipe diameter in m
         - Length: The pipe length in m
         - Total K: The total of fitting k-factors for this section of pipe
         - Elev Change: The change in elevation for this section of pipe, in m
 - One worksheet named 'Slurry'
-    - Have named ranges Slurry!['name', 'Cv', 'd_15', 'd_50', 'd_85', 'fluid', 'pipe_dia', 'rhoi', 'rhos']
+    - Has named ranges Slurry!['name', 'Cv', 'd_15', 'd_50', 'd_85', 'fluid', 'pipe_dia', 'rhoi', 'rhos']
     - d_15, d_50, d_85 are diameters in mm
     - pipe_dia is in m
     - fluid is 'salt' or 'fresh'
     - rhos is the solids density in ton/m3
     - rhoi is the insitu density in ton/m3
 - One or more worksheets whose name ends in the word 'pump'
-    - Have named ranges SomePump!['name', 'design_impeller', 'suction_dia', 'disch_dia','design_speed', 'limited',
+    - Has named ranges SomePump!['name', 'design_impeller', 'suction_dia', 'disch_dia','design_speed', 'limited',
     'gear_ratio', 'avail_power','pump_curve']
     - name is any valid python string (be careful of escape sequences)
     - design_impeller, suction_dia, and disch_dia are in m
     - speed is in Hz
-    - The limited range can contain the value 'torque', 'power', or 'curve'
+    - The limited range can contain the string 'torque', 'power', or 'curve'
     - avail_power is in kW
     - gear_ratio is the pump speed divided by the maximum/rated engine speed
     - The pump_curve range has at least three columns and a header row:
