@@ -22,7 +22,7 @@ from bokeh.plotting import figure
 from DHLLDV import DHLLDV_framework
 
 import SystemTab
-import load_pump_excel
+from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
 
 # Set up data
 
@@ -524,11 +524,14 @@ def upload_xl_data(attr, old, new):
     global pipeline
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
-    pipeline = load_pump_excel.load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
-    slurry = pipeline.slurry
-    pipeline_dropdown.label = "Pipeline: " + pipeline.name
-    SystemTab.setups[pipeline.name] = pipeline
-    pipeline_dropdown.menu=[(s, s) for s in SystemTab.setups.keys()]
+    try:
+        pipeline = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
+        slurry = pipeline.slurry
+        pipeline_dropdown.label = "Pipeline: " + pipeline.name
+        SystemTab.setups[pipeline.name] = pipeline
+        pipeline_dropdown.menu=[(s, s) for s in SystemTab.setups.keys()]
+    except InvalidExcelError as e:
+        print(f'Error loading {file_input.filename}: {e}')
     update_source_data()
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
 file_input.on_change('filename', upload_xl_data)
