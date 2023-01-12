@@ -56,6 +56,10 @@ from DHLLDV.SlurryObj import Slurry
 from DHLLDV.DHLLDV_Utils import interpDict
 
 
+class InvalidExcelError(Exception):
+    """The user tried loading an improper Excel worksheet"""
+
+
 def get_range_value(wb: openpyxl.Workbook, sheet_id: int, range_name: str):
     """Get the value from the given range on the given sheet"""
     sheet_name = wb.sheetnames[sheet_id]
@@ -133,8 +137,11 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
     """Create a pipeline object from a workbook
     wb: The workbook to load
     """
+    pipesheet_id = False
+    slurry = False
     pump_sheets = {}
     driver_sheets = {}
+
     for ws_name in wb.sheetnames:
         sheet_id = wb.sheetnames.index(ws_name)  # The id / index of a worksheet
         if 'pipeline' in ws_name.lower():
@@ -148,6 +155,12 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
             slurry = load_slurry_from_workbook(wb, sheet_id)
         else:
             ...
+
+    if not pipesheet_id:
+        raise InvalidExcelError('Invalid Excel workbook: missing Pipeline tab')
+    if not slurry:
+        raise InvalidExcelError('Invalid Excel workbook: missing Slurry tab')
+
     pumps = {}
     for pump_name in pump_sheets:
         pumps[pump_name] = load_pump_from_worksheet(wb, pump_sheets[pump_name], driver_sheets.get(pump_name))
