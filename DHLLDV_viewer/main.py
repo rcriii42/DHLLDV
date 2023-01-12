@@ -1,7 +1,7 @@
 """
-bokeh_viewer: a program to view the curves in a bokeh interactive session
+DHLLDV_viewer: a program to view the curves in a bokeh interactive session
 
-Execute by running 'bokeh serve --show .\Scripts\bokeh_viewer.py' to open a tab in your browser
+Execute by running 'bokeh serve --show DHLLDV_viewer' to open a tab in your browser
 
 Added by R. Ramsdell 19 August, 2021
 """
