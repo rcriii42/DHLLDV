@@ -521,7 +521,6 @@ unit_picker.on_click(choose_units)
 
 
 def upload_xl_data(attr, old, new):
-    print(f"Uploaded: {file_input} {file_input.filename}")
     global pipeline
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
