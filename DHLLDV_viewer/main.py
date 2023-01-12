@@ -81,6 +81,15 @@ def update_source_data():
     update_inputs()
     sys_update(pipeline)
 
+    # Reset the file input
+    global file_input
+    if file_input.filename:
+        file_input.remove_on_change('filename', upload_xl_data)
+        del top_row.children[2]  # This deletes the file_input
+        file_input = FileInput(accept=".xls, .xlsm, .xlsx")
+        file_input.on_change('filename', upload_xl_data)
+        top_row.children.insert(2, file_input)
+
 
 ################
 # Set up HQ plot
