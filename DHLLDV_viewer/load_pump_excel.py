@@ -46,6 +46,7 @@ The spreadsheet should have sheets with the following properties:
         - speed is in Hz
         - power is in kW
 """
+
 import copy
 import openpyxl
 
@@ -54,6 +55,45 @@ from DHLLDV.PumpObj import Pump
 from DHLLDV.PipeObj import Pipe, Pipeline
 from DHLLDV.SlurryObj import Slurry
 from DHLLDV.DHLLDV_Utils import interpDict
+
+# The following dict defines the required tabs and fields for a valid excel spreadsheet
+# The keys are allowed/required tabs
+# The values are dicts with one key "required" that is true if the tab is required. The other keys are required defined
+# names whose values are the expected type of the contents. If the range is a table, the type is yet another dict, with
+# Column names and the type of data in the column
+excel_requireds = {'pipeline': {'required': True,
+                                'name': str,
+                                'pipe_table': {'name': str,
+                                               'dia': float,
+                                               'length': float,
+                                               ('total', 'k'): float,
+                                               ('elev', 'change'): float}},
+                   'slurry': {'required': True,
+                              'name': str,
+                              'pipe_dia': float,
+                              'd_15': float,
+                              'd_50': float,
+                              'd_85': float,
+                              'fluid': str,
+                              'Cv': float,
+                              'rhos': float,
+                              'rhoi': float
+                              },
+                   'pump': {'required': False,
+                            'name': str,
+                            'design_impeller': float,
+                            'suction_dia': float,
+                            'disch_dia': float,
+                            'design_speed': float,
+                            'limited': str,
+                            'gear_ratio': float,
+                            'avail_power': float,
+                            },
+                   'driver': {'required': False,
+                              'name': str,
+                              'power_curve': {'speed': float,
+                                              'power': float}}
+                   }
 
 
 class InvalidExcelError(Exception):
@@ -96,17 +136,9 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     sheet_id: The id of the pump sheet in the sheet list
     driver_id: The id of any driver in the sheet list, or None if no driver
     """
-    single_values = {'name': str,
-                     'design_impeller': float,
-                     'suction_dia': float,
-                     'disch_dia': float,
-                     'design_speed': float,
-                     'limited': str,
-                     'gear_ratio': float,
-                     'avail_power': float,
-                     }
+    single_values = excel_requireds['pump']
 
-    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()])
+    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items() if v in [str, int, float]])
     my_range = wb.defined_names.get('pump_curve', sheet_id)
     sheet_name = wb.sheetnames[sheet_id]
     flow_col = None
@@ -184,7 +216,7 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
             k_col = next(i for i, c in enumerate(vals) if all(['total' in c.lower(),
                                                               'k' in c.lower()]))
             dz_col = next(i for i, c in enumerate(vals) if all(['elev' in c.lower(),
-                                                              'change' in c.lower()]))
+                                                                'change' in c.lower()]))
         elif 'pump' in vals[name_col].lower():
             pump_name = vals[name_col].lower().removesuffix('pump')
             pipes.append(copy.copy(pumps[pump_name]))
@@ -202,18 +234,11 @@ def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
 
     wb: The workbook with the data
     sheet_id: The id of the Slurry tab"""
-    single_values = {'name': str,
-                     'pipe_dia': float,
-                     'd_15': float,
-                     'd_50': float,
-                     'd_85': float,
-                     'fluid': str,
-                     'Cv': float,
-                     'rhos': float,
-                     'rhoi': float
-                     }
+    single_values = excel_requireds['slurry']
 
-    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items()])
+    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items() if v in [str,
+                                                                                                       int,
+                                                                                                       float]])
     s = Slurry(name=params['name'],
                Dp=params['pipe_dia'],
                D50=params['d_50']/1000,
