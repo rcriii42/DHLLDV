@@ -169,6 +169,8 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
     """Create a pipeline object from a workbook
     wb: The workbook to load
     """
+    validate_excel(wb)
+
     pipesheet_id = False
     slurry = False
     pump_sheets = {}
@@ -187,11 +189,6 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
             slurry = load_slurry_from_workbook(wb, sheet_id)
         else:
             ...
-
-    if not pipesheet_id:
-        raise InvalidExcelError('Invalid Excel workbook: missing Pipeline tab')
-    if not slurry:
-        raise InvalidExcelError('Invalid Excel workbook: missing Slurry tab')
 
     pumps = {}
     for pump_name in pump_sheets:
@@ -250,6 +247,14 @@ def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
     s.rhos = params['rhos']
     s.rhoi = params['rhoi']
     return s
+
+
+def validate_excel(wb: openpyxl.workbook):
+    """Validate that the excel file has the correct tabs and defined ranges"""
+    for sheet_name, fields in excel_requireds.items():
+        present = [s for s in wb.sheetnames if sheet_name in s.lower()]
+        if fields['required'] and len(present) != 1:
+            raise InvalidExcelError(f'Workbook missing the {sheet_name} tab.')
 
 
 if __name__ == "__main__":
