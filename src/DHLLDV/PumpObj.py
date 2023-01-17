@@ -171,8 +171,6 @@ class Pump():
         if _power_gap(self.design_speed) >= 0:
             return self.design_speed
 
-        result = scipy.optimize.root_scalar(_power_gap, bracket=[self.driver.minimum_speed/self.gear_ratio,
-                                                                 self.design_speed])
         speeds = reversed([p/self.gear_ratio for p in self.driver.design_power_curve.keys()])
 
         n_high = next(speeds)
