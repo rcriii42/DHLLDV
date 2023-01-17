@@ -165,7 +165,6 @@ class Pump():
         """
         def _power_gap(n):
             """Wrapper to return the avail - required power gap at a certain speed"""
-            return self.power_required(Q, n, water=water) - self.power_available(n)
             return self.power_available(n) - self.power_required(Q, n, water=water)
 
         if _power_gap(self.design_speed) >= 0:
