@@ -1,12 +1,13 @@
-'''
+"""
 Created on Mar 4, 2015
 
 @author: rcriii
-'''
+"""
 import unittest
 
 from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
+
 
 class Test(unittest.TestCase):
 
@@ -28,7 +29,7 @@ class Test(unittest.TestCase):
         DHLLDV_framework.use_sqrtcx = True
 
     def testCvs_Erhg_obj2(self):
-        #test at a higher velocity to trigger He
+        # test at a higher velocity to trigger He
         vls = 4.0
         Dp = 0.5
         d = 0.4/1000
@@ -58,7 +59,7 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(Erhg, 0.13631182, places=6)
 
     def testCvs_Erhg_result2(self):
-        #test at a higher velocity to trigger He
+        # test at a higher velocity to trigger He
         vls = 4.0
         Dp = 0.5
         d = 0.4/1000
@@ -84,11 +85,10 @@ class Test(unittest.TestCase):
         Erhg_regime = DHLLDV_framework.Cvs_regime(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         Erhg = DHLLDV_framework.Cvs_Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(Erhg, 0.13631182, places=6)
-        self.assertAlmostEqual(Erhg_regime,'fixed bed')
+        self.assertEqual(Erhg_regime, 'fixed bed')
 
     def test_dlim(self):
         Dp = 0.5
-        d = 1.0 / 1000
         nu = 0.001005 / (0.9982 * 1000)
         rhos = 2.65
         rhol = DHLLDV_constants.water_density[20]
@@ -96,5 +96,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
