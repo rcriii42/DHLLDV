@@ -7,6 +7,7 @@ Created on Oct 23, 2014
 '''
 import bisect
 
+
 class interpDict(dict):
     """
     interpDict: Dict of two-tuples that will interpolate values not found in the dict.
@@ -17,8 +18,7 @@ class interpDict(dict):
     tolerance: By how much x is allowed to exceed the top or bottom end
     """
     def __init__(self, *args, **kwargs):
-        #print type(args[0]), args
-        if type(args[0])==type(dict()):
+        if type(args[0]) == type(dict()):
             self.update(args[0])
         else:
             dict.__init__(self, args)
@@ -32,7 +32,7 @@ class interpDict(dict):
         except KeyError:
             keys = sorted(self.keys())
             index = bisect.bisect(keys, key)
-            if index and index!=len(keys):
+            if index and index != len(keys):
                 x1 = keys[index-1]
                 x2 = keys[index]
                 y1 = dict.__getitem__(self, x1)

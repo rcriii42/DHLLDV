@@ -183,6 +183,7 @@ def LDV(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, max_steps=10):
     FL = max(FL_ul, FL_ll)  # Eqn 8.11-13
     return FL*fbot
 
+
 @functools.lru_cache(maxsize=1200)
 def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
@@ -239,12 +240,13 @@ def slip_ratio(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
         Xi_SBHeHo = Xi_th*(1-(vls/vls_t)**alpha_xi) + Xi_t*(vls/vls_t)**alpha_xi  # Eqn 8.12-9
     else:
         Xi_SBHeHo = Xi_th  # Eqn 8.12-9
-    Xi_SBHeHo = max(Xi_SBHeHo, Xi_3LM) # Eqn 8.12-9
+    Xi_SBHeHo = max(Xi_SBHeHo, Xi_3LM)  # Eqn 8.12-9
 
-    f = 4./3. - (1./3.)*(d/Dp)/particle_ratio # Eqn 8.12-10 TODO: update with dynamic particle ratio in section 7.7.5
+    f = 4./3. - (1./3.)*(d/Dp)/particle_ratio  # Eqn 8.12-10 TODO: update with dynamic particle ratio in section 7.7.5
     f = min(max(f, 0), 1)
     Xi_SF = Xi_SBHeHo * f + Xi_3LM*(1-f)    # Eqn 8.12-11
     return Xi_SF
+
 
 def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     """
@@ -260,7 +262,8 @@ def Cvs_from_Cvt(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt):
     get_dict: if true return the dict with all models.
     """
     Xi = slip_ratio(vls, Dp, d, epsilon, nu, rhol, rhos, Cvt)
-    return (1/(1-Xi)) * Cvt # Eqn 8.12-12
+    return (1/(1-Xi)) * Cvt  # Eqn 8.12-12
+
 
 @functools.lru_cache(maxsize=2048)
 def Cvt_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvt, get_dict=False):
@@ -323,8 +326,9 @@ def pseudo_dlim(Dp, nu, rhol, rhos):
     rhos = particle density (ton/m3)
     """
 
-    dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5 # Eqn 8.15-2
+    dlim = (stk_fine*9.*rhol*nu*Dp / (rhos*7.5*Dp**0.4))**0.5  # Eqn 8.15-2
     return dlim
+
 
 def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
     """Divide the GSD into at least num_fracs fractions
@@ -390,6 +394,7 @@ def create_fracs(GSD, Dp, nu, rhol, rhos, num_fracs=10):
     new_GSD[fthis] = 10 ** logdthis
     return new_GSD
 
+
 def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num_fracs=10, get_dict=False):
     """
     Erhg_graded - Calculate the Erhg for the given slurry, using the appropriate model
@@ -426,8 +431,8 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
     fnext = next(fiter, None)
     dnext = GSD[fnext]
 
-    ds = [dlow]         #These are the boundaries of the fractions
-    dxs = []            #These are the central diameter of the fractions
+    ds = [dlow]         # These are the boundaries of the fractions
+    dxs = []            # These are the central diameter of the fractions
     ims = []            # This will be a list of the fi, i_mxi
     frac_list = []
     while fnext:
@@ -450,17 +455,17 @@ def Erhg_graded(GSD, vls, Dp, epsilon, nu, rhol, rhos, Cv, Cvt_eq_Cvs=False, num
         dlow = GSD[flow]
         fnext = next(fiter, None)
 
-    im_x = sum(f*imxi for f, imxi in zip(frac_list, ims))/ (1-X)
+    im_x = sum(f * imxi for f, imxi in zip(frac_list, ims)) / (1-X)
     il_x = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu_x, rhox)
     im = rhox*im_x/rhol
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Erhg = (im - il)/(Rsd*Cv)
     if get_dict:
-        return {'ims': ims, 'im_x': im_x, 'ds': ds, 'dxs': dxs, 'fracs': frac_list, 'GSD': GSD, # lists
-                'dmin': ds[0], 'X': X, 'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox, # Pseudoliquid properties
-                'Rsd_x': Rsd_x, 'Cv_x': Cv_x, 'Cv_r': Cv_r, # Slurry properties based on pseudoliquid
+        return {'ims': ims, 'im_x': im_x, 'ds': ds, 'dxs': dxs, 'fracs': frac_list, 'GSD': GSD,  # lists
+                'dmin': ds[0], 'X': X, 'mu_x': mu_x, 'nu_x': nu_x, 'rhox': rhox,  # Pseudoliquid properties
+                'Rsd_x': Rsd_x, 'Cv_x': Cv_x, 'Cv_r': Cv_r,  # Slurry properties based on pseudoliquid
                 'Erhg_x': (im_x - il_x)/(Rsd_x*Cv_r),
-                'Erhg': Erhg, 'il': il, # Final slurry properties
+                'Erhg': Erhg, 'il': il,  # Final slurry properties
                 }
     else:
         return Erhg

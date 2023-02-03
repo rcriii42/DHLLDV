@@ -14,6 +14,7 @@ from .DHLLDV_constants import gravity, musf, particle_ratio
 Acv = 3.0   # coefficient homogeneous regime, see note after Eqn 8.7-8
 kvK = 0.4   # von Karman constant
 
+
 @functools.lru_cache(maxsize=1200)
 def pipe_reynolds_number(vls, Dp, nu):
     """
@@ -24,6 +25,7 @@ def pipe_reynolds_number(vls, Dp, nu):
     """
     return vls*Dp/nu    # Eqn 8.7-2 / 3.2-1
 
+
 @functools.lru_cache(maxsize=1024)
 def swamee_jain_ff(Re, Dp, epsilon):
     """
@@ -33,7 +35,7 @@ def swamee_jain_ff(Re, Dp, epsilon):
     epsilon: pipe absolute roughness in m
     """
     if Re <= 2320:
-        #laminar flow
+        # laminar flow
         return 64. / Re
     c1 = epsilon / (3.7 * Dp)
     c2 = 5.75 / Re**0.9
@@ -52,7 +54,7 @@ def fluid_pressure_loss(vls, Dp, epsilon, nu, rhol):
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
     lmbda = swamee_jain_ff(Re, Dp, epsilon)
-    return lmbda*rhol*vls**2/(2*Dp) # Eqn 8.2-5
+    return lmbda * rhol * vls**2 / (2 * Dp)  # Eqn 8.2-5
     
 
 def fluid_head_loss(vls, Dp, epsilon, nu, rhol=1.0):
@@ -66,7 +68,7 @@ def fluid_head_loss(vls, Dp, epsilon, nu, rhol=1.0):
     """
     Re = pipe_reynolds_number(vls, Dp, nu)
     lmbda = swamee_jain_ff(Re, Dp, epsilon)
-    return lmbda*vls**2/(2*gravity*Dp) # Eqn 8.2-6 / 8.7-5
+    return lmbda * vls**2 / (2 * gravity * Dp)  # Eqn 8.2-6 / 8.7-5
 
 
 def apparent_density(rhol, rhos, Cvs, X):
@@ -78,7 +80,7 @@ def apparent_density(rhol, rhos, Cvs, X):
     X is the fraction of fines
     """
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
-    return rhol + rhol*Rsd*X*Cvs/(1-Cvs+Cvs*X) # Eqn 8.3-1
+    return rhol + rhol * Rsd * X * Cvs / (1 - Cvs + Cvs * X)  # Eqn 8.3-1
 
 
 def apparent_viscosity(nu, rhol, rhos, Cvs, X):
@@ -94,7 +96,7 @@ def apparent_viscosity(nu, rhol, rhos, Cvs, X):
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
     top = nu * (1 + 2.5*X*Cvs + 10.05*(X*Cvs)**2 + 0.00273*exp(16.6*X*Cvs))
     bottom = 1+Rsd*X*Cvs
-    return   top/bottom # Eqn 8.3-2 modified to take nu directly
+    return top / bottom  # Eqn 8.3-2 modified to take nu directly
 
 
 def apparent_concentration(Cvs, X):
@@ -103,10 +105,10 @@ def apparent_concentration(Cvs, X):
     Cvs - spatial (insitu) volume concentration of solids
     X is the fraction of fines
     """
-    return (1 - X) * Cvs # Eqn 8.3-3
+    return (1 - X) * Cvs  # Eqn 8.3-3
 
 
-def limiting_particle(Dp, nu, rhol, rhos, Stk = 0.03):
+def limiting_particle(Dp, nu, rhol, rhos, Stk=0.03):
     """
     Return the limiting particle diameter for the particles influencing the
     viscosity
@@ -118,10 +120,10 @@ def limiting_particle(Dp, nu, rhol, rhos, Stk = 0.03):
     """
     top = Stk * 9 * rhol * nu * Dp
     bottom = rhos * 7.5 * Dp**0.4
-    return (top/bottom)**0.5 # Eqn 8.15-2
+    return (top/bottom)**0.5  # Eqn 8.15-2
 
 
-def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
+def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=True):
     """Return the Erhg value for homogeneous flow.
     Use the Talmon (2013) correction for slurry density.
     vls: line speed in m/sec
@@ -145,10 +147,10 @@ def Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf = True):
     bottom = Rsd*Cvs*sb
     il = fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     f = d/(particle_ratio * Dp)  # Eqn 8.8-4 in 2nd ed B, overridden in 3rd edition
-    if not use_sf or f<1:
+    if not use_sf or f < 1:
         return il*(1-(1-top/bottom)*(1-deltav_to_d))            # Eqn 8.7-8
     else:
-        #Sliding flow per equation 8.8-5 in 2nd ed B, overridden in 3rd edition
+        # Sliding flow per equation 8.8-5 in 2nd ed B, overridden in 3rd edition
         return (il*(1-(1-top/bottom)*(1-deltav_to_d)) + (f-1)*musf)/f
 
 

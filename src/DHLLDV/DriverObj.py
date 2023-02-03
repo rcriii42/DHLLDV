@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 from DHLLDV.DHLLDV_Utils import interpDict
 
+
 @dataclass
 class Driver():
     """Implement a pump driver (motor or engine) with an associated speed (Hz)- power (kW) curve"""

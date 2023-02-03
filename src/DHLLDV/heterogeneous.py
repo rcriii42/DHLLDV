@@ -16,9 +16,9 @@ def vt_ruby(d, Rsd, nu, K=0.26):
        nu fluid kinematic viscosity in m2/sec
        k particle shape factor (sand = 0.26) (not used, included for compatibility
     """
-    right = 10*nu/d
-    left = (1+(Rsd*gravity*d**3)/(100*nu**2))**0.5 -1
-    return right * left # Eqn 8.2-2
+    right = 10 * nu / d
+    left = (1 + (Rsd * gravity * d**3) / (100 * nu**2))**0.5 - 1
+    return right * left  # Eqn 8.2-2
 
 
 def vth_RZ(d, Rsd, nu, Cvs, K=0.26):
@@ -45,7 +45,7 @@ def Shr(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     bottom = 1. + 0.175*Rep**0.75
     beta = top/bottom               # Eqn 8.2-4
     KC = 0.175*(1+beta)
-    return vt*(1-Cvs/KC)**beta /vls # Eqn 8.6-2
+    return vt * (1 - Cvs / KC)**beta / vls  # Eqn 8.6-2
 
 
 def sqrtcx(vt, d):
@@ -85,11 +85,11 @@ def Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, use_sqrtcx=True):
     Re = homogeneous.pipe_reynolds_number(vls, Dp, nu)
     lbdl = homogeneous.swamee_jain_ff(Re, Dp, epsilon)
     if not use_sqrtcx:
-        return 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.6-2
-    return 8.5**2 * (1/lbdl) * (1/sqrtcx(vt, d))**(3.) * ((nu*gravity)**(1./3.)/vls)**2  #Eqn 8.6-2
+        return 8.5**2 * (1/lbdl) * (vt/(gravity*d)**0.5)**(10./3.) * ((nu*gravity)**(1./3.)/vls)**2  # Eqn 8.6-2
+    return 8.5**2 * (1/lbdl) * (1/sqrtcx(vt, d))**(3.) * ((nu*gravity)**(1./3.)/vls)**2  # Eqn 8.6-2
 
 
-def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True, use_sqrtcx=True):
+def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf=True, use_sqrtcx=True):
     """Relative excess pressure gradient, per equations 8.6-1 & 8.6-2
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -102,17 +102,17 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True, use_sqrtcx=Tr
        use_sf: Whether to apply the sliding flow correction
     """
     Erhg_ho = Shr(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs) + \
-                Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, use_sqrtcx)   # Eqn 8.6-1 & 8.6-2
+              Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, use_sqrtcx)   # Eqn 8.6-1 & 8.6-2
 
-    f = d/(particle_ratio * Dp)  #eqn 8.8-4
+    f = d/(particle_ratio * Dp)  # eqn 8.8-4
     if not use_sf or f<1:
         return Erhg_ho
     else:
-        #Sliding flow per equation 8.8-5
-        return (Erhg_ho + (f-1)*musf)/f
+        # Sliding flow per equation 8.8-5
+        return (Erhg_ho + (f - 1) * musf) / f
 
 
-def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True, use_sqrtcx=True):
+def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf=True, use_sqrtcx=True):
     """Return the pressure loss (delta_pm in kPa per m) for heterogeneous flow.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -126,7 +126,7 @@ def heterogeneous_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_s
     return heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf, use_sqrtcx)*gravity*rhol
 
 
-def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = True, use_sqrtcx=True):
+def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf=True, use_sqrtcx=True):
     """Return the head loss (m.w.c per m) for (pseudo) heterogeneous flow.
        vls = average line speed (velocity, m/sec)
        Dp = Pipe diameter (m)
@@ -140,7 +140,3 @@ def heterogeneous_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf = 
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
     return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf, use_sqrtcx)*Rsd*Cvs + il
-
-
-if __name__ == '__main__':
-    pass
