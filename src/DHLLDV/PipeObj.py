@@ -196,6 +196,7 @@ class Pipeline():
                     il = self.slurries[p.diameter].il(v)
                     Hfric_l += il * p.length
             elif isinstance(p, Pump):
+                p.slurry = self.slurry
                 Qp, Hp, Pp, np = p.point(Q, water=True)
                 Hpumps_l += Hp
                 Qp, Hp, Pp, np = p.point(Q)
