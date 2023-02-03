@@ -3,7 +3,6 @@ PipeObj - Holds the pipe and Pipeline objects that manage a pipeline system
 
 Added by R. Ramsdell 03 September, 2021
 """
-import bisect
 from copy import copy
 from dataclasses import dataclass
 from math import pi
@@ -13,12 +12,13 @@ from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 
+
 class OperatingPointError(Exception):
     """The pipeline has no operating point"""
 
 
 @dataclass
-class Pipe():
+class Pipe:
     """Object to manage the data about a section of pipe"""
     name: str = 'Pipe Section'
     diameter: float = 0.762
@@ -47,7 +47,8 @@ class Pipe():
                 returns velocity in m/sec"""
         return Q / ((self.diameter / 2) ** 2 * pi)
 
-class Pipeline():
+
+class Pipeline:
     """Object to manage the pipeline system"""
     def __init__(self, name="Pipeline", pipe_list=None, slurry=None):
         self.name = name
@@ -146,17 +147,15 @@ class Pipeline():
         """Update the dictionary of slurries by pipe diameter
 
         If self._slurry.Dp is not in the pipeline, set it to the last pipe diameter"""
-        self.slurries = {self._slurry.Dp: self.slurry}
+        self.slurries = {}
         count = 0
         for p in self.pipesections:
             if isinstance(p, Pipe) and p.diameter not in self.slurries:
                 self.slurries[p.diameter] = copy(self._slurry)
                 self.slurries[p.diameter].Dp = p.diameter
-            elif isinstance(p, Pipe) and p.diameter == self._slurry.Dp:
-                count += 1
             elif isinstance(p, Pump):
                 p.slurry = self.slurry
-        if count == 0:
+        if self._slurry.Dp not in self.slurries.keys():
             self._slurry.Dp = self.pipesections[-1].diameter
 
     def calc_system_head(self, Q):
@@ -167,8 +166,6 @@ class Pipeline():
         If a pipesection after the first has length 0, the elev_change is ignored
 
         returns a tuple: (head slurry, head water) in m water column"""
-        rhom = self.slurry.rhom
-
         Hfit_m = 0
         Hfit_l = 0
         Hfric_m = 0     # Total system head of slurry
@@ -186,7 +183,7 @@ class Pipeline():
             if isinstance(p, Pipe):
                 v = p.velocity(Q)
                 Hv = v ** 2 / (2 * gravity)
-                Hfit_m += p.total_K*Hv*self.slurry.rhom
+                Hfit_m += p.total_K * Hv * self.slurry.rhom
                 Hfit_l += p.total_K * Hv * self.slurry.rhol
                 if p.length > 0:
                     Hz_m += p.elev_change * self.slurry.rhom
@@ -210,8 +207,7 @@ class Pipeline():
                 Hpumps_l,   # Pump head slurry
                 Hpumps_m)   # Pump head fluid
 
-
-    def qimin(self, flow_list, precision = 0.02):
+    def qimin(self, flow_list, precision=0.02):
         """Find the minimum friction point in the slurry system using scipy.optimize.minimize_scalar
 
         flow_list is a list of flowrates (m3/sec) to consider
@@ -220,13 +216,13 @@ class Pipeline():
             lower_bound = flow_list[1] * 0.1
         else:
             lower_bound = flow_list[0] * 0.1
-        bounds = [lower_bound, flow_list[-1]]
+
         def _system_head(Q):
             """Wrapper that returns only the slurry system head"""
             return self.calc_system_head(Q)[0]
         result = scipy.optimize.minimize_scalar(_system_head,
-                                              bounds=[lower_bound, flow_list[-1]],
-                                              method='Bounded')
+                                                bounds=[lower_bound, flow_list[-1]],
+                                                method='Bounded')
         # print(f'qimin (scipy): x: {result.x} imin: {result.fun} success: {result.success} in {result.nit} iters. '
         #       f'Message: {result.message}')
         return result.x
@@ -241,17 +237,20 @@ class Pipeline():
         qimin = self.qimin(flow_list)
         imins = self.calc_system_head(qimin)
         if imins[0] > imins[3]:
-            raise OperatingPointError('Pump curve below system curve at qimin')
+            raise OperatingPointError('PipeObj.Pipeline.find_operating_point: Pump curve below system curve at qimin')
+
         def _head_gap(q):
             """Wrapper to return the pipe - pump head gap at a certain flow"""
             Htot_m, _, _, Hpumps_m = self.calc_system_head(q)
             return Htot_m - Hpumps_m
         result = scipy.optimize.root_scalar(_head_gap, x0=qimin, x1=(qimin + flow_list[-1])/2)
-        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
+        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} '
+        #       f'in {result.iterations} iters, flag: {result.flag}')
         if result.converged:
             return result.root
         else:
-            raise OperatingPointError(f'{result.root:0.3e} is not an operating point. Flag: {result.flag}')
+            raise OperatingPointError(f'PipeObj.Pipeline.find_operating_point: {result.root:0.3e} '
+                                      f'is not an operating point. Flag: {result.flag}')
 
     def hydraulic_gradient(self, Q):
         """Calculate the hydraulic gradient of the pipe at the given flow
@@ -271,7 +270,7 @@ class Pipeline():
         head_list_m = [hpump_m - hpipe_m]
         head_list_l = [hpump_l - hpipe_l]
         while len(temp_pl.pipesections) > 1:
-            p = temp_pl.pipesections.pop()
+            temp_pl.pipesections.pop()
             hpipe_m, hpipe_l, hpump_l, hpump_m = temp_pl.calc_system_head(Q)
             # print(f'Pump.hydraulic_gradient: {temp_pl.total_length:0.1f} {hpipe_m:0.2f} {hpump_m:0.2f}')
             loc_list.append(temp_pl.total_length)
@@ -285,4 +284,3 @@ class Pipeline():
         head_list_m.reverse()
         elev_list.reverse()
         return loc_list, head_list_m, elev_list
-
