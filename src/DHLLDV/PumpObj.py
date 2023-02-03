@@ -31,7 +31,7 @@ class Pump():
     slurry: Slurry = None
 
     def __post_init__(self):
-        if self.slurry == None:
+        if self.slurry is None:
             self.slurry = Slurry()
         self._current_speed = self.design_speed
         self._current_impeller = self.design_impeller
@@ -80,7 +80,8 @@ class Pump():
 
         N: New speed in Hz"""
         if N > self._max_driver_speed:
-            print(f'WARNING: Setting current speed of {N:0.4f} to greater than max_driver_speed of {self._max_driver_speed:0.4f}')
+            print(f'WARNING: Setting current speed of {N:0.4f} to greater than max_driver_speed of '
+                  f'{self._max_driver_speed:0.4f}')
         self._current_speed = N
 
     @property
@@ -207,10 +208,10 @@ class Pump():
 
         result = scipy.optimize.root_scalar(_power_gap,
                                             bracket=[n_low, n_high])
-        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in {result.iterations} iters, flag: {result.flag}')
+        # print(f'Operating Point (scipy): Op point: {result.root} success: {result.converged} in '
+        #       f'{result.iterations} iters, flag: {result.flag}')
         if result.converged:
             return result.root
-
 
     def find_curve_limited_speed_old(self, Q, water=False):
         """Find the pump speed (Hz) at the given flow if there is a power curve
@@ -238,7 +239,7 @@ class Pump():
             if gap_low >= 0:
                 break
             n_high = n_low
-        if n_high == n_low: # There was no intersection
+        if n_high == n_low:  # There was no intersection
             return n_low
         n_new = (n_high + n_low) / 2
         # speed_ratio_new = n_new / self.design_speed
@@ -275,7 +276,7 @@ class Pump():
             rho = self.slurry.rhom
         speed_ratio = self._current_speed / self.design_speed
         impeller_ratio = self._current_impeller / self.design_impeller
-        Q0 = Q / (speed_ratio * impeller_ratio**2) # Use affinity law for trimmed impeller, WACS 3rd Edition page 207
+        Q0 = Q / (speed_ratio * impeller_ratio**2)  # Use affinity law for trimmed impeller, WACS 3rd Edition page 207
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio**2 * impeller_ratio**2 * rho
 
