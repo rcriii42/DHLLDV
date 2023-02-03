@@ -383,10 +383,10 @@ Cv_input = TextInput(title="Cv (-)", value=f"{slurry.Cv:0.3f}", width=95)
 Cvi_input = TextInput(title=f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
 rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=150)
 rhom_input.on_change('value', update_rhom)
-conc_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
+density_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
 
 
-def check_value(widget, min, max, prev, fmt):
+def check_value(widget, min_val, max_val, prev, fmt):
     """Check and update or reset the value
 
     widget: The widget whose value to check
@@ -401,7 +401,7 @@ def check_value(widget, min, max, prev, fmt):
         print(f"{widget.title}: non numeric input")
         widget.value = f"{prev:{fmt}}"
         return prev
-    if min <= new <= max:
+    if min_val <= new <= max_val:
         return new
     else:
         print(f"{widget.title}: value out of range")
@@ -508,7 +508,7 @@ inputs = column(Div(text="""<B>Pipe</B>"""),
                 rhos_row,
                 Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Concentrations</B>"""),
-                conc_row,           # A row of text boxes
+                density_row,  # A row of text boxes
                 )
 plots = column(HQ_plot, Erhg_plot)
 slurry_panel = TabPanel(child=row(inputs, plots), title="Slurry")
