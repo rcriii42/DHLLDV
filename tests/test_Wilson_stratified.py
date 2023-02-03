@@ -25,8 +25,7 @@ class MyTestCase(unittest.TestCase):
     @unittest.skip('There appears to be an error in WASC2!')
     def test_Vsm_example5_1(self):
         """WASC2, Example 5.1(c), page 112"""
-        vs = Wilson_Stratified.Vsm(0.5, 1.0/1000.0, 0.9982, 1.4,
-                                   0.4 , 0.24)
+        vs = Wilson_Stratified.Vsm(0.5, 1.0/1000.0, 0.9982, 1.4, 0.4, 0.24)
         self.assertAlmostEqual(vs, 1.4, places=2)
 
     def test_vsm_CaseStudy5_1(self):

@@ -269,7 +269,6 @@ GSD_plot.xgrid.minor_grid_line_alpha = 0.1
 # Set up widgets
 def update_Dp(attrname, old, new):
     """Update the pipe diameter"""
-    old_Dp = slurry.Dp
     slurry.Dp = check_value(Dp_input, 25, 1500, slurry.Dp * 1000, '0.0f') / 1000
     pipeline.update_slurries()
     update_source_data()
@@ -380,7 +379,8 @@ Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min"
 Cv_down_button.on_click(Cv_down_callback)
 Cv_updown = column(Cv_up_button, Cv_down_button)
 Cv_input = TextInput(title="Cv (-)", value=f"{slurry.Cv:0.3f}", width=95)
-Cvi_input = TextInput(title=f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}", disabled=True, width=95)
+Cvi_input = TextInput(title=f'Cvi (\u03C1\u1D62 = {slurry.rhoi:0.3f})', value=f"{slurry.Cvi:0.3f}",
+                      disabled=True, width=95)
 rhom_input = TextInput(title='Slurry Density \u03C1\u2098 (ton/m\u00b3)', value=f"{slurry.rhom:0.3f}", width=150)
 rhom_input.on_change('value', update_rhom)
 density_row = row(rhom_input, Cv_input, Cv_updown, Spacer(width=10), Cvi_input)
@@ -442,6 +442,8 @@ def update_D85(attrname, old, new):
                       slurry.get_dx(.85) * 1000, '0.3f') / 1000
     slurry.generate_GSD(d85_ratio=d85/slurry.D50)
     update_source_data()
+
+
 D85_input.on_change('value', update_D85)
 
 
@@ -496,14 +498,14 @@ def update_inputs():
 
 # Set up layouts and add to document
 inputs = column(Div(text="""<B>Pipe</B>"""),
-                Dp_row,             # A row of text boxes
+                Dp_row,  # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Fluid</B>"""),
                 fluid_radio,
-                fluid_properties,   # A row of text boxes
+                fluid_properties,  # A row of text boxes
                 Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Grain Size Distribution</B>"""),
-                GSD_inputs,         # A row of text boxes
+                GSD_inputs,  # A row of text boxes
                 GSD_plot,
                 rhos_row,
                 Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),

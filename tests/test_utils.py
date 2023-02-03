@@ -1,8 +1,8 @@
-'''
+"""
 Created on Oct 23, 2014
 
 @author: RCRamsdell
-'''
+"""
 
 import unittest
 
@@ -17,7 +17,7 @@ class TestInterpDict(unittest.TestCase):
                                       5: 0.99996,
                                       10: 0.99970,
                                       15: 0.99910,
-                                      20: 0.99820,})
+                                      20: 0.99820, })
         self.assertAlmostEqual(t1[12.5], (0.9997+0.9991)/2)
         
     def testInterpolation(self):

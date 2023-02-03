@@ -1,10 +1,10 @@
-'''
+"""
 Created on Oct 7, 2014
 
 @author: RCRamsdell
 
 Testing the homogeneous module and water constants
-'''
+"""
 
 import unittest
 
@@ -38,7 +38,6 @@ class Test(unittest.TestCase):
         
     def test_apparent_density(self):
         rhol = DHLLDV_constants.water_density[20]
-        nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
         self.assertAlmostEqual(homogeneous.apparent_density(rhol, rhos, Cvs, 0.1), 1.05148387)
@@ -95,7 +94,6 @@ class Test(unittest.TestCase):
     def test_fluid_head_loss(self):
         vls = 3.0
         Dp = 0.5
-        d = 0.075 / 1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]

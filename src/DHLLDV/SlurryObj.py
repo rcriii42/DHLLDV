@@ -179,9 +179,7 @@ class Slurry():
     def __str__(self):
         """String representation of the slurry"""
         out_string = [f'Slurry in {self.Dp:0.3f} m pipe',
-                      f'D15/D50/D85 (mm): {self.get_dx(0.15)*1000:0.3f}/'
-                                        f'{self.get_dx(0.50)*1000:0.3f}/'
-                                        f'{self.get_dx(0.85)*1000:0.3f}',
+                      f'D15/D50/D85 (mm): {self.get_dx(0.15)*1000:0.3f}/{self.get_dx(0.50)*1000:0.3f}/{self.get_dx(0.85)*1000:0.3f}',
                       f'Solids Concentration (Cvs, -): {self.Cv:0.3f}',
                       f'Insitu Concentration (Cvi, -): {self.Cvi:0.3f}',
                       f'Fluid Density (Rhos, ton/m3): {self.rhol:0.3f}',
@@ -291,15 +289,19 @@ class Slurry():
                 'ELM': [il_list[i] * self.rhom for i in range(self.max_index)],
                 'Ho': [c['Ho'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
                 'Cvt_im': [c['Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)]
+                'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i]
+                                  for i in range(self.max_index)],
+                'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i]
+                                  for i in range(self.max_index)]
                 }
 
     def generate_LDV_curves(self, d):
         cv_points = 50
         Cv_list = [(i + 1) / 100. for i in range(cv_points)]
-        LDV_vls_list = [DHLLDV_framework.LDV(1, self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv) for Cv in Cv_list]
-        LDV_il_list = [homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol) for vls in LDV_vls_list]
+        LDV_vls_list = [DHLLDV_framework.LDV(1, self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv)
+                        for Cv in Cv_list]
+        LDV_il_list = [homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol)
+                       for vls in LDV_vls_list]
         LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], self.Dp, d, self.epsilon, self.nu, self.rhol,
                                                    self.rhos, Cv_list[i]) for i in range(cv_points)]
         LDV_im_list = [LDV_Ergh_list[i] * self.Rsd * Cv_list[i] + LDV_il_list[i] for i in range(cv_points)]

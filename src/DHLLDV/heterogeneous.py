@@ -105,7 +105,7 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, use_sf=True, use_sqrtcx=True
               Srs(vls, Dp,  d, epsilon, nu, rhol, rhos, use_sqrtcx)   # Eqn 8.6-1 & 8.6-2
 
     f = d/(particle_ratio * Dp)  # eqn 8.8-4
-    if not use_sf or f<1:
+    if not use_sf or f < 1:
         return Erhg_ho
     else:
         # Sliding flow per equation 8.8-5

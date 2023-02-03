@@ -21,7 +21,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.1
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(LDV, 0.8288413, places=4)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
@@ -36,7 +35,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.1
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(LDV, 3.6732778916, places=4)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
@@ -51,7 +49,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.1
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
         self.assertAlmostEqual(LDV, 4.9492960, places=4)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
@@ -66,7 +63,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.1
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
         self.assertAlmostEqual(LDV, 4.8456347, places=5)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)   # , max_steps=100)
@@ -83,7 +79,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.1
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
         self.assertAlmostEqual(LDV, 4.3325182, places=5)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
@@ -98,7 +93,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.0025
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
         self.assertAlmostEqual(LDV, 3.2844888, places=5)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
@@ -113,7 +107,6 @@ class Test(unittest.TestCase):
         rhol = DHLLDV_constants.water_density[20]
         rhos = 2.65
         Cvs = 0.0025
-        Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
         self.assertAlmostEqual(LDV, 3.8770674, places=5)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)

@@ -1,8 +1,8 @@
-'''
+"""
 Created on Feb 22, 2015
 
 @author: rcriii
-'''
+"""
 import unittest
 
 from DHLLDV import heterogeneous
