@@ -104,7 +104,7 @@ HQ_TOOLTIPS = [
 ]
 HQ_plot = figure(height=450, width=725, title="im curves",
                  tools="crosshair,pan,reset,save,wheel_zoom",
-                 #x_range=[0, 10], y_range=[0, 0.6],
+                 # x_range=[0, 10], y_range=[0, 0.6],
                  tooltips=HQ_TOOLTIPS)
 
 HQ_plot.line('v', 'graded_Cvt_im', source=im_source,
@@ -170,57 +170,57 @@ Erhg_TOOLTIPS = [
     ("Regime", "@regime")
 ]
 Erhg_plot = figure(height=450, width=725, title="Erhg Curves",
-                 tools="crosshair,pan,reset,save,wheel_zoom",
-                 #x_range=[0.001, 1.0], y_range=[0.001, 1.2],
-                 x_axis_type='log', y_axis_type='log',
-                 tooltips=Erhg_TOOLTIPS)
+                   tools="crosshair,pan,reset,save,wheel_zoom",
+                   # x_range=[0.001, 1.0], y_range=[0.001, 1.2],
+                   x_axis_type='log', y_axis_type='log',
+                   tooltips=Erhg_TOOLTIPS)
 
 Erhg_plot.line('il', 'graded_Cvt', source=Erhg_source,
-             color='black',
-             line_dash='dashed',
-             line_width=3,
-             line_alpha=0.6,
-             legend_label='graded Sand Cvt=c',
-             name='graded Sand Cvt=c')
+               color='black',
+               line_dash='dashed',
+               line_width=3,
+               line_alpha=0.6,
+               legend_label='graded Sand Cvt=c',
+               name='graded Sand Cvt=c')
 
 Erhg_plot.line('il', 'Cvt', source=Erhg_source,
-             color='green',
-             line_dash='dashed',
-             line_width=2,
-             line_alpha=0.6,
-             legend_label='uniform Sand Cvt=c',
-             name='uniform Sand Cvt=c')
+               color='green',
+               line_dash='dashed',
+               line_width=2,
+               line_alpha=0.6,
+               legend_label='uniform Sand Cvt=c',
+               name='uniform Sand Cvt=c')
 
 Erhg_plot.line('il', 'Cvs', source=Erhg_source,
-             color='red',
-             line_dash='solid',
-             line_width=2,
-             line_alpha=0.6,
-             legend_label='uniform Sand Cvs=c',
-             name='uniform Sand Cvs=c')
+               color='red',
+               line_dash='solid',
+               line_width=2,
+               line_alpha=0.6,
+               legend_label='uniform Sand Cvs=c',
+               name='uniform Sand Cvs=c')
 
 Erhg_plot.line('il', 'il', source=Erhg_source,
-             color='blue',
-             line_dash='dashed',
-             line_width=2,
-             line_alpha=0.3,
-             legend_label='il',
-             name='il')
+               color='blue',
+               line_dash='dashed',
+               line_width=2,
+               line_alpha=0.3,
+               legend_label='il',
+               name='il')
 
 Erhg_plot.line('il', 'Erhg', source=LDV50_source,
-             color='magenta',
-             line_dash='solid',
-             line_width=2,
-             line_alpha=0.6,
-             legend_label='LDV D50',
-             name='LDV D50')
+               color='magenta',
+               line_dash='solid',
+               line_width=2,
+               line_alpha=0.6,
+               legend_label='LDV D50',
+               name='LDV D50')
 Erhg_plot.line('il', 'Erhg', source=LDV85_source,
-             color='magenta',
-             line_dash='dashed',
-             line_width=1,
-             line_alpha=0.6,
-             legend_label='LDV D85',
-             name='LDV D85')
+               color='magenta',
+               line_dash='dashed',
+               line_width=1,
+               line_alpha=0.6,
+               legend_label='LDV D85',
+               name='LDV D85')
 
 Erhg_plot.xaxis[0].axis_label = 'Hydraulic Gradient il (m/m)'
 Erhg_plot.yaxis[0].axis_label = 'Relative Excess Hydraulic Gradient Erhg (-)'
@@ -240,18 +240,18 @@ GSD_TOOLTIPS = [
     ("%", "$y"),
 ]
 GSD_plot = figure(height=280, width=450, title="Grain Size Distribution",
-                 tools="crosshair,pan,reset,save,wheel_zoom",
-                 x_range=[0.01, 100], y_range=[0, 1.0],
-                 x_axis_type='log', y_axis_type='auto',
-                 tooltips=GSD_TOOLTIPS)
+                  tools="crosshair,pan,reset,save,wheel_zoom",
+                  x_range=[0.01, 100], y_range=[0, 1.0],
+                  x_axis_type='log', y_axis_type='auto',
+                  tooltips=GSD_TOOLTIPS)
 
 GSD_plot.line('dia', 'p', source=GSD_source,
-             color='blue',
-             line_dash='solid',
-             line_width=1,
-             line_alpha=0.6,
-             #legend_label='Grain Size Distribution',
-             name='GSD')
+              color='blue',
+              line_dash='solid',
+              line_width=1,
+              line_alpha=0.6,
+              # legend_label='Grain Size Distribution',
+              name='GSD')
 
 GSD_plot.circle_dot('dia', 'p', source=GSD_source, name='GSD')
 GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
@@ -262,8 +262,8 @@ GSD_plot.yaxis.ticker = FixedTicker(ticks=[x*0.2 for x in range(5)],
 GSD_plot.axis.major_tick_in = 10
 GSD_plot.axis.minor_tick_in = 7
 GSD_plot.axis.minor_tick_out = 0
-GSD_plot.xgrid.minor_grid_line_color='navy'
-GSD_plot.xgrid.minor_grid_line_alpha=0.1
+GSD_plot.xgrid.minor_grid_line_color = 'navy'
+GSD_plot.xgrid.minor_grid_line_alpha = 0.1
 
 
 # Set up widgets
@@ -274,10 +274,15 @@ def update_Dp(attrname, old, new):
     pipeline.update_slurries()
     update_source_data()
 
+
 def Dp_up_callback():
-    Dp_input.value=f"{int(slurry.Dp*1000)+25}"
+    Dp_input.value = f"{int(slurry.Dp*1000)+25}"
+
+
 def Dp_down_callback():
-    Dp_input.value=f"{int(slurry.Dp*1000)-25}"
+    Dp_input.value = f"{int(slurry.Dp*1000)-25}"
+
+
 Dp_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
 Dp_up_button.on_click(Dp_up_callback)
 Dp_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
@@ -296,6 +301,8 @@ def update_fluid(attr, old, new):
     else:
         slurry.fluid = 'salt'
     update_source_data()
+
+
 fluid_radio = RadioButtonGroup(labels=['Fresh', 'Salt'], active={'fresh': 0,
                                                                  'salt': 1}[pipeline.slurry.fluid])
 fluid_radio.on_change('active', update_fluid)
@@ -321,8 +328,12 @@ def D50_adjust_proportionate(delta):
 
 def D50_up_callback():
     D50_adjust_proportionate(0.1)
+
+
 def D50_down_callback():
     D50_adjust_proportionate(-0.1)
+
+
 D85_input = TextInput(title="D85 (mm)", value=f"{slurry.get_dx(0.85) * 1000:0.3f}", width=95)
 D50_input = TextInput(title="D50 (mm)", value=f"{slurry.D50 * 1000:0.3f}", width=95)
 D50_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
@@ -338,8 +349,10 @@ GSD_inputs = row(D85_input, D50_input, D50_updown, Spacer(width=10), D15_input)
 def update_rhos(attrname, old, new):
     Cvi = (slurry.rhoi - slurry.rhol) / (slurry.rhos - slurry.rhol)
     slurry.rhos = check_value(rhos_input, 1.5, 7.0, slurry.rhos, "0.3f")
-    slurry.rhoi = Cvi *(slurry.rhos - slurry.rhol) + slurry.rhol
+    slurry.rhoi = Cvi * (slurry.rhos - slurry.rhol) + slurry.rhol
     update_source_data()
+
+
 rhos_input = TextInput(title="Solids Density \u03C1\u209B (ton/m\u00b3)", value=f"{slurry.rhos:0.3f}", width=150)
 rhos_input.on_change('value', update_rhos)
 Rsd_input = TextInput(title="Rsd (-)", value=f"{slurry.Rsd:0.3f}", disabled=True, width=95)
@@ -350,11 +363,17 @@ def update_rhom(attrname, old, new):
     """Update the Cv based on rhom input"""
     max_rhom = 0.5 * (slurry.rhos - slurry.rhol) + slurry.rhol
     slurry.rhom = check_value(rhom_input, 1.05, max_rhom, slurry.rhom, "0.3f")
-    Cv_input.value=f"{slurry.Cv:0.3f}"
+    Cv_input.value = f"{slurry.Cv:0.3f}"
+
+
 def Cv_up_callback():
-    Cv_input.value=f"{slurry.Cv+0.005:0.3f}"
+    Cv_input.value = f"{slurry.Cv+0.005:0.3f}"
+
+
 def Cv_down_callback():
-    Cv_input.value=f"{slurry.Cv-0.005:0.3f}"
+    Cv_input.value = f"{slurry.Cv-0.005:0.3f}"
+
+
 Cv_up_button = Button(label=u"\u25B2", width_policy="min", height_policy="min")
 Cv_up_button.on_click(Cv_up_callback)
 Cv_down_button = Button(label=u"\u25BC", width_policy="min", height_policy="min")
@@ -395,6 +414,8 @@ def update_D15(attrname, old, new):
     d15 = check_value(D15_input, 0.04, slurry.D50 * 1000, slurry.get_dx(0.15) * 1000, '0.3f') / 1000
     slurry.generate_GSD(d15_ratio=slurry.D50 / d15)
     update_source_data()
+
+
 D15_input.on_change('value', update_D15)
 
 
@@ -408,6 +429,8 @@ def update_D50(attrname, old, new):
                              slurry.D50 * 1000, '0.3f') / 1000
     slurry.generate_GSD()
     update_source_data()
+
+
 D50_input.on_change('value', update_D50)
 
 
@@ -426,6 +449,8 @@ def update_Cv(attrname, old, new):
     """Check and update the Cv"""
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
     update_source_data()
+
+
 Cv_input.on_change('value', update_Cv)
 
 
@@ -472,21 +497,21 @@ def update_inputs():
 # Set up layouts and add to document
 inputs = column(Div(text="""<B>Pipe</B>"""),
                 Dp_row,             # A row of text boxes
-                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Fluid</B>"""),
                 fluid_radio,
                 fluid_properties,   # A row of text boxes
-                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Grain Size Distribution</B>"""),
                 GSD_inputs,         # A row of text boxes
                 GSD_plot,
                 rhos_row,
-                Spacer(background='lightblue', height=5, margin=(5,0,5,0)),
+                Spacer(background='lightblue', height=5, margin=(5, 0, 5, 0)),
                 Div(text="""<B>Concentrations</B>"""),
                 conc_row,           # A row of text boxes
                 )
 plots = column(HQ_plot, Erhg_plot)
-slurry_panel = TabPanel(child= row(inputs, plots), title="Slurry")
+slurry_panel = TabPanel(child=row(inputs, plots), title="Slurry")
 
 
 # Select a pipeline from the list
@@ -498,6 +523,8 @@ def choose_pipeline(event):
     slurry = pipeline.slurry
     pipeline_dropdown.label = "Pipeline: " + pipeline.name
     update_source_data()
+
+
 pipeline_dropdown = Dropdown(label="Pipeline: " + pipeline.name, menu=[(s, s) for s in SystemTab.setups.keys()])
 pipeline_dropdown.on_click(choose_pipeline)
 
@@ -505,16 +532,20 @@ pipeline_dropdown.on_click(choose_pipeline)
 # Button to stop the server
 def stop_button_callback():
     sys.exit()  # Stop the server
+
+
 stop_button = Button(label="Stop", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
 
-#Dropdown to pick units
+# Dropdown to pick units
 def choose_units(event):
     """Select the units-of-measure for the System Tab"""
     unit_picker.label = event.item + " Units"
     SystemTab.select_units(event.item)
     sys_update(pipeline)
+
+
 unit_picker = Dropdown(label='SI Units', menu=[('SI', 'SI'),
                                                ('US', 'US')])
 unit_picker.on_click(choose_units)
@@ -529,10 +560,12 @@ def upload_xl_data(attr, old, new):
         slurry = pipeline.slurry
         pipeline_dropdown.label = "Pipeline: " + pipeline.name
         SystemTab.setups[pipeline.name] = pipeline
-        pipeline_dropdown.menu=[(s, s) for s in SystemTab.setups.keys()]
+        pipeline_dropdown.menu = [(s, s) for s in SystemTab.setups.keys()]
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
     update_source_data()
+
+
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
 file_input.on_change('filename', upload_xl_data)
 

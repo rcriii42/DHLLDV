@@ -179,7 +179,9 @@ class Slurry():
     def __str__(self):
         """String representation of the slurry"""
         out_string = [f'Slurry in {self.Dp:0.3f} m pipe',
-                      f'D15/D50/D85 (mm): {self.get_dx(0.15)*1000:0.3f}/{self.get_dx(0.50)*1000:0.3f}/{self.get_dx(0.85)*1000:0.3f}',
+                      f'D15/D50/D85 (mm): {self.get_dx(0.15)*1000:0.3f}/'
+                                        f'{self.get_dx(0.50)*1000:0.3f}/'
+                                        f'{self.get_dx(0.85)*1000:0.3f}',
                       f'Solids Concentration (Cvs, -): {self.Cv:0.3f}',
                       f'Insitu Concentration (Cvi, -): {self.Cvi:0.3f}',
                       f'Fluid Density (Rhos, ton/m3): {self.rhol:0.3f}',
@@ -201,7 +203,7 @@ class Slurry():
             d15_ratio = self.get_dx(0.5) / self.get_dx(0.15)
         temp_GSD = {0.15: self.D50 / d15_ratio,
                     0.50: self.D50,
-                    0.85: self.D50 * d85_ratio,}
+                    0.85: self.D50 * d85_ratio, }
         self._GSD = DHLLDV_framework.create_fracs(temp_GSD, self.Dp, self.nu, self.rhol, self.rhos)
 
         self.curves_dirty = True
@@ -251,8 +253,8 @@ class Slurry():
         """Generate a dict with the Erhg curves
 
         Note assumes the GSD is already generated"""
-        Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv, get_dict=True) for vls in
-                         self.vls_list]
+        Erhg_obj_list = [DHLLDV_framework.Cvs_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos,
+                                                   self.Cv, get_dict=True) for vls in self.vls_list]
         il_list = [Erhg_obj['il'] for Erhg_obj in Erhg_obj_list]
         # Erhg for the ELM is just the il
         return {'Erhg_objects': Erhg_obj_list,
@@ -263,17 +265,17 @@ class Slurry():
                 'He': [Erhg_obj['He'] for Erhg_obj in Erhg_obj_list],
                 'Ho': [Erhg_obj['Ho'] for Erhg_obj in Erhg_obj_list],
                 'Cvs_regime': [Erhg_obj['regime'] for Erhg_obj in Erhg_obj_list],
-                'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv) for vls in
-                                 self.vls_list],
-                'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv) for vls in self.vls_list],
+                'Cvs_from_Cvt': [DHLLDV_framework.Cvs_from_Cvt(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol,
+                                                               self.rhos, self.Cv) for vls in self.vls_list],
+                'Cvt_Erhg': [DHLLDV_framework.Cvt_Erhg(vls, self.Dp, self.D50, self.epsilon, self.nu, self.rhol,
+                                                       self.rhos, self.Cv) for vls in self.vls_list],
                 'graded_Cvs_Erhg': [
-                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon, self.nu, self.rhol, self.rhos, self.Cv, Cvt_eq_Cvs=False,
-                                                 num_fracs=None)
+                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon, self.nu, self.rhol, self.rhos,
+                                                 self.Cv, Cvt_eq_Cvs=False, num_fracs=None)
                     for vls in self.vls_list],
                 'graded_Cvt_Erhg': [
-                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon,
-                                                 self.nu, self.rhol, self.rhos, self.Cv,
-                                                 Cvt_eq_Cvs=True, num_fracs=None)
+                    DHLLDV_framework.Erhg_graded(self.GSD, vls, self.Dp, self.epsilon, self.nu, self.rhol, self.rhos,
+                                                 self.Cv, Cvt_eq_Cvs=True, num_fracs=None)
                     for vls in self.vls_list],
                 }
 
@@ -298,8 +300,8 @@ class Slurry():
         Cv_list = [(i + 1) / 100. for i in range(cv_points)]
         LDV_vls_list = [DHLLDV_framework.LDV(1, self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv) for Cv in Cv_list]
         LDV_il_list = [homogeneous.fluid_head_loss(vls, self.Dp, self.epsilon, self.nu, self.rhol) for vls in LDV_vls_list]
-        LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], self.Dp, d, self.epsilon, self.nu, self.rhol, self.rhos, Cv_list[i]) for i in
-                         range(cv_points)]
+        LDV_Ergh_list = [DHLLDV_framework.Cvs_Erhg(LDV_vls_list[i], self.Dp, d, self.epsilon, self.nu, self.rhol,
+                                                   self.rhos, Cv_list[i]) for i in range(cv_points)]
         LDV_im_list = [LDV_Ergh_list[i] * self.Rsd * Cv_list[i] + LDV_il_list[i] for i in range(cv_points)]
         return {'Cv': Cv_list,
                 'vls': LDV_vls_list,
@@ -308,6 +310,7 @@ class Slurry():
                 'im': LDV_im_list,
                 'regime': [f'LDV for {d * 1000:0.3f} mm particle at Cvs={Cv_list[i]}' for i in range(cv_points)]
                 }
+
     def generate_curves(self):
         if self.GSD_curves_dirty:
             self.generate_GSD()

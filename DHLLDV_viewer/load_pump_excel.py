@@ -10,8 +10,8 @@ The spreadsheet should have sheets with the following properties:
     - Has a named range Pipeline!pipe_table with a header row and the following columns:
         - Pipe Name: The name of the pipesection or pump
             - If this is a pipesection, any valid string not containing the word 'pump'
-            - If a pump, the name of the tab defining the pump (for pumps the other columns are ignored). Note that if you
-              list a pump more than once, the proram will make copies, so you can reuse pump definitions.
+            - If a pump, the name of the tab defining the pump (for pumps the other columns are ignored). Note that if
+             you list a pump more than once, the program will make copies, so you can reuse pump definitions.
         - Diameter: The pipe diameter in m
         - Length: The pipe length in m
         - Total K: The total of fitting k-factors for this section of pipe
@@ -138,7 +138,8 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     """
     single_values = excel_requireds['pump']
 
-    params = dict([(k, v(get_range_value(wb, sheet_id, k))) for k, v in single_values.items() if v in [str, int, float]])
+    params = dict([(k, v(get_range_value(wb, sheet_id, k)))
+                   for k, v in single_values.items() if v in [str, int, float]])
     my_range = wb.defined_names.get('pump_curve', sheet_id)
     sheet_name = wb.sheetnames[sheet_id]
     flow_col = None
@@ -260,7 +261,7 @@ def validate_excel(wb: openpyxl.workbook):
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
 
-    wb = openpyxl.load_workbook(filename=fname, data_only=True) # Loading a workbook, data_only takes the stored values
+    wb = openpyxl.load_workbook(filename=fname, data_only=True)  # Loading a workbook, data_only takes the stored values
     pumps = {}
     drivers = {}
     for ws_name in wb.sheetnames:
@@ -271,17 +272,15 @@ if __name__ == "__main__":
             pipeline_name = get_range_value(wb, sheet_id, 'name')
             pipeline = load_pipeline_from_workbook(wb)
 
-
     print(pipeline)
 
     try:
         import sys
         import matplotlib.pyplot as plt
-    except:
+    except ImportError:
         print('matplotlib not found')
         plt = None
         sys.exit()
-
 
     fig = plt.figure(figsize=(11, 7.5))
     flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
@@ -293,7 +292,7 @@ if __name__ == "__main__":
 
         HQ_title = f'{pl.name}: length = {pl.total_length:0.0f} Dp={s.Dp*1000:0.0f}mm, d50={s.D50*1000:0.2f}mm, ' \
                    f'Rsd={s.Rsd:0.3f}, Cv={s.Cv:0.3f}, rhom={s.rhom:0.3f}'
-        HQ_plot = fig.add_subplot(sp_num, title=HQ_title, xlim=(0,flow_list[-1]), ylim=(0,head_lists[0][-1]))
+        HQ_plot = fig.add_subplot(sp_num, title=HQ_title, xlim=(0, flow_list[-1]), ylim=(0, head_lists[0][-1]))
         HQ_plot.plot(flow_list, head_lists[0], linewidth=2, linestyle='--', color='black', label="System Cvt=c")
         HQ_plot.plot(flow_list, head_lists[1], linewidth=1, linestyle='--', color='blue', label="System Fluid")
         HQ_plot.plot(flow_list, head_lists[2], linewidth=1, linestyle='-', color='blue', label="Pump Fluid")
@@ -320,9 +319,6 @@ if __name__ == "__main__":
             legend = PN_plot.legend()
             for label in legend.get_texts():
                 label.set_fontsize('small')
-
-
-
 
     plt.tight_layout()
     plt.show()

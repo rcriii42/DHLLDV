@@ -57,7 +57,7 @@ def lambda1(Dp_H, v1, epsilon, nu_l):
     c1 = 0.27*epsilon/Dp_H
     c2 = 5.75/Re**0.9
     bottom = log(c1+c2)**2
-    return 1.325/bottom # Eqn 8.4-12
+    return 1.325/bottom  # Eqn 8.4-12
 
 
 def lambda12(Dp_H, d, v1, v2, nu_l):
@@ -72,7 +72,7 @@ def lambda12(Dp_H, d, v1, v2, nu_l):
     c1 = 0.27 * d/Dp_H
     c2 = 5.75/Re**0.9
     bottom = log(c1+c2)**2
-    return 1.325*alpha_tel/bottom # Eqn 8.4-13
+    return 1.325*alpha_tel/bottom  # Eqn 8.4-13
 
 
 def lambda12_sf(Dp_H, d, v1, v2, epsilon, nu_l, rhol, rhos):
@@ -131,7 +131,8 @@ def fb_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
        Cvs = insitu volume concentration
     """
     delta_p = fb_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)
-    return delta_p /(rhol*gravity)  # Eqn 8.2-6 with deltaL = 1.0
+    return delta_p / (rhol * gravity)  # Eqn 8.2-6 with deltaL = 1.0
+
 
 @functools.lru_cache(maxsize=3000)
 def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
@@ -141,6 +142,7 @@ def fb_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     im = fb_head_loss(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)
     return (im - il)/(Rsd * Cvs)    # Eqn 8.2-9
+
 
 def vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvs,
              max_steps=20, e=0.415/1000):
@@ -166,10 +168,11 @@ def vls_FBSB(Dp,  d, epsilon, nu, rhol, rhos, Cvs,
         if abs(fn) < e:
             return vls_fb
         dfndv = (fb_Erhg(vls_fb + dv, Dp, d, epsilon, nu, rhol, rhos, Cvs) - musf - fn) / dv
-        #print(f"{n:6d} {vls_fb:6.3f} {fn:9.4f} {dfndv:10.5f}")
         vls_fb = vls_fb - fn/dfndv
     return vls_fb
-vls_lsdv = vls_FBSB # Theses are the same value, see discussion in section 7.8.6
+
+
+vls_lsdv = vls_FBSB  # Theses are the same value, see discussion in section 7.8.6
 
 
 def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
@@ -183,7 +186,7 @@ def Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
        rhos = particle density (ton/m3)
        Cvs = insitu volume concentration
     """
-    return musf # Eqn 8.5-1
+    return musf  # Eqn 8.5-1
 
 
 def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
@@ -199,7 +202,7 @@ def sliding_bed_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, Cvb=0.6):
     """
     il = homogeneous.fluid_head_loss(vls, Dp, epsilon, nu, rhol)
     Rsd = (rhos - rhol)/rhol     # Eqn 8.2-1
-    return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il # Eqn 8.5-2
+    return Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs)*Rsd*Cvs + il  # Eqn 8.5-2
 
 
 def sliding_bed_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs):
