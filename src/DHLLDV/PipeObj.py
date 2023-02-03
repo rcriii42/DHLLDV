@@ -26,6 +26,13 @@ class Pipe():
     total_K: float = 0.0
     elev_change: float = 0.0
 
+    def __str__(self):
+        return(f'Pipe(name="{self.name}", '
+               f'diameter={self.diameter:0.4f}, '
+               f'length={self.length:0.2f}, '
+               f'total_k={self.total_K:0.2f}, '
+               f'elev_change={self.elev_change:0.2f})')
+
     def flow(self, v):
         """Return the flow for the associated velocity
 
@@ -54,9 +61,21 @@ class Pipeline():
         self.slurry = slurry
 
     def __str__(self):
+        """Printable version with reasonable precision"""
+        try:
+            flow_list = [self.pipesections[-1].flow(v) for v in self.slurry.vls_list]
+            op_point = self.find_operating_point(flow_list)
+        except OperatingPointError:
+            op_point = -1
+        _, _, elev_list = self.hydraulic_gradient(op_point)
         s = [f'Pipeline: {self.name}',
-             f'Length: {self.total_length:0.0f}',
-             f'Number of Pumps: {self.num_pumps}']
+             f'Length (m): {self.total_length:0.0f}',
+             f'Total k (-): {self.total_K:0.2f}',
+             f'Number of Pumps: {self.num_pumps}',
+             f'Total Power (kW): {self.total_power:0.0f}',
+             f'Dig Depth (m): {elev_list[0]:0.2f}',
+             f'Final Elev (m): {elev_list[-1]:0.2f}',
+             ]
         s.extend([f'{p}' for p in self.pipesections])
         return '\n'.join(s)
 
