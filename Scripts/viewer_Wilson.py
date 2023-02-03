@@ -1,9 +1,9 @@
-'''
+"""
 viewer_Wilson - Compare the DHLLDV and Wilson curves for a given sand
 Created on Oct 15, 2016
 
 @author: rcriii
-'''
+"""
 
 import csv
 
