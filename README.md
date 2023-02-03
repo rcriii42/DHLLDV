@@ -5,7 +5,7 @@ Python implementation of the DHLLDV slurry transport framework
 
 Note that the equations are from the 3<sup>rd</sup> edition of the book '[Slurry Transport Fundamentals, A Historical Overview &  The Delft Head Loss &  Limit Deposit Velocity Framework](https://www.researchgate.net/publication/330753872_The_Delft_Head_Loss_Limit_Deposit_Velocity_Framework_2nd_Edition)', By Sape A. Miedema, Edited by Robert Ramsdell
 
-Each model has a test suite, based on 'hand' calculations contained in the included excel spreadsheet [tests/tests.xls](https://github.com/rcriii42/DHLLDV/blob/master/tests/tests.xls)
+Each model has a test suite, based on 'hand' calculations contained in the included Excel spreadsheet [tests/tests.xls](https://github.com/rcriii42/DHLLDV/blob/master/tests/tests.xls)
 
 In addition, [DHLLDV Framework.xlsm](https://github.com/rcriii42/DHLLDV/blob/master/DHLLDV%20Framework.xlsm), a spreadsheet developed by Sape Miedema, implements the framework, a simple pump and slurry system model, historical models and more.
 
@@ -101,10 +101,10 @@ The viewer has a top bar, and two tabs; a Slurry Tab and Pipeline Tab
 
 The viewer allows you to adjust certain properties of the system:
 
-* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25mm each way. The roughness is the absolute roughness of new steel pipe in m (per Cameron Hydraulic Data). This does _not_ update the pipeline, but does change the pipe diameter for the velocity graphs.
+* **Pipe**: Allows input of pipe diameter in mm. The up and down arrows adjust the pipe diameter by 25 mm each way. The roughness is the absolute roughness of new steel pipe in m (per Cameron Hydraulic Data). This does _not_ update the pipeline, but does change the pipe diameter for the velocity graphs.
 * **Fluid**: Allows selection of fresh or salt water at 20&deg;C (68&deg;F). This adjusts the density and viscosity of the carrier fluid.
-* **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075mm).
-  * The up and down arrows vary the D50 by 0.1mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction.
+* **Grain Size Distribution** (GSD): Allows adjusting the grain size distribution by adjusting the D85, D50, D15 and fines fraction (defined as passing the #200 sieve, 0.075 mm).
+  * The up and down arrows vary the D50 by 0.1 mm each way, adjusting D85, and D15 proportionally, but not adjusting the fines fraction.
   * The fines fraction can be set blank, in which case it is ignored when generating the GSD
   * The resulting GSD curve is calculated and shown on the "Grain Size Distribution" graph. The distribution starts at the low end with the 'pseudoliquid diameter', the diameter of particle below which particles are essentially part of the fluid (this is pipe-size, fluid, and particle density dependent). It then calculates the fractions of particles between the given D15, D50, and D85, targeting a 10-point distribution, then adds one above the largest particle diameter.
 * **Concentrations**: Allows adjusting the concentration of the slurry by adjusting either the Cv or the rhom. The up and down arrows adjust the Cv by 0.005 each way.
@@ -124,8 +124,8 @@ Shows a particular pipeline, including a CSD dredge with two pumps.
 
 ### Right Panel
 * An interactive head-flow-velocity plot of the system (head required) and pump (head available) curves.
-* The system minimum friction point - flow, velocity (in the same pipe diamater as in the plot above), and slurry head requirement.
-* The **Operating Point**, the right-hand intersection of the system and pump curves for slurry - flow, velocity, head requrement, and delivered production.
+* The system minimum friction point - flow, velocity (in the same pipe diameter as in the plot above), and slurry head requirement.
+* The **Operating Point**, the right-hand intersection of the system and pump curves for slurry - flow, velocity, head requirement, and delivered production.
 * A plot of the pressure gradeline - shows the pressure change and elevations along the pipe
 
 <img src="https://user-images.githubusercontent.com/9353408/189940930-af14bd12-5aaf-4790-8b1b-928a3b239789.png" width="125%" alt="Pipeline Tab">
