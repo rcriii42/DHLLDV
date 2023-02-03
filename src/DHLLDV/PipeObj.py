@@ -133,6 +133,15 @@ class Pipeline():
         """Return a list of the pumps in line"""
         return [p for p in self.pipesections if isinstance(p, Pump)]
 
+    @property
+    def vls_list(self):
+        """The slurry velocity list, assumes the slurry has a reasonable Dp"""
+        return self.slurry.vls_list
+
+    @property
+    def flow_list(self):
+        return [Pipe(diameter=self.slurry.Dp).flow(v) for v in self.vls_list]
+
     def update_slurries(self):
         """Update the dictionary of slurries by pipe diameter
 
