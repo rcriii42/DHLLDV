@@ -116,8 +116,8 @@ class Pipeline():
     @Cv.setter
     def Cv(self, Cv):
         """Allow the user to set the Cv for the entire system"""
-        for s in self.slurries.values():
-            s.Cv = Cv
+        self._slurry.Cv = Cv
+        self.update_slurries()
 
     @property
     def slurry(self):
