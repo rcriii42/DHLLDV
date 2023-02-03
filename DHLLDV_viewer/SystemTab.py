@@ -333,7 +333,7 @@ def system_panel(PL):
         hop = f'{pipeline.calc_system_head(qop)[0]*unit_convs["len"]:0.1f}'
         prod = f'{pipeline.slurry.Cvi*qop*60*60*unit_convs["vol"]:0.0f}'
     except OperatingPointError as e:
-        print(f'Creating pipline toals: OperatingPointError: {e} for pipeline {pipeline.name}')
+        print(f'Creating pipeline totals: OperatingPointError: {e} for pipeline {pipeline.name}')
         qop = qimin
         qop_str = "None"
         vop = "None"
