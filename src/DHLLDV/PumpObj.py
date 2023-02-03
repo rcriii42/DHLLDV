@@ -3,7 +3,7 @@ PumpObj: Object to simulate a pump and driver
 
 Added by R. Ramsdell 03 September, 2021
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 
 import scipy.optimize
 
@@ -40,6 +40,29 @@ class Pump():
         self.design_QP_curve.extrapolate_high = True
         if self.limited != 'curve':
             self.driver_name = f'{self.limited} driver {self.avail_power:0.1f} at {self.design_speed:0.3f}'
+
+    def __str__(self):
+        """Only print parameters that are string or float. Print the names of the driver and slurry"""
+        s = [f'Pump(name="{self.name}", ']
+        for f in fields(self):
+            if f.type == float:
+                s.append(f'{f.name}={getattr(self, f.name):0.4f}, ')
+            elif f.type == int:
+                s.append(f'{f.name}={getattr(self, f.name)}, ')
+            elif f.type == Driver and getattr(self, f.name) is not None:
+                s.append(f'{f.name}="{getattr(self, f.name).name}", ')
+            elif f.type == Slurry and getattr(self, f.name) is not None:
+                slurry = getattr(self, f.name)
+                if slurry._name:
+                    s.append(f'{f.name}="{slurry.name}", ')
+                else:
+                    d15 = slurry.get_dx(0.15)*1000
+                    d50 = slurry.get_dx(0.50)*1000
+                    d85 = slurry.get_dx(0.85)*1000
+                    slurry_name = f'Slurry of {d15:0.3f}/{d50:0.3f}/{d85:0.3f} mm sand in {slurry.fluid} water'
+                    s.append(f'{f.name}="{slurry_name}", ')
+        s.append(')')
+        return ''.join(s)
 
     def efficiency(self, q):
         """Return the efficiency of the pump based on the current speed"""
