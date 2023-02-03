@@ -32,7 +32,7 @@ class Test(unittest.TestCase):
         Re = homogeneous.pipe_reynolds_number(3.0, 0.5, nu)
         lmbda = homogeneous.swamee_jain_ff(Re, 0.5, DHLLDV_constants.steel_roughness)
         self.assertAlmostEqual(lmbda, 0.0129407)
-        Re = 2320  #laminar
+        Re = 2320  # laminar
         lmbda = homogeneous.swamee_jain_ff(Re, 0.5, DHLLDV_constants.steel_roughness)
         self.assertAlmostEqual(lmbda, 2.75862069e-02)
         
@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(homogeneous.apparent_concentration(Cvs, 1.0), 0.0)
         
     def test_limiting_particle(self):
-        Dp =0.5
+        Dp = 0.5
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
@@ -69,8 +69,8 @@ class Test(unittest.TestCase):
 
     def test_Erhg(self):
         vls = 3.0
-        Dp =0.5
-        d=0.075/1000
+        Dp = 0.5
+        d = 0.075/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
     def test_head_loss(self):
         vls = 3.0
         Dp = 0.5
-        d=0.075/1000
+        d = 0.075/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
@@ -107,8 +107,8 @@ class Test(unittest.TestCase):
     
     def test_Erhg_med_sand(self):
         vls = 3.0
-        Dp =0.5
-        d=0.4/1000
+        Dp = 0.5
+        d = 0.4/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
@@ -118,16 +118,17 @@ class Test(unittest.TestCase):
         
     def test_Erhg_sf(self):
         vls = 3.0
-        Dp =0.5
-        d=8.0/1000
+        Dp = 0.5
+        d = 8.0/1000
         epsilon = DHLLDV_constants.steel_roughness
         rhol = DHLLDV_constants.water_density[20]
         nu = DHLLDV_constants.water_viscosity[20]
         rhos = 2.65
         Cvs = 0.25
-        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False), 0.00465260820521)
+        self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, use_sf=False),
+                               0.00465260820521)
         self.assertAlmostEqual(homogeneous.Erhg(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs), 0.0302993)
 
+
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

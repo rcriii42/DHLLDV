@@ -24,7 +24,7 @@ class Test(unittest.TestCase):
     def test_perimeters(self):
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
         self.assertAlmostEqual(Op, 1.5707963)
-        #Reduced precision because Beta only to 4 places
+        # Reduced precision because Beta only to 4 places
         self.assertAlmostEqual(O1, 1.0788463, places=4)
         self.assertAlmostEqual(O12, 0.4163317, places=4)
         self.assertAlmostEqual(O2, 0.4919500, places=4)
@@ -56,7 +56,7 @@ class Test(unittest.TestCase):
         Ap, A1, A2 = stratified.areas(0.5, 0.1)
         Op, O1, O12, O2 = stratified.perimeters(0.5, 0.1)
         Dp_H = 4*A1/(O1+O12)
-        d=0.3
+        d = 0.3
         vls = 3.0
         v1 = vls*Ap/A1
         v2 = 0.0
@@ -93,12 +93,12 @@ class Test(unittest.TestCase):
         rho_l = DHLLDV_constants.water_density[20]
         Cvs = 0.1
         self.assertAlmostEqual(stratified.sliding_bed_pressure_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.788499308)#, places=5)
+                               0.788499308)  # , places=5)
         self.assertAlmostEqual(stratified.sliding_bed_head_loss(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
-                               0.08054954196153)#, places=6)
+                               0.08054954196153)  # , places=6)
         self.assertAlmostEqual(stratified.Erhg(vls, Dp, d, epsilon, nu_l, rho_l, rho_s, Cvs),
                                0.415)
 
+
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

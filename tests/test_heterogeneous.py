@@ -38,10 +38,6 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(heterogeneous.vth_RZ(10.000/1000, Rsd, nu, Cvs), 0.313060300)
         self.assertAlmostEqual(heterogeneous.vth_RZ(20.000/1000, Rsd, nu, Cvs), 0.444118731)
 
-
-
-
-
     def test_Ehrg_nosf(self):
         vls = 3.0
         Dp = 0.5
@@ -86,5 +82,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

@@ -93,8 +93,8 @@ class Test(unittest.TestCase):
         il = self.slurry.im_curves['il'][42]
         self.slurry.epsilon = 4.0e-05
         self.assertTrue(self.slurry.curves_dirty)   # Curves should be dirty after updating epsilon
-        self.assertNotEqual(self.slurry.im_curves['il'][42], il)    # The value of il for that velocity
-                                                                    # should have changed
+        self.assertNotEqual(self.slurry.im_curves['il'][42], il)    # The value of il for that velocity should change
+
     def test_rhos_changed(self):
         """Test that the curves are regenerated after changing rhos
 
@@ -148,6 +148,7 @@ class Test(unittest.TestCase):
         new_name = f'Test slurry created at {datetime.datetime.now()}'
         s = SlurryObj.Slurry(name=new_name)
         self.assertEqual(s.name, new_name)
+
 
 if __name__ == '__main__':
     unittest.main()

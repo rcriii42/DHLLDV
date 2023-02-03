@@ -9,8 +9,8 @@ import unittest
 from DHLLDV import DHLLDV_constants
 from DHLLDV import DHLLDV_framework
 
-class Test(unittest.TestCase):
 
+class Test(unittest.TestCase):
 
     def testLDV_very_small(self):
         vls = 1
@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         Rsd = (rhos-rhol)/rhol
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=100)
         self.assertAlmostEqual(LDV, 4.8456347, places=5)
-        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)#, max_steps=100)
+        LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs)   # , max_steps=100)
         self.assertAlmostEqual(LDV, 4.8456347, places=4)
         LDV = DHLLDV_framework.LDV(vls, Dp, d, epsilon, nu, rhol, rhos, Cvs, max_steps=5)
         self.assertAlmostEqual(LDV, 4.8456347, places=3)
@@ -121,5 +121,4 @@ class Test(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

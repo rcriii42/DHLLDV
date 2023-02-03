@@ -11,8 +11,8 @@ import DHLLDV.DHLLDV_constants
 class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.epsilon = DHLLDV.DHLLDV_constants.steel_roughness
-        self.nu = 1.003e-06 #DHLLDV.DHLLDV_constants.water_viscosity[20]
-        self.rhol = 0.9982 #DHLLDV.DHLLDV_constants.water_density[20]
+        self.nu = 1.003e-06  # DHLLDV.DHLLDV_constants.water_viscosity[20]
+        self.rhol = 0.9982  # DHLLDV.DHLLDV_constants.water_density[20]
         self.rhos = 2.65
         self.musf = 0.4
 
@@ -43,8 +43,8 @@ class MyTestCase(unittest.TestCase):
     def test_head_loss_CaseStudy6_1a(self):
         """Test based on WASC Case Study 6.1, page 145"""
         im = Wilson.Wilson_V50.heterogeneous_head_loss(6.3, 0.65, 0.7/1000, 1.0/1000,
-                                                           self.epsilon, self.nu, self.rhol,
-                                                           self.rhos, 0.2, self.musf)
+                                                       self.epsilon, self.nu, self.rhol,
+                                                       self.rhos, 0.2, self.musf)
         self.assertAlmostEqual(im, 0.0612, places=1)
 
 
