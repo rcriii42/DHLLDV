@@ -199,7 +199,11 @@ class Pump():
         n_low = next(speeds)
         while _power_gap(n_low) < 0:
             n_high = n_low
-            n_low = next(speeds)
+            try:
+                n_low = next(speeds)
+            except StopIteration:
+                print(f'Pump.find_curve_limited_speed: {self.name} using minimum speed for flow of {Q: 0.3f} m/sec')
+                return n_high
 
         result = scipy.optimize.root_scalar(_power_gap,
                                             bracket=[n_low, n_high])
