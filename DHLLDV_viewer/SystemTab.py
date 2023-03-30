@@ -181,6 +181,7 @@ def system_panel(PL):
 
     def update_all(pipeline):
         """Update the data sources and information boxes"""
+        pipeline.update_slurries()
         this_pipe = Pipe(diameter=pipeline.slurry.Dp)
         flow_list = [this_pipe.flow(v) for v in pipeline.slurry.vls_list]
         head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
