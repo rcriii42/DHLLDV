@@ -450,6 +450,7 @@ D85_input.on_change('value', update_D85)
 def update_Cv(attrname, old, new):
     """Check and update the Cv"""
     slurry.Cv = check_value(Cv_input, 0.01, 0.5, slurry.Cv, '0.3f')
+    pipeline.update_slurries()
     update_source_data()
 
 
