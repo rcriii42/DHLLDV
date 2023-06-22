@@ -250,12 +250,41 @@ def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
     return s
 
 
-def validate_excel(wb: openpyxl.workbook):
+def validate_excel_fields(wb:openpyxl.workbook, sheet_type: str, sheet_name: int) -> None:
+    """Validate that the given sheet has the right single-valued fields
+
+    wb: The workbook
+    sheet_type: The type of sheet (must be a key of excel_requireds)
+    sheet_name: The name of the sheet in the wb to check"""
+    sheet_id = wb.sheetnames.index(sheet_name)  # The id / index of a worksheet
+    if sheet_type not in excel_requireds.keys():
+        raise InvalidExcelError(f'Unknown sheet type {sheet_type = } for {sheet_name = } in {wb.path}, '
+                                f'must be a key of load_pump_excel.excel_requireds')
+    for field_name, field_type in excel_requireds[sheet_type].items():
+        if field_type in [str, float]:
+            try:
+                value = get_range_value(wb, sheet_id, field_name)
+            except AttributeError:
+                raise InvalidExcelError(f'Missing field {field_name = } for {sheet_name = } in {wb.path}, '
+                                        f'must be worksheet scope')
+            if (not type(value) == field_type) and (field_type == float and not type(value) == int):
+                raise InvalidExcelError(f'The value of {field_name = } {value = } for {sheet_name = } in {wb.path}, '
+                                        f'is of type {type(value)}, should be {field_type}')
+
+
+def validate_excel(wb: openpyxl.workbook) -> None:
     """Validate that the excel file has the correct tabs and defined ranges"""
     for sheet_name, fields in excel_requireds.items():
         present = [s for s in wb.sheetnames if sheet_name in s.lower()]
         if fields['required'] and len(present) != 1:
             raise InvalidExcelError(f'Workbook missing the {sheet_name} tab.')
+
+    for ws_name in wb.sheetnames:
+        sheet_type = [t for t in excel_requireds.keys() if t in ws_name.lower()]  # This actually a list
+        print(f'validate_excel: Checking {ws_name = } of {sheet_type = }')
+        if len(sheet_type) == 1:
+            validate_excel_fields(wb, sheet_type[0], ws_name)
+
 
 
 if __name__ == "__main__":
