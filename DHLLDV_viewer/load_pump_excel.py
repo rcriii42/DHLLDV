@@ -49,6 +49,9 @@ The spreadsheet should have sheets with the following properties:
 
 import copy
 import openpyxl
+import os.path
+import string
+import unicodedata
 
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
@@ -94,6 +97,9 @@ excel_requireds = {'pipeline': {'required': True,
                               'power_curve': {'speed': float,
                                               'power': float}}
                    }
+
+# These are the characters allowed in filenames when saving to excel
+valid_filename_chars = f'-_{string.ascii_letters}{string.digits}'
 
 
 class InvalidExcelError(Exception):
@@ -286,6 +292,22 @@ def validate_excel(wb: openpyxl.workbook) -> None:
             validate_excel_fields(wb, sheet_type[0], ws_name)
 
 
+def remove_disallowed_filename_chars(filename):
+    cleaned_filename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
+    return ''.join(c for c in cleaned_filename if c in valid_filename_chars)
+
+
+def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="static/pipelines") -> None:
+    """Store the pipeline to a new excel file
+
+    The filename will be a version of the pipeline name
+
+    pipeline: The pipeline to store
+    requireds: A dict with the layout of the file. If NOne, use excel_requireds defined above
+    path: The folder path (relative to .) for saving
+    """
+    fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name))
+    ...
 
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
