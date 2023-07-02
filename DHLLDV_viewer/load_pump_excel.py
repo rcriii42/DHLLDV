@@ -49,9 +49,6 @@ The spreadsheet should have sheets with the following properties:
 
 import copy
 import openpyxl
-import os.path
-import string
-import unicodedata
 
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
@@ -64,6 +61,7 @@ from DHLLDV.DHLLDV_Utils import interpDict
 # The values are dicts with one key "required" that is true if the tab is required. The other keys are required defined
 # names whose values are the expected type of the contents. If the range is a table, the type is yet another dict, with
 # Column names and the type of data in the column
+# TODO: The defined names should match the attributes in the relevant objects, to reduce custom parsing
 excel_requireds = {'pipeline': {'required': True,
                                 'name': str,
                                 'pipe_table': {'name': str,
@@ -97,9 +95,6 @@ excel_requireds = {'pipeline': {'required': True,
                               'power_curve': {'speed': float,
                                               'power': float}}
                    }
-
-# These are the characters allowed in filenames when saving to excel
-valid_filename_chars = f'-_{string.ascii_letters}{string.digits}'
 
 
 class InvalidExcelError(Exception):
@@ -256,7 +251,7 @@ def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
     return s
 
 
-def validate_excel_fields(wb:openpyxl.workbook, sheet_type: str, sheet_name: int) -> None:
+def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: int) -> None:
     """Validate that the given sheet has the right single-valued fields
 
     wb: The workbook
@@ -286,28 +281,11 @@ def validate_excel(wb: openpyxl.workbook) -> None:
             raise InvalidExcelError(f'Workbook missing the {sheet_name} tab.')
 
     for ws_name in wb.sheetnames:
-        sheet_type = [t for t in excel_requireds.keys() if t in ws_name.lower()]  # This actually a list
-        print(f'validate_excel: Checking {ws_name = } of {sheet_type = }')
+        sheet_type = [t for t in excel_requireds.keys() if t in ws_name.lower()]
+        # print(f'validate_excel: Checking {ws_name = } of {sheet_type = }')
         if len(sheet_type) == 1:
             validate_excel_fields(wb, sheet_type[0], ws_name)
 
-
-def remove_disallowed_filename_chars(filename):
-    cleaned_filename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
-    return ''.join(c for c in cleaned_filename if c in valid_filename_chars)
-
-
-def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="static/pipelines") -> None:
-    """Store the pipeline to a new excel file
-
-    The filename will be a version of the pipeline name
-
-    pipeline: The pipeline to store
-    requireds: A dict with the layout of the file. If NOne, use excel_requireds defined above
-    path: The folder path (relative to .) for saving
-    """
-    fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name))
-    ...
 
 if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
