@@ -6,7 +6,7 @@ Added by R. Ramsdell 2023-07-02"""
 
 import openpyxl
 from openpyxl.workbook.defined_name import DefinedName
-from openpyxl.utils import quote_sheetname, absolute_coordinate
+from openpyxl.utils import quote_sheetname, absolute_coordinate, get_column_letter
 import os.path
 import string
 
@@ -43,12 +43,12 @@ def remove_disallowed_filename_chars(filename_candidate: str, extension: str) ->
     return cleaned_filename
 
 
-def create_and_fill_named_range(wb: openpyxl.Workbook, sheet_name: str or None, range_name: str, range_addr: str,
+def create_and_fill_named_range(wb: openpyxl.Workbook, sheet_name: str, range_name: str, range_addr: str,
                                 value: str or float) -> None:
-    """Create a named range and fill with the given value
+    """Create a worksheet-scope named range and fill with the given value
 
     wb: The workbook
-    sheet_name: The sheet to scope the range to, or None for workbook scope
+    sheet_name: The sheet with the range
     range_name: The name of the defined name, must meet excel rules
     range_addr: The cell address in excel "A1" format
     value: The value to place in the cell
@@ -68,6 +68,7 @@ def write_slurry_to_excel(wb: openpyxl.workbook, slurry: Slurry, reqs: dict) -> 
     reqs: The 'slurry' dict from excel_requireds
     """
     sheet_name = 'slurry'
+    ws = wb.create_sheet(sheet_name)
     current_row = 1
     units_map = {'name': '',
                  'pipe_dia': 'm',
@@ -90,14 +91,53 @@ def write_slurry_to_excel(wb: openpyxl.workbook, slurry: Slurry, reqs: dict) -> 
                 value = slurry.__dict__[range_name]
             except KeyError:
                 value = slurry.__dict__[f'_{range_name}']  # Several parameters have shadow "_xxx" variables
-        wb['slurry'][f'A{current_row}'].value = range_name
+        ws[f'A{current_row}'].value = range_name
         create_and_fill_named_range(wb, sheet_name, range_name, f'B{current_row}', value)
-        wb['slurry'][f'C{current_row}'].value = units_map[range_name]
+        ws[f'C{current_row}'].value = units_map[range_name]
         current_row += 1
 
 
-def write_pump_to_excel():
-    pass
+def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, reqs: dict):
+    ws = wb.create_sheet(pump_name)
+    current_row = 1
+    units_map = {'name': '',
+                 'design_impeller': 'm',
+                 'suction_dia': 'm',
+                 'disch_dia': 'm',
+                 'design_speed': 'Hz',
+                 'limited': 'torque/power/curve',
+                 'gear_ratio': '-',
+                 'avail_power': 'kW',}
+    for range_name, val_type in reqs.items():
+        if range_name == 'required':
+            continue
+        else:
+            try:
+                value = this_pump.__dict__[range_name]
+            except KeyError:
+                value = this_pump.__dict__[f'_{range_name}']  # Several parameters have shadow "_xxx" variables
+        ws[f'A{current_row}'].value = range_name
+        create_and_fill_named_range(wb, pump_name, range_name, f'B{current_row}', value)
+        ws[f'C{current_row}'].value = units_map[range_name]
+        current_row += 1
+
+    # The flow/head/power curves
+    current_col = 1
+    first_row = current_row
+    for header in ('Flow m3/sec', 'Head m', 'Power kW'):
+        ws.cell(row=current_row, column=current_col).value = header
+        current_col += 1
+    current_row += 1
+    for point in zip(this_pump.design_QH_curve.keys(),
+                     this_pump.design_QH_curve.values(),
+                     this_pump.design_QP_curve.values(),
+                     this_pump.design_QP_curve.keys()):
+        current_col = 1
+        # TODO: Check here for different QH/QP flow lists
+        for value in point[:-1]:
+            ws.cell(row=current_row, column=current_col).value = value
+            current_col += 1
+        current_row += 1
 
 
 def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, Pump], current_row: int) -> int:
@@ -106,12 +146,43 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
     wb: The Workbook
     pipesections: The list of Pipe or Pump objects
     current_row: The row to start writing
+
+    returns the new current_row
     """
     sheet_name = 'pipeline'
-    sheet_id = wb.sheetnames.index(sheet_name)
+    ws = wb[sheet_name]
     current_col = 1
-    for header in ('Pipe Name', 'Diameter (m)', 'Length (m)', 'Total K', 'Elev Change (m)', 'Final Elev (m)'):
-        wb[sheet_name].cells()
+    first_row = current_row
+    for header in ('Pipe Name', 'Diameter (m)', 'Length (m)', 'Total K (-)', 'Elev Change (m)', 'Final Elev (m)'):
+        ws.cell(row=current_row, column=current_col).value = header
+        current_col += 1
+    current_row += 1
+    current_elev = 0
+    pump_num = 1
+    for p in pipesections:
+        if isinstance(p, Pump):
+            pump_name = f'Number{pump_num}Pump'
+            write_pump_to_excel(wb, p, pump_name, excel_requireds['pump'])
+            current_col = 1
+            for value in (pump_name, '', '', '', '', current_elev):
+                ws.cell(row=current_row, column=current_col).value = value
+                current_col += 1
+            pump_num += 1
+        elif isinstance(p, Pipe):
+            current_elev += p.elev_change
+            current_col = 1
+            for value in (p.name, p.diameter, p.length, p.total_K, p.elev_change, current_elev):
+                ws.cell(row=current_row, column=current_col).value = value
+                current_col += 1
+        else:
+            raise TypeError(f'Object of type {type(p)} not supported when storing to Excel')
+        current_row += 1
+    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row}'
+    ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
+    defn = DefinedName('pipe_table', attr_text=ref)
+    ws.defined_names.add(defn)
+
+    return current_row
 
 
 def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="static/pipelines") -> str:
@@ -127,6 +198,8 @@ def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="sta
     """
     fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
     wb = openpyxl.Workbook()
+
+    # Create the documentations sheets
     ws = wb.active
     ws.title = 'documentation'
     current_row = 1
@@ -134,16 +207,17 @@ def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="sta
         cell_addr = f'A{current_row}'
         ws[cell_addr].value = row
         current_row += 1
+    # Create other sheets
     for sheet_name, req_data in requireds.items():
-        wb.create_sheet(sheet_name)
         if sheet_name == 'slurry':
             write_slurry_to_excel(wb, pipeline.slurry, req_data)
+        elif sheet_name == 'pipeline':
+            ws = wb.create_sheet(sheet_name)
+            ws[f'A1'] = 'Name:'
+            create_and_fill_named_range(wb, sheet_name, 'name', f'B1', pipeline.name)
+            write_pipesections_to_excel(wb, pipeline.pipesections, 3)
         else:
-            current_row = 1
-            for range_name, data_type in requireds[sheet_name].items():  # Create the range names
-                if data_type in [str, float]:  # But not for the 'required' field or tables
-                    create_and_fill_named_range(wb, sheet_name, range_name, f'B{current_row}', range_name)
-                    current_row += 2
+            pass
     wb.save(fname)
 
     wb.close()
@@ -154,7 +228,7 @@ if __name__ == "__main__":
     import datetime
     from DHLLDV_viewer.load_pump_excel import load_pipeline_from_workbook
     in_fname = "static/pipelines/Example_input.xlsx"
-    wb = openpyxl.load_workbook(filename=in_fname, data_only=True)  # Loading a workbook, data_only takes the stored values
+    wb = openpyxl.load_workbook(filename=in_fname, data_only=True)
     PL = load_pipeline_from_workbook(wb)
     PL.name = f'Example Stored Pipeline: {datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")}'
     new_PL_xl_name = store_to_excel(PL, excel_requireds)
