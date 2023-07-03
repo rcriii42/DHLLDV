@@ -104,7 +104,7 @@ class InvalidExcelError(Exception):
 def get_range_value(wb: openpyxl.Workbook, sheet_id: int, range_name: str):
     """Get the value from the given range on the given sheet"""
     sheet_name = wb.sheetnames[sheet_id]
-    sheet_addr = wb.defined_names.get(range_name, sheet_id).value.split("!")[1]
+    sheet_addr = wb[sheet_name].defined_names[range_name].attr_text.split("!")[1]
     return wb[sheet_name][sheet_addr].value
 
 
@@ -114,11 +114,11 @@ def load_driver_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     sheet_id: The id of the driver sheet in the sheet list
     """
     params = {'name': get_range_value(wb, sheet_id, 'name')}
-    my_range = wb.defined_names.get('power_curve', sheet_id)
+    sheet_name = wb.sheetnames[sheet_id]
     speed_col = None
     power_col = None
-    cell_range = next(my_range.destinations)  # returns a generator of (worksheet title, cell range) tuples
-    rows = wb[wb.sheetnames[sheet_id]][cell_range[1]]
+    cell_range = next(wb[sheet_name].defined_names['power_curve'].destinations)  # returns a generator of (worksheet title, cell range) tuples
+    rows = wb[sheet_name][cell_range[1]]
     curve = {}
     for row in rows:
         vals = [c.value for c in row]
@@ -141,12 +141,11 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
 
     params = dict([(k, v(get_range_value(wb, sheet_id, k)))
                    for k, v in single_values.items() if v in [str, int, float]])
-    my_range = wb.defined_names.get('pump_curve', sheet_id)
     sheet_name = wb.sheetnames[sheet_id]
     flow_col = None
     head_col = None
     power_col = None
-    cell_range = next(my_range.destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    cell_range = next(wb[sheet_name].defined_names['pump_curve'].destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
     rows = wb[sheet_name][cell_range]
     QH = {}
     QP = {}
@@ -196,14 +195,13 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
     for pump_name in pump_sheets:
         pumps[pump_name] = load_pump_from_worksheet(wb, pump_sheets[pump_name], driver_sheets.get(pump_name))
 
-    my_range = wb.defined_names.get('pipe_table', pipesheet_id)
     sheet_name = wb.sheetnames[pipesheet_id]
     name_col = None
     dia_col = None
     len_col = None
     k_col = None
     dz_col = None
-    cell_range = next(my_range.destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    cell_range = next(wb[sheet_name].defined_names['pipe_table'].destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
     rows = wb[sheet_name][cell_range]
     pipes = []
     for row in rows:
