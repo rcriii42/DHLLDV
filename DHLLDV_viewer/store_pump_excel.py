@@ -230,7 +230,7 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
     return current_row
 
 
-def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="static/pipelines") -> str:
+def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path=None) -> str:
     """Store the pipeline to a new excel file
 
     The filename will be a version of the pipeline name
@@ -241,6 +241,10 @@ def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path="sta
 
     TODO: returns (fname or workbook?)
     """
+    if requireds is None:
+        requireds = excel_requireds
+    if path is None:
+        path = os.path.join(os.path.dirname(__file__), 'static', 'pipelines')
     fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
     wb = openpyxl.Workbook()
 
