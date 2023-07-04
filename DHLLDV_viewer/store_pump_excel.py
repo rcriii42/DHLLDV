@@ -14,10 +14,9 @@ from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
 from DHLLDV.PipeObj import Pipe, Pipeline
 from DHLLDV.SlurryObj import Slurry
-from DHLLDV.DHLLDV_Utils import interpDict
 
-from DHLLDV_viewer.load_pump_excel import excel_requireds
-from DHLLDV_viewer.load_pump_excel import __doc__ as xl_doc
+from load_pump_excel import excel_requireds
+from load_pump_excel import __doc__ as xl_doc
 
 
 # These are the characters allowed in filenames when saving to excel
@@ -144,7 +143,7 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
                  'design_speed': 'Hz',
                  'limited': 'torque/power/curve',
                  'gear_ratio': '-',
-                 'avail_power': 'kW',}
+                 'avail_power': 'kW'}
     for range_name, val_type in reqs.items():
         if range_name == 'required':
             continue
