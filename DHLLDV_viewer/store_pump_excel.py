@@ -97,6 +97,43 @@ def write_slurry_to_excel(wb: openpyxl.workbook, slurry: Slurry, reqs: dict) -> 
         current_row += 1
 
 
+def write_driver_to_excel(wb: openpyxl.Workbook, this_driver: Driver, driver_name: str, reqs: dict):
+    ws = wb.create_sheet(driver_name)
+    current_row = 1
+    units_map = {'name': '',
+                 }
+    for range_name, val_type in reqs.items():
+        if range_name in ('required', 'power_curve'):
+            continue
+        else:
+            try:
+                value = this_driver.__dict__[range_name]
+            except KeyError:
+                value = this_driver.__dict__[f'_{range_name}']  # Several parameters have shadow "_xxx" variables
+        ws[f'A{current_row}'].value = range_name
+        create_and_fill_named_range(wb, driver_name, range_name, f'B{current_row}', value)
+        ws[f'C{current_row}'].value = units_map[range_name]
+        current_row += 2
+
+        # The speed/power curve
+        current_col = 1
+        first_row = current_row
+        for header in ('Speed Hz', 'Power kW'):
+            ws.cell(row=current_row, column=current_col).value = header
+            current_col += 1
+        current_row += 1
+        for speed, power in this_driver.design_power_curve.items():
+            current_col = 1
+            for value in (speed, power):
+                ws.cell(row=current_row, column=current_col).value = value
+                current_col += 1
+            current_row += 1
+        range_addr = f'A{first_row}:{get_column_letter(current_col - 1)}{current_row - 1}'
+        ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
+        defn = DefinedName('power_curve', attr_text=ref)
+        ws.defined_names.add(defn)
+
+
 def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, reqs: dict):
     ws = wb.create_sheet(pump_name)
     current_row = 1
@@ -138,10 +175,15 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
             ws.cell(row=current_row, column=current_col).value = value
             current_col += 1
         current_row += 1
-    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row - 1}'
+    range_addr = f'A{first_row}:{get_column_letter(current_col - 1)}{current_row - 1}'
     ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
     defn = DefinedName('pump_curve', attr_text=ref)
     ws.defined_names.add(defn)
+
+    # The driver
+    if this_pump.limited == 'curve':
+        driver_name = pump_name.replace('Pump', 'Driver')
+        write_driver_to_excel(wb, this_pump.driver, driver_name, excel_requireds['driver'])
 
 
 def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, Pump], current_row: int) -> int:
@@ -181,7 +223,7 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
         else:
             raise TypeError(f'Object of type {type(p)} not supported when storing to Excel')
         current_row += 1
-    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row - 1}'
+    range_addr = f'A{first_row}:{get_column_letter(current_col - 1)}{current_row - 1}'
     ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
     defn = DefinedName('pipe_table', attr_text=ref)
     ws.defined_names.add(defn)
