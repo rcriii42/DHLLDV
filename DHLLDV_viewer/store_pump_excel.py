@@ -138,6 +138,10 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
             ws.cell(row=current_row, column=current_col).value = value
             current_col += 1
         current_row += 1
+    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row - 1}'
+    ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
+    defn = DefinedName('pump_curve', attr_text=ref)
+    ws.defined_names.add(defn)
 
 
 def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, Pump], current_row: int) -> int:
@@ -177,7 +181,7 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
         else:
             raise TypeError(f'Object of type {type(p)} not supported when storing to Excel')
         current_row += 1
-    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row}'
+    range_addr = f'A{first_row}:{get_column_letter(current_col)}{current_row - 1}'
     ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
     defn = DefinedName('pipe_table', attr_text=ref)
     ws.defined_names.add(defn)
