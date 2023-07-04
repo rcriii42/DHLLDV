@@ -23,6 +23,7 @@ from DHLLDV import DHLLDV_framework
 
 import SystemTab
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
+from store_pump_excel import store_to_excel
 
 # Set up data
 
@@ -572,11 +573,20 @@ file_input = FileInput(accept=".xls, .xlsm, .xlsx")
 file_input.on_change('filename', upload_xl_data)
 
 
+# Button to save to Excel
+def save_button_callback():
+    store_to_excel(pipeline)
+
+
+save_button = Button(label="Save to Excel", button_type="success")
+save_button.on_click(save_button_callback)
+
+
 sys_tab, sys_update = SystemTab.system_panel(pipeline)
 
 tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
 tabbed_panels.active = 1
-top_row = row(pipeline_dropdown, unit_picker, file_input, stop_button)
+top_row = row(pipeline_dropdown, unit_picker, file_input, save_button, stop_button)
 curdoc().add_root(column(top_row,
                          tabbed_panels))
 
