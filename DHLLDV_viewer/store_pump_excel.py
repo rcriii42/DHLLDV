@@ -118,23 +118,23 @@ def write_driver_to_excel(wb: openpyxl.Workbook, this_driver: Driver, driver_nam
         ws[f'C{current_row}'].value = units_map[range_name]
         current_row += 2
 
-        # The speed/power curve
+    # The speed/power curve
+    current_col = 1
+    first_row = current_row
+    for header in ('Speed Hz', 'Power kW'):
+        ws.cell(row=current_row, column=current_col).value = header
+        current_col += 1
+    current_row += 1
+    for speed, power in this_driver.design_power_curve.items():
         current_col = 1
-        first_row = current_row
-        for header in ('Speed Hz', 'Power kW'):
-            ws.cell(row=current_row, column=current_col).value = header
+        for value in (speed, power):
+            ws.cell(row=current_row, column=current_col).value = value
             current_col += 1
         current_row += 1
-        for speed, power in this_driver.design_power_curve.items():
-            current_col = 1
-            for value in (speed, power):
-                ws.cell(row=current_row, column=current_col).value = value
-                current_col += 1
-            current_row += 1
-        range_addr = f'A{first_row}:{get_column_letter(current_col - 1)}{current_row - 1}'
-        ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
-        defn = DefinedName('power_curve', attr_text=ref)
-        ws.defined_names.add(defn)
+    range_addr = f'A{first_row}:{get_column_letter(current_col - 1)}{current_row - 1}'
+    ref = f"{quote_sheetname(ws.title)}!{absolute_coordinate(range_addr)}"
+    defn = DefinedName('power_curve', attr_text=ref)
+    ws.defined_names.add(defn)
 
 
 def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, pump_reqs: dict, driver_reqs: dict):
