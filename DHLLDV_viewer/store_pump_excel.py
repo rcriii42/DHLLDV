@@ -14,9 +14,12 @@ from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
 from DHLLDV.PipeObj import Pipe, Pipeline
 from DHLLDV.SlurryObj import Slurry
-
-from load_pump_excel import excel_requireds
-from load_pump_excel import __doc__ as xl_doc
+try:
+    from load_pump_excel import excel_requireds
+    from load_pump_excel import __doc__ as xl_doc
+except ImportError:
+    from .load_pump_excel import excel_requireds
+    from .load_pump_excel import __doc__ as xl_doc
 
 
 # These are the characters allowed in filenames when saving to excel
