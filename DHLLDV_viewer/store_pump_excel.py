@@ -234,7 +234,7 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
     return current_row
 
 
-def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path=None) -> str:
+def store_to_excel(pipeline: Pipeline, fname: str = None, requireds: dict or None = None, path: str = None) -> str:
     """Store the pipeline to a new excel file
 
     The filename will be a version of the pipeline name
@@ -243,13 +243,19 @@ def store_to_excel(pipeline: Pipeline, requireds: dict or None = None, path=None
     requireds: A dict with the layout of the file. If NOne, use excel_requireds defined above
     path: The folder path (relative to .) for saving
 
-    TODO: returns (fname or workbook?)
+    returns the new filename
     """
     if requireds is None:
         requireds = excel_requireds
     if path is None:
         path = os.path.join(os.path.dirname(__file__), 'static', 'pipelines')
-    fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
+    if fname is None:
+        fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
+    else:
+        if '.xlsx' in fname and fname[-5:] == '.xlsx':
+            fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name))
+        else:
+            fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
     wb = openpyxl.Workbook()
 
     # Create the documentations sheets
