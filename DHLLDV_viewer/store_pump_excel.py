@@ -238,10 +238,12 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
     return current_row
 
 
-def store_to_excel(pipeline: Pipeline, fname: str = None, requireds: dict or None = None, path: str = None) -> str:
+def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dict or None = None,
+                   path: str or None = None) -> str:
     """Store the pipeline to a new excel file
 
     The filename will be a version of the pipeline name
+    The filename will be a version of the pipeline name if not given
 
     pipeline: The pipeline to store
     requireds: A dict with the layout of the file. If NOne, use excel_requireds defined above
@@ -258,8 +260,10 @@ def store_to_excel(pipeline: Pipeline, fname: str = None, requireds: dict or Non
     else:
         if '.xlsx' in fname and fname[-5:] == '.xlsx':
             fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name))
+            fname = os.path.join(path, fname)  # Assume this is a valid filename
         else:
             fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
+            fname = os.path.join(path, remove_disallowed_filename_chars(fname, '.xlsx'))
     wb = openpyxl.Workbook()
 
     # Create the documentation sheets
@@ -294,7 +298,7 @@ if __name__ == "__main__":
     wb = openpyxl.load_workbook(filename=in_fname, data_only=True)
     PL = load_pipeline_from_workbook(wb)
     PL.name = f'Example Stored Pipeline: {datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")}'
-    new_PL_xl_name = store_to_excel(PL, excel_requireds)
+    new_PL_xl_name = store_to_excel(PL, requireds=excel_requireds)
 
     new_wb = openpyxl.load_workbook(filename=new_PL_xl_name, data_only=True)
     new_PL = load_pipeline_from_workbook(new_wb)
