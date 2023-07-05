@@ -259,10 +259,8 @@ def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dic
         fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
     else:
         if '.xlsx' in fname and fname[-5:] == '.xlsx':
-            fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name))
-            fname = os.path.join(path, fname)  # Assume this is a valid filename
+            fname = os.path.join(path, remove_disallowed_filename_chars(fname[:-5], '.xlsx'))
         else:
-            fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
             fname = os.path.join(path, remove_disallowed_filename_chars(fname, '.xlsx'))
     wb = openpyxl.Workbook()
 
