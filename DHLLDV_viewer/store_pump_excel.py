@@ -23,25 +23,26 @@ except ImportError:
 
 
 # These are the characters allowed in filenames when saving to excel
+replace_filename_chars = [' ', ]  # These will be replaced with '_', applied before deleting invalid characters
 valid_filename_chars = f'-_{string.ascii_letters}{string.digits}'
-replace_filename_chars = ('.', ' ')  # These will be replaced with '_'
 
 
-def remove_disallowed_filename_chars(filename_candidate: str, extension: str) -> str:
+def remove_disallowed_filename_chars(filename_candidate: str, extension: str or None = None) -> str:
     """Turn a string into an acceptable filename using a whitelist approach
 
-    '.' and ' ' become '_', other unwanted characters are removed
+    The characters in replace_filename_characters are replaced with '_', other unwanted characters are removed
 
     filename_candidate is the string to be transformed
     extension is the filename extension to add
 
     Returns the cleaned filename
     """
+    if extension is None:
+        extension = ''
     for c in replace_filename_chars:
         cleaned_filename = filename_candidate.replace(c, '_')
     cleaned_filename = ''.join(c for c in cleaned_filename if c in valid_filename_chars)
     cleaned_filename += extension
-    # cleaned_filename = unicodedata.normalize('NFKD', cleaned_filename).encode('ASCII', 'ignore')
     return cleaned_filename
 
 
