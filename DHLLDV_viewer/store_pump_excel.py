@@ -137,7 +137,7 @@ def write_driver_to_excel(wb: openpyxl.Workbook, this_driver: Driver, driver_nam
         ws.defined_names.add(defn)
 
 
-def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, reqs: dict):
+def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, pump_reqs: dict, driver_reqs: dict):
     ws = wb.create_sheet(pump_name)
     current_row = 1
     units_map = {'name': '',
@@ -148,7 +148,7 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
                  'limited': 'torque/power/curve',
                  'gear_ratio': '-',
                  'avail_power': 'kW'}
-    for range_name, val_type in reqs.items():
+    for range_name, val_type in pump_reqs.items():
         if range_name == 'required':
             continue
         else:
@@ -186,18 +186,22 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
     # The driver
     if this_pump.limited == 'curve':
         driver_name = pump_name.replace('Pump', 'Driver')
-        write_driver_to_excel(wb, this_pump.driver, driver_name, excel_requireds['driver'])
+        write_driver_to_excel(wb, this_pump.driver, driver_name, driver_reqs)
 
 
-def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, Pump], current_row: int) -> int:
+def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, Pump],
+                                current_row: int, requireds: dict or None = None) -> int:
     """Write the pipe section table to the workbook
 
     wb: The Workbook
     pipesections: The list of Pipe or Pump objects
     current_row: The row to start writing
+    requireds: the Dict of required names, uses excel_requireds if None
 
     returns the new current_row
     """
+    if requireds is None:
+        requireds = excel_requireds
     sheet_name = 'pipeline'
     ws = wb[sheet_name]
     current_col = 1
@@ -211,7 +215,7 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
     for p in pipesections:
         if isinstance(p, Pump):
             pump_name = f'Number{pump_num}Pump'
-            write_pump_to_excel(wb, p, pump_name, excel_requireds['pump'])
+            write_pump_to_excel(wb, p, pump_name, requireds['pump'], requireds['driver'])
             current_col = 1
             for value in (pump_name, '', '', '', '', current_elev):
                 ws.cell(row=current_row, column=current_col).value = value
@@ -258,7 +262,7 @@ def store_to_excel(pipeline: Pipeline, fname: str = None, requireds: dict or Non
             fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
     wb = openpyxl.Workbook()
 
-    # Create the documentations sheets
+    # Create the documentation sheets
     ws = wb.active
     ws.title = 'documentation'
     current_row = 1
