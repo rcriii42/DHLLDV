@@ -131,11 +131,13 @@ def load_driver_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     return Driver(**params)
 
 
-def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: int = None):
+def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: int = None) -> Pump:
     """Create a pump object from a pump worksheet
     wb: The workbook to load
     sheet_id: The id of the pump sheet in the sheet list
     driver_id: The id of any driver in the sheet list, or None if no driver
+
+    Return the pump object
     """
     single_values = excel_requireds['pump']
 
