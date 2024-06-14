@@ -242,13 +242,13 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
 
 def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dict or None = None,
                    path: str or None = None) -> str:
-    """Store the pipeline to a new excel file
+    """Store the pipeline to a new Excel file
 
     The filename will be a version of the pipeline name
     The filename will be a version of the pipeline name if not given
 
     pipeline: The pipeline to store
-    requireds: A dict with the layout of the file. If NOne, use excel_requireds defined above
+    requireds: A dict with the layout of the file. If None, use excel_requireds defined above
     path: The folder path (relative to .) for saving
 
     returns the new filename
