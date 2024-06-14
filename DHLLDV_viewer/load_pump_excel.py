@@ -157,9 +157,12 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
             flow_col = next(i for i, c in enumerate(vals) if 'flow' in c.lower())
             head_col = next(i for i, c in enumerate(vals) if 'head' in c.lower())
             power_col = next(i for i, c in enumerate(vals) if 'power' in c.lower())
+        elif sum([float(vals[flow_col]), float(vals[head_col]), float(vals[power_col])]) == 0:
+            pass
         else:
             QH[float(vals[flow_col])] = float(vals[head_col])
             QP[float(vals[flow_col])] = float(vals[power_col])
+
     params['design_QH_curve'] = interpDict(QH)
     params['design_QP_curve'] = interpDict(QP)
     if driver_id is not None:
