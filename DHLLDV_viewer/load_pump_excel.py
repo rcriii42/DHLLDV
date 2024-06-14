@@ -31,7 +31,7 @@ The spreadsheet should have sheets with the following properties:
     - speed is in Hz
     - The limited range can contain the string 'torque', 'power', or 'curve'
     - avail_power is in kW
-    - gear_ratio is the pump speed divided by the maximum/rated engine speed
+    - gear_ratio is the engine/motor speed divided by the pump speed
     - The pump_curve range has at least three columns and a header row:
         - Three of the columns have the word 'flow', 'head', or 'power' (not case sensitive) in the first row
         - flow is in m3/sec
