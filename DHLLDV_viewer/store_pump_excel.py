@@ -4,11 +4,13 @@ Create an excel file with the format defines in load_pump_excel
 
 Added by R. Ramsdell 2023-07-02"""
 
+from datetime import datetime
+import os.path
+import string
+
 import openpyxl
 from openpyxl.workbook.defined_name import DefinedName
 from openpyxl.utils import quote_sheetname, absolute_coordinate, get_column_letter
-import os.path
-import string
 
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
@@ -256,7 +258,8 @@ def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dic
     if path is None:
         path = os.path.join(os.path.dirname(__file__), 'static', 'pipelines')
     if fname is None:
-        fname = os.path.join(path, remove_disallowed_filename_chars(pipeline.name, '.xlsx'))
+        basename = f'{pipeline.name}_{datetime.now().strftime("%Y-%m-%d_%H%M%S")}'
+        fname = os.path.join(path, remove_disallowed_filename_chars(basename, ".xlsx"))
     else:
         if '.xlsx' in fname and fname[-5:] == '.xlsx':
             fname = os.path.join(path, remove_disallowed_filename_chars(fname[:-5], '.xlsx'))
