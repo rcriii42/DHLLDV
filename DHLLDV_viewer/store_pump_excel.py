@@ -41,8 +41,9 @@ def remove_disallowed_filename_chars(filename_candidate: str, extension: str or 
     """
     if extension is None:
         extension = ''
+    cleaned_filename = filename_candidate
     for c in replace_filename_chars:
-        cleaned_filename = filename_candidate.replace(c, '_')
+        cleaned_filename = cleaned_filename.replace(c, '_')
     cleaned_filename = ''.join(c for c in cleaned_filename if c in valid_filename_chars)
     cleaned_filename += extension
     return cleaned_filename
