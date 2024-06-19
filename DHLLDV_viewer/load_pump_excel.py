@@ -269,11 +269,12 @@ def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):
 
 
 def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: int) -> None:
-    """Validate that the given sheet has the right single-valued fields
+    """Validate that the given sheet has the right single-valued fields, raise an InvalidExcelError if not
 
-    wb: The workbook
-    sheet_type: The type of sheet (must be a key of excel_requireds)
-    sheet_name: The name of the sheet in the wb to check"""
+       wb: The workbook
+       sheet_type: The type of sheet (must be a key of excel_requireds)
+       sheet_name: The name of the sheet in the wb to check
+    """
     sheet_id = wb.sheetnames.index(sheet_name)  # The id / index of a worksheet
     if sheet_type not in excel_requireds.keys():
         raise InvalidExcelError(f'Unknown sheet type {sheet_type = } for {sheet_name = } in {wb.path}, '
@@ -291,8 +292,11 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
 
 
 def validate_excel(wb: openpyxl.workbook) -> None:
-    """Validate that the Excel file has the correct tabs and defined ranges"""
+    """Validate that the Excel file has the correct tabs and defined ranges, raise an InvalidExcelError if not
+        wb: The workbook
+    """
     for sheet_name, fields in excel_requireds.items():
+        # First check that the required tabs exist
         present = [s for s in wb.sheetnames if sheet_name in s.lower()]
         if fields['required'] and len(present) != 1:
             raise InvalidExcelError(f'Workbook missing the {sheet_name} tab.')
