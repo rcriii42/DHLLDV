@@ -194,7 +194,7 @@ class Pump():
         if _power_gap(self.design_speed) >= 0:
             return self.design_speed
 
-        speeds = reversed([p/self.gear_ratio for p in self.driver.design_power_curve.keys()])
+        speeds = iter(sorted([p/self.gear_ratio for p in self.driver.design_power_curve.keys()], reverse=True))
 
         n_high = next(speeds)
         n_low = next(speeds)
