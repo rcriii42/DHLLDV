@@ -1,10 +1,10 @@
-'''
+"""
 DHLLDV_Utils: Utility functions.
 
 Created on Oct 23, 2014
 
 @author: RCRamsdell
-'''
+"""
 import bisect
 
 
