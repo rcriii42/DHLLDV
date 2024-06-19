@@ -50,6 +50,7 @@ The spreadsheet should have sheets with the following properties:
 import copy
 import openpyxl
 from operator import itemgetter
+import warnings
 
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
@@ -167,8 +168,13 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     QH.sort(key=itemgetter(0))
     QP.sort(key=itemgetter(0))
 
-    params['design_QH_curve'] = interpDict(QH)
-    params['design_QP_curve'] = interpDict(QP)
+
+    params['design_QH_curve'] = interpDict(*QH)
+    params['design_QP_curve'] = interpDict(*QP)
+    if QH[-1][0] > 0.0:
+        warnings.warn(f'Curves for pump: {params["name"]} do not start at 0, enabling low end interpolation')
+        params['design_QH_curve'].extrapolate_low = True
+        params['design_QP_curve'].extrapolate_low = True
     if driver_id is not None:
         params['driver'] = load_driver_from_worksheet(wb, driver_id)
         params['driver_name'] = params['driver'].name
