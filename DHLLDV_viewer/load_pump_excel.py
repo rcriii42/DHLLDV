@@ -312,6 +312,7 @@ if __name__ == "__main__":
     fname = "static/pipelines/Example_input.xlsx"
 
     wb = openpyxl.load_workbook(filename=fname, data_only=True)  # Loading a workbook, data_only takes the stored values
+    validate_excel(wb)
     pumps = {}
     drivers = {}
     for ws_name in wb.sheetnames:
