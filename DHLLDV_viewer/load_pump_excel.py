@@ -119,7 +119,8 @@ def load_driver_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     sheet_name = wb.sheetnames[sheet_id]
     speed_col = None
     power_col = None
-    cell_range = next(wb[sheet_name].defined_names['power_curve'].destinations)  # returns a generator of (worksheet title, cell range) tuples
+    # returns a generator of (worksheet title, cell range) tuples
+    cell_range = next(wb[sheet_name].defined_names['power_curve'].destinations)
     rows = wb[sheet_name][cell_range[1]]
     curve = []
     for row in rows:
@@ -168,7 +169,6 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     QH.sort(key=itemgetter(0))
     QP.sort(key=itemgetter(0))
 
-
     params['design_QH_curve'] = interpDict(*QH)
     params['design_QP_curve'] = interpDict(*QP)
     if QH[-1][0] > 0.0:
@@ -216,7 +216,8 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
     len_col = None
     k_col = None
     dz_col = None
-    cell_range = next(wb[sheet_name].defined_names['pipe_table'].destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    # returns a generator of (worksheet title, cell range) tuples
+    cell_range = next(wb[sheet_name].defined_names['pipe_table'].destinations)[1]
     rows = wb[sheet_name][cell_range]
     pipes = []
     for row in rows:
@@ -287,7 +288,7 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
 
 
 def validate_excel(wb: openpyxl.workbook) -> None:
-    """Validate that the excel file has the correct tabs and defined ranges"""
+    """Validate that the Excel file has the correct tabs and defined ranges"""
     for sheet_name, fields in excel_requireds.items():
         present = [s for s in wb.sheetnames if sheet_name in s.lower()]
         if fields['required'] and len(present) != 1:
@@ -313,8 +314,6 @@ if __name__ == "__main__":
             input_type = 'pipeline'
             pipeline_name = get_range_value(wb, sheet_id, 'name')
             pipeline = load_pipeline_from_workbook(wb)
-
-    print(pipeline)
 
     try:
         import sys
