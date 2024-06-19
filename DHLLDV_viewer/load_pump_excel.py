@@ -151,8 +151,8 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     power_col = None
     cell_range = next(wb[sheet_name].defined_names['pump_curve'].destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
     rows = wb[sheet_name][cell_range]
-    QH = {}
-    QP = {}
+    QH = []
+    QP = []
     for row in rows:
         vals = [c.value for c in row]
         if flow_col is None:    # Assume the first row is a header
@@ -162,8 +162,10 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
         elif sum([float(vals[flow_col]), float(vals[head_col]), float(vals[power_col])]) == 0:
             pass
         else:
-            QH[float(vals[flow_col])] = float(vals[head_col])
-            QP[float(vals[flow_col])] = float(vals[power_col])
+            QH.append((float(vals[flow_col]), float(vals[head_col])))
+            QP.append((float(vals[flow_col]), float(vals[power_col])))
+    QH.sort(key=itemgetter(0))
+    QP.sort(key=itemgetter(0))
 
     params['design_QH_curve'] = interpDict(QH)
     params['design_QP_curve'] = interpDict(QP)
