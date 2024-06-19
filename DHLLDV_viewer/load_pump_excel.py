@@ -302,7 +302,7 @@ def validate_excel(wb: openpyxl.workbook) -> None:
 
 
 if __name__ == "__main__":
-    fname = "static/pipelines/Damen350_with_Booster.xlsx"
+    fname = "static/pipelines/Example_input.xlsx"
 
     wb = openpyxl.load_workbook(filename=fname, data_only=True)  # Loading a workbook, data_only takes the stored values
     pumps = {}
