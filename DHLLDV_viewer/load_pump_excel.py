@@ -49,6 +49,7 @@ The spreadsheet should have sheets with the following properties:
 
 import copy
 import openpyxl
+from operator import itemgetter
 
 from DHLLDV.DriverObj import Driver
 from DHLLDV.PumpObj import Pump
@@ -119,15 +120,16 @@ def load_driver_from_worksheet(wb: openpyxl.Workbook, sheet_id: int):
     power_col = None
     cell_range = next(wb[sheet_name].defined_names['power_curve'].destinations)  # returns a generator of (worksheet title, cell range) tuples
     rows = wb[sheet_name][cell_range[1]]
-    curve = {}
+    curve = []
     for row in rows:
         vals = [c.value for c in row]
         if speed_col is None:  # Assume the first row is a header
             speed_col = next(i for i, c in enumerate(vals) if 'speed' in c.lower())
             power_col = next(i for i, c in enumerate(vals) if 'power' in c.lower())
         else:
-            curve[float(vals[speed_col])] = float(vals[power_col])
-    params['design_power_curve'] = interpDict(curve)
+            curve.append((float(vals[speed_col]), float(vals[power_col])))
+    curve.sort(key=itemgetter(0))
+    params['design_power_curve'] = interpDict(*curve)
     return Driver(**params)
 
 
@@ -291,7 +293,7 @@ def validate_excel(wb: openpyxl.workbook) -> None:
 
 
 if __name__ == "__main__":
-    fname = "static/pipelines/Example_input.xlsx"
+    fname = "static/pipelines/Damen350_with_Booster.xlsx"
 
     wb = openpyxl.load_workbook(filename=fname, data_only=True)  # Loading a workbook, data_only takes the stored values
     pumps = {}
