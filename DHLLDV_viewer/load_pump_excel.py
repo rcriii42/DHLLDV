@@ -154,7 +154,7 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
     flow_col = None
     head_col = None
     power_col = None
-    cell_range = next(wb[sheet_name].defined_names['pump_curve'].destinations)[1]  # returns a generator of (worksheet title, cell range) tuples
+    cell_range = next(wb[sheet_name].defined_names['pump_curve'].destinations)[1]
     rows = wb[sheet_name][cell_range]
     QH = []
     QP = []
@@ -290,7 +290,6 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
                 raise InvalidExcelError(f'The value of {field_name = } {value = } for {sheet_name = } in {wb.path}, '
                                         f'is of type {type(value)}, should be {field_type}')
         elif isinstance(field_type, dict):
-            # returns a generator of (worksheet title, cell range) tuples
             print(f'found {field_name = }')
             try:
                 cell_range = next(wb[sheet_name].defined_names[field_name].destinations)[1]
