@@ -280,7 +280,7 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
         raise InvalidExcelError(f'Unknown sheet type {sheet_type = } for {sheet_name = } in {wb.path}, '
                                 f'must be a key of load_pump_excel.excel_requireds')
     for field_name, field_type in excel_requireds[sheet_type].items():
-        if field_type in [str, float]:
+        # print(f'validate_excel_fields: {sheet_type = } {field_name = } {field_type = }')
         if field_name in ['required']:
             pass
         elif field_type in [str, float]:
@@ -300,6 +300,18 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
                 raise InvalidExcelError(f'Did not find {field_name = } {field_type = } for {sheet_name = } in {wb.path}')
             rows = wb[sheet_name][cell_range]
             print(f'{sheet_type = }{sheet_name = } rows: {len(rows)} columns: {len(rows[0])}')
+            header = [c.value.lower() for c in rows[0]]
+            for col_header, col_type in field_type.items():
+                if isinstance(col_header, tuple):
+                    cols = [c for c in header if all([x in c.lower() for x in col_header])]
+                else:
+                    cols = [c for c in header if col_header in c.lower()]
+                if len(cols) == 0:
+                    raise InvalidExcelError(f'Did not find {col_header = } in table {field_name = } '
+                                            f'of {sheet_name = }')
+                elif len(cols) > 1:
+                    raise InvalidExcelError(f'Found multiple {col_header = } columns in table {field_name = } '
+                                            f'of {sheet_name = }')
         else:
             print(f'{field_type = } not found for {field_name = }')
 
