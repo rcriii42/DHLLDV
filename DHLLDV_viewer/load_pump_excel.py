@@ -281,6 +281,9 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
                                 f'must be a key of load_pump_excel.excel_requireds')
     for field_name, field_type in excel_requireds[sheet_type].items():
         if field_type in [str, float]:
+        if field_name in ['required']:
+            pass
+        elif field_type in [str, float]:
             try:
                 value = get_range_value(wb, sheet_id, field_name)
             except AttributeError:
