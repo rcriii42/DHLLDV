@@ -174,7 +174,7 @@ def load_pump_from_worksheet(wb: openpyxl.Workbook, sheet_id: int, driver_id: in
 
     params['design_QH_curve'] = interpDict(*QH)
     params['design_QP_curve'] = interpDict(*QP)
-    if QH[-1][0] > 0.0:
+    if QH[0][0] > 0.0:
         warnings.warn(f'Curves for pump: {params["name"]} do not start at 0, enabling low end interpolation')
         params['design_QH_curve'].extrapolate_low = True
         params['design_QP_curve'].extrapolate_low = True
