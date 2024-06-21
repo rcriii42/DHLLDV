@@ -293,13 +293,12 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
                 raise InvalidExcelError(f'The value of {field_name = } {value = } for {sheet_name = } in {wb.path}, '
                                         f'is of type {type(value)}, should be {field_type}')
         elif isinstance(field_type, dict):
-            print(f'found {field_name = }')
             try:
                 cell_range = next(wb[sheet_name].defined_names[field_name].destinations)[1]
             except KeyError:
                 raise InvalidExcelError(f'Did not find {field_name = } {field_type = } for {sheet_name = } in {wb.path}')
             rows = wb[sheet_name][cell_range]
-            print(f'{sheet_type = }{sheet_name = } rows: {len(rows)} columns: {len(rows[0])}')
+            # print(f'{sheet_type = }{sheet_name = } rows: {len(rows)} columns: {len(rows[0])}')
             header = [c.value.lower() for c in rows[0]]
             for col_header, col_type in field_type.items():
                 if isinstance(col_header, tuple):
@@ -375,7 +374,6 @@ if __name__ == "__main__":
         for label in legend.get_texts():
             label.set_fontsize('small')
         for j, pump in enumerate(pl.pumps):
-            print(pump.name)
             sp_num += 1
             if pump.limited == 'curve':
                 speed_list = [k/pump.gear_ratio for k in pump.driver.design_power_curve.keys()]
