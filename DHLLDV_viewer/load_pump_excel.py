@@ -396,3 +396,4 @@ if __name__ == "__main__":
 
     print(pipeline.calc_system_head(flow))
     print(pipeline.pumps[1].point(flow))
+    print(pipeline.find_operating_point(flow_list))
