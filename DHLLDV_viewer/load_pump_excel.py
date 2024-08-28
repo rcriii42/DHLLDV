@@ -289,7 +289,7 @@ def validate_excel_fields(wb: openpyxl.workbook, sheet_type: str, sheet_name: in
             except AttributeError:
                 raise InvalidExcelError(f'Missing field {field_name = } for {sheet_name = } in {wb.path}, '
                                         f'must be worksheet scope')
-            if (not type(value) == field_type) and (field_type == float and not type(value) == int):
+            if not isinstance(value, field_type) and (field_type == float and not isinstance(value, int)):
                 raise InvalidExcelError(f'The value of {field_name = } {value = } for {sheet_name = } in {wb.path}, '
                                         f'is of type {type(value)}, should be {field_type}')
         elif isinstance(field_type, dict):
