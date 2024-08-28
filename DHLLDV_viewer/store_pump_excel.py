@@ -151,17 +151,15 @@ def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, 
                  'gear_ratio': '-',
                  'avail_power': 'kW'}
     for range_name, val_type in pump_reqs.items():
-        if range_name == 'required':
-            continue
-        else:
+        if val_type in [str, int, float]:
             try:
                 value = this_pump.__dict__[range_name]
             except KeyError:
                 value = this_pump.__dict__[f'_{range_name}']  # Several parameters have shadow "_xxx" variables
-        ws[f'A{current_row}'].value = range_name
-        create_and_fill_named_range(wb, pump_name, range_name, f'B{current_row}', value)
-        ws[f'C{current_row}'].value = units_map[range_name]
-        current_row += 1
+            ws[f'A{current_row}'].value = range_name
+            create_and_fill_named_range(wb, pump_name, range_name, f'B{current_row}', value)
+            ws[f'C{current_row}'].value = units_map[range_name]
+            current_row += 1
 
     # The flow/head/power curves
     current_col = 1
