@@ -38,8 +38,8 @@ The spreadsheet should have sheets with the following properties:
         - head is in m.w.c
         - power is in kW
 - One or more worksheets matching a pump sheet, with the word pump replaced by the word 'driver' (not case-sensitive)
-  in the sheet name. For example, if the pump tab is named "SomePump", then the driver will be 'SomeDriver'.
-    - Has named ranges 'SomePump Driver'![name', 'power_curve']
+  in the sheet name. For example, if the pump tab is named "SomePump", then the driver tab will be 'SomeDriver'.
+    - Has named ranges 'SomeDriver'![name', 'power_curve']
     - name is any valid python string (be careful of escape sequences)
     - power_curve has at least two columns and a header row
         - Two of the columns have the word 'speed' and 'power' in the first row
