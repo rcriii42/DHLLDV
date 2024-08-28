@@ -165,7 +165,8 @@ class Pipeline:
 
         If a pipesection after the first has length 0, the elev_change is ignored
 
-        returns a tuple: (head slurry, head water) in m water column"""
+        returns a tuple: (System (pipeline) head losses slurry, System (pipeline) head losses fluid,
+                          Pump head slurry, Pump head fluid) in m water column"""
         Hfit_m = 0
         Hfit_l = 0
         Hfric_m = 0     # Total system head of slurry
