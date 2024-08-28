@@ -244,10 +244,8 @@ def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dic
                    path: str or None = None) -> str:
     """Store the pipeline to a new Excel file
 
-    The filename will be a version of the pipeline name
-    The filename will be a version of the pipeline name if not given
-
     pipeline: The pipeline to store
+    fname: The name of the file to store. If None, the filename will be a version of the pipeline name with a timestamp
     requireds: A dict with the layout of the file. If None, use excel_requireds defined above
     path: The folder path (relative to .) for saving
 
