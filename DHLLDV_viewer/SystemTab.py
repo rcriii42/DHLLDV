@@ -63,7 +63,7 @@ try:
     pipeline = setups[CustomSetups.setup_to_use]
 except ImportError:
     print('Import Error: Custom Dredge setups not found. To use, create file '
-          'Scripts\\CustomSetups.py with the following code:')
+          'DHLLDV_Viewer\\CustomSetups.py with the following code:')
     print('''"""Custom setups for My Project"""
 
 import copy
