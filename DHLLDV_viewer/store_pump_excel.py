@@ -1,6 +1,6 @@
 """Store pipelines to Excel
 
-Create an excel file with the format defines in load_pump_excel
+Create an Excel file with the format defines in load_pump_excel
 
 Added by R. Ramsdell 2023-07-02"""
 
@@ -41,8 +41,9 @@ def remove_disallowed_filename_chars(filename_candidate: str, extension: str or 
     """
     if extension is None:
         extension = ''
+    cleaned_filename = filename_candidate
     for c in replace_filename_chars:
-        cleaned_filename = filename_candidate.replace(c, '_')
+        cleaned_filename = cleaned_filename.replace(c, '_')
     cleaned_filename = ''.join(c for c in cleaned_filename if c in valid_filename_chars)
     cleaned_filename += extension
     return cleaned_filename
@@ -55,7 +56,7 @@ def create_and_fill_named_range(wb: openpyxl.Workbook, sheet_name: str, range_na
     wb: The workbook
     sheet_name: The sheet with the range
     range_name: The name of the defined name, must meet excel rules
-    range_addr: The cell address in excel "A1" format
+    range_addr: The cell address in Excel "A1" format
     value: The value to place in the cell
     """
     ws = wb[sheet_name]
@@ -103,6 +104,12 @@ def write_slurry_to_excel(wb: openpyxl.workbook, slurry: Slurry, reqs: dict) -> 
 
 
 def write_driver_to_excel(wb: openpyxl.Workbook, this_driver: Driver, driver_name: str, reqs: dict):
+    """Write the driver to an Excel tab
+
+    wb: The workbook to write to
+    this_driver: The driver to write
+    driver_name: The name of the driver to use as the tab name (not necessarily the same name in the object)
+    reqs: The 'driver' dict from excel_requireds, indicating required data ranges"""
     ws = wb.create_sheet(driver_name)
     current_row = 1
     units_map = {'name': '',
@@ -140,6 +147,13 @@ def write_driver_to_excel(wb: openpyxl.Workbook, this_driver: Driver, driver_nam
 
 
 def write_pump_to_excel(wb: openpyxl.Workbook, this_pump: Pump, pump_name: str, pump_reqs: dict, driver_reqs: dict):
+    """Write the pump to an Excel tab
+
+        wb: The workbook to write to
+        this_pump: The driver to write
+        pump_name: The name of the pump to use as the tab name (not necessarily the same name in the object)
+        pump_reqs: The 'pump' dict from excel_requireds, indicating required data ranges for the pump
+        driver_reqs: The 'driver' dict from excel_requireds, indicating required data ranges for the driver"""
     ws = wb.create_sheet(pump_name)
     current_row = 1
     units_map = {'name': '',
