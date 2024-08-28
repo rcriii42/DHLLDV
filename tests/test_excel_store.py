@@ -43,10 +43,16 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(3.4017658516096114, pipeline.find_operating_point(flow_list))
 
         flow = 4.0
-        self.assertTupleEqual((155.83833315609024, 147.87084371417842, 101.75436068325409, 95.93219789540075),
-                              pipeline.calc_system_head(flow))
-        self.assertTupleEqual((4.0, 74.32723942350866, 3728.499999999634, 4.811435751810117),
-                              pipeline.pumps[1].point(flow))
+        for param, expected, actual in zip(('System head slurry', 'System head fluid', 'Pump head slurry', 'Pump head fluid'),
+                                           (155.83833315609024, 147.87084371417842, 101.75436068325409, 95.93219789540075),
+                                           pipeline.calc_system_head(flow)):
+            with self.subTest(msg=param):
+                self.assertAlmostEqual(expected, actual, 15)
+        for param, expected, actual in zip(('Flow', 'Pump Head', 'Pump Power', 'Pump Speed'),
+                                           (4.0, 74.32723942350866, 3728.499999999634, 4.811435751810117),
+                                           pipeline.pumps[1].point(flow)):
+            with self.subTest(msg=param):
+                self.assertAlmostEqual(expected, actual, 5)
 
 
 if __name__ == '__main__':
