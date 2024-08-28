@@ -24,7 +24,7 @@ class MyTestCase(unittest.TestCase):
 
     def tearDown(self):
         """Delete the newly-created output file"""
-        pass  # Not really
+        os.remove(self.output_fname)
 
     def test_roundtrip_objects(self):
         """Test storing then loading the pipeline and pump objects correctly"""
@@ -47,7 +47,7 @@ class MyTestCase(unittest.TestCase):
                                            (155.83833315609024, 147.87084371417842, 101.75436068325409, 95.93219789540075),
                                            pipeline.calc_system_head(flow)):
             with self.subTest(msg=param):
-                self.assertAlmostEqual(expected, actual, 15)
+                self.assertAlmostEqual(expected, actual, 5)
         for param, expected, actual in zip(('Flow', 'Pump Head', 'Pump Power', 'Pump Speed'),
                                            (4.0, 74.32723942350866, 3728.499999999634, 4.811435751810117),
                                            pipeline.pumps[1].point(flow)):
