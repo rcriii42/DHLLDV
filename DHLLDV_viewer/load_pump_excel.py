@@ -319,12 +319,13 @@ def validate_excel(wb: openpyxl.workbook) -> None:
     """Validate that the Excel file has the correct tabs and defined ranges, raise an InvalidExcelError if not
         wb: The workbook
     """
+    # First check that the required tabs exist
     for sheet_name, fields in excel_requireds.items():
-        # First check that the required tabs exist
         present = [s for s in wb.sheetnames if sheet_name in s.lower()]
         if fields['required'] and len(present) != 1:
             raise InvalidExcelError(f'Workbook missing the {sheet_name} tab.')
 
+    # Check for the correct fields in all input tabs
     for ws_name in wb.sheetnames:
         sheet_type = [t for t in excel_requireds.keys() if t in ws_name.lower()]
         # print(f'validate_excel: Checking {ws_name = } of {sheet_type = }')
