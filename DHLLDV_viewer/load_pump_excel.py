@@ -60,9 +60,9 @@ from DHLLDV.DHLLDV_Utils import interpDict
 
 # The following dict defines the required tabs and fields for a valid excel spreadsheet
 # The keys are allowed/required tabs
-# The values are dicts with one key "required" that is true if the tab is required. The other keys are required defined
-# names whose values are the expected type of the contents. If the range is a table, the type is yet another dict, with
-# Column names and the type of data in the column
+# The values are dicts with one key "required" that is true if the tab is required. Note that required items are also
+# unique. The other keys are required defined names whose values are the expected type of the contents. If the range is
+# a table, the type is yet another dict, with Column names and the type of data in the column.
 # TODO: The defined names should match the attributes in the relevant objects, to reduce custom parsing
 excel_requireds = {'pipeline': {'required': True,
                                 'name': str,
