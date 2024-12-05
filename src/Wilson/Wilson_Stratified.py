@@ -96,7 +96,7 @@ def stratified_pressure_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cv
     return stratified_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6)*gravity*rhol
 
 def stratified_head_loss(vls, Dp,  d, epsilon, nu, rhol, rhos, musf, Cvt, Cvb=0.6):
-    """Return the head loss for the Wilson stratified (sliding bed) case
+    """Return the head loss (m.w.c per m) for the Wilson stratified (sliding bed) case
        Assume that Eqn. 6.20-41 is calibrated for musf=0.4, and adjust accordingly
             Vls = average line speed (velocity, m/sec)
             Dp = Pipe diameter (m)
