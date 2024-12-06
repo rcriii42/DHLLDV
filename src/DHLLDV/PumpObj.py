@@ -136,7 +136,7 @@ class Pump:
                 return self.avail_power
             case 'curve':
                 return self.driver.power(n*self.gear_ratio)
-            case other:
+            case _:
                 speed_ratio = n / self._max_driver_speed
                 impeller_ratio = self.current_impeller / self.design_impeller
                 return max(self.design_QP_curve.values()) * speed_ratio**3 * impeller_ratio**5 * self.slurry.rhom + 1
