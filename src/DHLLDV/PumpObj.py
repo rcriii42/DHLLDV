@@ -179,10 +179,15 @@ class Pump:
         return n_new
 
     def find_curve_limited_speed(self, Q, water=False):
+        """Find the pump speed (Hz) at the given flow if there is a power curve
+
+        Q is the flow rate in m3/sec
+        water is True if calculating for the carrier fluid, False if for slurry
+        """
         return self.find_curve_limited_speed_root_scalar(Q, water)
 
     def find_curve_limited_speed_root_scalar(self, Q, water=False):
-        """Find the pump speed (Hz) at the given flow if there is a power curve
+        """Find the pump speed (Hz) at the given flow if there is a power curve, using the root scalar method
 
         Q is the flow rate in m3/sec
         water is True if calculating for the carrier fluid, False if for slurry
@@ -214,7 +219,7 @@ class Pump:
             return result.root
 
     def find_curve_limited_speed_old(self, Q, water=False):
-        """Find the pump speed (Hz) at the given flow if there is a power curve
+        """Find the pump speed (Hz) at the given flow if there is a power curve using a modified Newtons method
 
         Q is the flow rate in m3/sec
         water is True if calculating for the carrier fluid, False if for slurry
