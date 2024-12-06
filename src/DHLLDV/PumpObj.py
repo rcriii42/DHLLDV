@@ -14,7 +14,7 @@ from DHLLDV.SlurryObj import Slurry
 
 
 @dataclass
-class Pump():
+class Pump:
     """Model a pump and driver"""
     name: str
     design_speed: float     # Hz
@@ -283,7 +283,7 @@ class Pump():
         P = self.power_required(Q, self.current_speed, water=water)
 
         if self.limited.lower() == 'none' or P <= self.power_available(self._current_speed):
-            return (Q, H, P, self._current_speed)
+            return Q, H, P, self._current_speed
         elif self.limited.lower() == 'torque':
             n_new = self.find_torque_limited_speed(Q, water=water)
         elif self.limited.lower() == 'power':
@@ -295,4 +295,4 @@ class Pump():
         P = self.power_required(Q, n_new, water=water)
         H0 = self.design_QH_curve[Q0]
         H = H0 * speed_ratio ** 2 * impeller_ratio**2 * rho
-        return (Q, H, P, n_new)
+        return Q, H, P, n_new
