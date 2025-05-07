@@ -13,9 +13,13 @@ from . import homogeneous
 
 
 class Slurry():
-    def __init__(self, name=None, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100):
+    def __init__(self, name=None, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100, min_index=0):
         self._name = name
+        # max and min indices represent start and end points of the velocity range, where each index represents
+        # 0.1 m/sec
+        self._min_index = min_index
         self._max_index = max_index
+
         self._Dp = Dp
         self._epsilon = DHLLDV_constants.steel_roughness
 
@@ -140,6 +144,15 @@ class Slurry():
     @property
     def max_index(self):
         return self._max_index
+
+    @property
+    def min_index(self):
+        return self._min_index
+
+    @min_index.setter
+    def min_index(self, min_index):
+        self.curves_dirty = True
+        self._min_index = min_index
 
     @max_index.setter
     def max_index(self, imax):
@@ -281,18 +294,19 @@ class Slurry():
         """Generate the im curves, given the Erhg curves"""
         c = self.Erhg_curves
         il_list = c['il']
+        indices = range(len(il_list))
         return {'il': il_list,
-                'Cvs_im': [c['Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'FB': [c['FB'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'SB': [c['SB'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'He': [c['He'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'ELM': [il_list[i] * self.rhom for i in range(self.max_index)],
-                'Ho': [c['Ho'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
-                'Cvt_im': [c['Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in range(self.max_index)],
+                'Cvs_im': [c['Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
+                'FB': [c['FB'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
+                'SB': [c['SB'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
+                'He': [c['He'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
+                'ELM': [il_list[i] * self.rhom for i in indices],
+                'Ho': [c['Ho'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
+                'Cvt_im': [c['Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i] for i in indices],
                 'graded_Cvs_im': [c['graded_Cvs_Erhg'][i] * self.Rsd * self.Cv + il_list[i]
-                                  for i in range(self.max_index)],
+                                  for i in indices],
                 'graded_Cvt_im': [c['graded_Cvt_Erhg'][i] * self.Rsd * self.Cv + il_list[i]
-                                  for i in range(self.max_index)]
+                                  for i in indices]
                 }
 
     def generate_LDV_curves(self, d):
@@ -317,7 +331,7 @@ class Slurry():
         if self.GSD_curves_dirty:
             self.generate_GSD()
         self.curves_dirty = False   # set it at the top so curves generate only once
-        self._vls_list = [(i + 1) / 10. for i in range(self.max_index)]
+        self._vls_list = [(i + 1) / 10. for i in range(self.min_index, self.max_index)]
         self._Erhg_curves = self.generate_Erhg_curves()
         self._im_curves = self.generate_im_curves()
         self._LDV_curves = self.generate_LDV_curves(self.get_dx(0.5))
