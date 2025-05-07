@@ -116,6 +116,17 @@ class Test(unittest.TestCase):
         self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating max_index
         self.assertNotEqual(max(self.slurry.vls_list), vmax)  # The maximum velocity is tied to the max_index
 
+    def test_min_index_changed(self):
+        self.slurry.generate_curves()               # Make sure the curves were up-to-date
+        self.assertFalse(self.slurry.curves_dirty)  # generating curves should set this false
+        vmin = self.slurry.vls_list[0]
+        self.assertEqual(min(self.slurry.vls_list), vmin)  # Should be sorted
+        self.slurry.min_index = 13
+        self.assertTrue(self.slurry.curves_dirty)  # Curves should be dirty after updating min_index
+        self.slurry.generate_curves()
+        self.assertNotEqual(self.slurry.vls_list[0], vmin)  # Should have changed
+        self.assertEqual(self.slurry.vls_list[0], 1.4)
+
     def test_Dmean(self):
         """Test the Dmean function for the default slurry"""
         self.assertAlmostEqual(self.slurry.Dmean*1000, 1.407, places=4)
