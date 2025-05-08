@@ -19,11 +19,12 @@ from DHLLDV.PipeObj import Pipe, Pipeline
 def add_slurries(sw1: [Slurry | None, float], sw2: [Slurry | None, float]) -> Slurry:
     """Create a weighted average of two slurries
 
-    ATM updates the density of sw2, eventually needs to combine the GSDs, etc"""
+    Returns a new Slurry with averaged density, eventually needs to combine the GSDs, etc"""
     if sw1[0] is None:
         return sw2[0]
     elif sw2[0] is None:
         return sw1[0]
     rho_new = (sw1[0].rhom * sw1[1] + sw2[0].rhom * sw2[1])/(sw1[1] + sw2[1])
-    sw2[0].rhom = rho_new
-    return sw2
+    new_slurry = copy(sw2[0])
+    new_slurry.rhom = rho_new
+    return new_slurry
