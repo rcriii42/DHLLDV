@@ -587,7 +587,25 @@ sys_tab, sys_update = SystemTab.system_panel(pipeline)
 tabbed_panels = Tabs(tabs=[slurry_panel, sys_tab])
 tabbed_panels.active = 1
 top_row = row(pipeline_dropdown, unit_picker, file_input, save_button, stop_button)
-curdoc().add_root(column(top_row,
+doc = curdoc()
+
+
+def cleanup_session(session_context):
+    """This function executes when the user closes the session.
+
+    https://docs.bokeh.org/en/latest/docs/user_guide/server/app.html#ug-server-apps
+
+    Note: Takes forever to run on my windows system.
+    """
+    import sys
+    # print('Session closed (main.py)')
+    sys.exit()
+
+
+doc.on_session_destroyed(cleanup_session)
+
+
+doc.add_root(column(top_row,
                          tabbed_panels))
 
-curdoc().title = "Visualizing DHLLDV"
+doc.title = "Visualizing DHLLDV"
