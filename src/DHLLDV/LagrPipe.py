@@ -15,9 +15,15 @@ from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 from DHLLDV.PipeObj import Pipe, Pipeline
 
-@dataclass
-class LagrPipe(Pipe):
-    """A Lagrangian view of the pipe that tracks 'slugs' of slurry moving through the pipe section """
-    slugs: list[(float, Slurry)] | None = None
-    feed: Callable[[float], (float, Slurry)] | None = None  # Stub for the feed function
 
+def add_slurries(sw1: [Slurry | None, float], sw2: [Slurry | None, float]) -> Slurry:
+    """Create a weighted average of two slurries
+
+    ATM updates the density of sw2, eventually needs to combine the GSDs, etc"""
+    if sw1[0] is None:
+        return sw2[0]
+    elif sw2[0] is None:
+        return sw1[0]
+    rho_new = (sw1[0].rhom * sw1[1] + sw2[0].rhom * sw2[1])/(sw1[1] + sw2[1])
+    sw2[0].rhom = rho_new
+    return sw2
