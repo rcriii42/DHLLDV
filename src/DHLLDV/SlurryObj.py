@@ -13,7 +13,7 @@ from . import homogeneous
 
 
 class Slurry():
-    def __init__(self, name=None, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100, min_index=0):
+    def __init__(self, name=None, Dp=0.762, D50=1.0/1000., fluid='salt', Cv=0.175, max_index=100, min_index=9):
         self._name = name
         # max and min indices represent start and end points of the velocity range, where each index represents
         # 0.1 m/sec
