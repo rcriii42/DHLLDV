@@ -35,6 +35,14 @@ class Slug:
     length: float
     slurry: Slurry
 
+    def __add__(self, other):
+        """Add two slugs together"""
+        if type(other) is Slug:
+            return Slug(self.length + other.length,
+                        add_slurries((self.slurry, self.length), (other.slurry, other.length)))
+        else:
+            raise TypeError
+
 
 @dataclass
 class LagrPipe(Pipe):

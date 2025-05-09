@@ -28,6 +28,11 @@ class MyTestCase(unittest.TestCase):
         rho_expect = (self.slurry1.rhom*0.75 + self.slurry2.rhom*0.33)/(0.75+0.33)
         self.assertEqual(new_slurry.rhom, rho_expect)
 
+    def test_add_slugs(self):
+        new_slug = Slug(5.0, self.slurry1) + Slug(5.0, self.slurry2)
+        self.assertEqual(new_slug.length, 10)
+        self.assertEqual(new_slug.slurry.rhom, (self.slurry1.rhom + self.slurry2.rhom)/2)
+
     def test_init_lagrpipe(self):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
