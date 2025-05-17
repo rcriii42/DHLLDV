@@ -1,6 +1,6 @@
 import unittest
 
-from DHLLDV.LagrPipe import add_slurries, LagrPipe, Slug
+from DHLLDV.LagrPipe import add_slurries, LagrPipe, Slug, SuctionFeed
 from DHLLDV.SlurryObj import Slurry
 
 
@@ -8,7 +8,9 @@ class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.slurry1 = Slurry(Cv=0.2)
         self.slurry2 = Slurry(Cv=0.1)
-        self.l_pipe = LagrPipe(slugs=[Slug(10.0, self.slurry1)])
+        self.suct_feed = SuctionFeed(self.slurry2, suct_elev=1/self.slurry2.rhom)
+        self.l_pipe = LagrPipe(slugs=[Slug(10.0, self.slurry1)],
+                               feed_in=self.suct_feed.feed)
 
     def test_add_slurries_first_none(self):
         new_slurry = add_slurries((None, 1), (self.slurry2, 1))
@@ -37,15 +39,20 @@ class MyTestCase(unittest.TestCase):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
 
+    def test_suction_feed(self):
+        """Test that the SuctionFeed.feed function returns the right thing"""
+        head, slug = self.suct_feed.feed(1.824146925)
+        self.assertEqual(head, 1)
+        self.assertAlmostEqual(slug.length, 4)
+        self.assertEqual(slug.slurry, self.slurry2)
+
     def test_feed_rhom_out(self):
-        self.l_pipe.feed_in = lambda q: (1.0, Slug(4.0, self.slurry2))
         h_out, slug_out = self.l_pipe.feed(1.824146925)
         self.assertEqual(slug_out.slurry.rhom, 1.34984824)
         self.assertAlmostEqual(slug_out.length, 4)
 
     def test_feed4_step_1(self):
         """Test the first step if velocity is 4 m/sec"""
-        self.l_pipe.feed_in = lambda q: (1.0, Slug(4.0, self.slurry2))
         h_out, slurry_out = self.l_pipe.feed(1.824146925)
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
@@ -56,7 +63,6 @@ class MyTestCase(unittest.TestCase):
 
     def test_feed4_step_2(self):
         """Test the second step if velocity is 4 m/sec"""
-        self.l_pipe.feed_in = lambda q: (1.0, Slug(4.0, self.slurry2))
         for i in range(2):
             h_out, slug_out = self.l_pipe.feed(1.824146925)
         total_length = sum(s.length for s in self.l_pipe.slugs)
@@ -69,7 +75,6 @@ class MyTestCase(unittest.TestCase):
 
     def test_feed5p5_step_2(self):
         """Test the second step if velocity is 5.5 m/sec"""
-        self.l_pipe.feed_in = lambda q: (1.0, Slug(5.5, self.slurry2))
         for i in range(2):
             h_out, slug_out = self.l_pipe.feed(2.508202022)
         total_length = sum(s.length for s in self.l_pipe.slugs)

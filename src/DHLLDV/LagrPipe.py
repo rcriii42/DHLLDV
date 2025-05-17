@@ -44,6 +44,42 @@ class Slug:
             raise TypeError
 
 
+class SuctionFeed():
+    """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
+
+    def __init__(self, slurry: Slurry, density: float = None, Dp: float = None, suct_elev: float = 0):
+        self.slurry = slurry
+        if density is not None:
+            self.slurry.rhom = density
+        if Dp is not None:
+            self.slurry.Dp = Dp
+        self.elev = suct_elev
+
+    @property
+    def rhom(self):
+        return self.slurry.rhom
+
+    @rhom.setter
+    def rhom(self, value):
+        self.slurry.rhom = value
+
+    @property
+    def Dp(self):
+        return self.slurry.Dp
+
+    @Dp.setter
+    def Dp(self, value):
+        self.slurry.Dp = value
+
+    @property
+    def area(self):
+        """THe area of the suction pipe"""
+        return pi * (self.Dp/2)**2
+
+    def feed(self, Q: float) -> (float, Slug):
+        """Return the suction elevation head and a slug of slurry"""
+        return self.slurry.rhom * self.elev, Slug(Q/self.area, self.slurry)
+
 @dataclass
 class LagrPipe(Pipe):
     """A Lagrangian view of the pipe that tracks 'slugs' of slurry moving through the pipe section """
