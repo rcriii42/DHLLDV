@@ -6,6 +6,7 @@ Creates a Lagrangian view of the pipeline that tracks 'slugs' of slurry moving d
 from collections.abc import Callable
 from copy import copy
 from dataclasses import dataclass
+from functools import partial
 from math import pi
 
 import scipy.optimize
@@ -142,3 +143,66 @@ class LagrPipe(Pipe):
             h_in += im * s.length + s.slurry.rhom * (self.total_K * s.length/self.length) * hvel
 
         return h_in, extruded_slug
+
+
+class LagrPipeline(Pipeline):
+    """Manage a Lagrangian pipeline that tracks slugs of slurry moving through a pipeline
+
+    Has to:
+    Connect the suction feed, LagrPipes and pumps
+    Calculates acceleration/deceleration
+    """
+
+    def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None):
+        super().__init__(name, pipe_list, slurry)
+
+        self.lpipe_list = []
+        self.suction_feed = SuctionFeed(copy(self.slurry),
+                                        Dp=self.pipesections[0].diameter,
+                                        suct_elev=self.pipesections[0].elev_change)
+        last_feed = self.suction_feed.feed
+        for i, element in enumerate(self.pipesections):
+            if type(element) is Pipe:
+                self.lpipe_list.append(LagrPipe.from_pipe(this_pipe=element, feed_in=last_feed, slurry=slurry))
+                last_feed = self.lpipe_list[-1].feed
+
+            elif type(element) is Pump:
+                # add a feed method for the pump
+                element.feed_in = last_feed
+
+                def pump_feed(this_pump, Q):
+                    """Function handle the feed of a pump object"""
+                    h_in, in_slug = this_pump.feed_in(Q)
+                    this_pump.slurry = in_slug.slurry
+                    Q, H, P, n_new = this_pump.point(Q)
+                    return h_in - H, in_slug
+
+                last_feed = partial(pump_feed, element)
+                self.lpipe_list.append(element)
+
+            else:
+                print(f'LagrPipeline.__init__: Warning, unknown element type {type(element)} '
+                      f'in pipeline at position {i}, not adding')
+
+
+if __name__ == '__main__':
+    from tests.test_Pipe import Ladder_Pump600, Main_Pump500
+
+    pipe1 = Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0)
+    slurry = Slurry(fluid='salt')
+    lpipeline = LagrPipeline(name="test lagrangian pipeline",
+                                  pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                                             pipe1,
+                                             Ladder_Pump600,
+                                             Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                                             Main_Pump500,
+                                             Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2,
+                                                  elev_change=-1.0),
+                                             Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0,
+                                                  elev_change=1.0)],
+                                  slurry=slurry)
+    slugs_length = 0
+    for p in lpipeline.lpipe_list:
+        if type(p) is LagrPipe:
+            slugs_length += sum(s.length for s in p.slugs)
+    print(slugs_length)
