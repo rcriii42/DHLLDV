@@ -38,7 +38,7 @@ class MyTestCase(unittest.TestCase):
     def test_add_slug_to_other(self):
         """Test behaviour if trying to add a slug to the wrong thing"""
         new_slug = Slug(5.0, self.slurry1)
-        self.assertRaises(TypeError, add_slurries, new_slug, 5)
+        self.assertRaises(TypeError, new_slug.__add__, 5)
 
     def test_init_lagrpipe(self):
         total_length = sum(s.length for s in self.l_pipe.slugs)
