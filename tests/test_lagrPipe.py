@@ -44,7 +44,8 @@ class MyTestCase(unittest.TestCase):
         head, slug = self.suct_feed.feed(1.824146925)
         self.assertEqual(head, 1)
         self.assertAlmostEqual(slug.length, 4)
-        self.assertEqual(slug.slurry, self.slurry2)
+        self.assertNotEqual(slug.slurry, self.slurry2)
+        self.assertEqual(slug.slurry.rhom, self.slurry2.rhom)
 
     def test_feed_rhom_out(self):
         h_out, slug_out = self.l_pipe.feed(1.824146925)

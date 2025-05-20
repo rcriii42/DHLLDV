@@ -44,7 +44,7 @@ class Slug:
             raise TypeError
 
 
-class SuctionFeed():
+class SuctionFeed:
     """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
 
     def __init__(self, slurry: Slurry, density: float = None, Dp: float = None, suct_elev: float = 0):
@@ -78,7 +78,8 @@ class SuctionFeed():
 
     def feed(self, Q: float) -> (float, Slug):
         """Return the suction elevation head and a slug of slurry"""
-        return self.slurry.rhom * self.elev, Slug(Q/self.area, self.slurry)
+        return self.slurry.rhom * self.elev, Slug(Q/self.area, copy(self.slurry))
+
 
 @dataclass
 class LagrPipe(Pipe):
