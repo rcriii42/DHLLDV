@@ -35,6 +35,11 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(new_slug.length, 10)
         self.assertEqual(new_slug.slurry.rhom, (self.slurry1.rhom + self.slurry2.rhom)/2)
 
+    def test_add_slug_to_other(self):
+        """Test behaviour if trying to add a slug to the wrong thing"""
+        new_slug = Slug(5.0, self.slurry1)
+        self.assertRaises(TypeError, add_slurries, new_slug, 5)
+
     def test_init_lagrpipe(self):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
