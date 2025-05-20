@@ -90,6 +90,23 @@ class LagrPipe(Pipe):
     def __post_init__(self):
         self.length = sum(s.length for s in self.slugs)
 
+    @classmethod
+    def from_pipe(cls, this_pipe: Pipe,
+                  feed_in: Callable[[float], (float, Slug)] | None = None,
+                  slurry: Slurry | None = None) -> 'LagrPipe':
+        """Create a LagrPipe from an existing Pipe"""
+        if slurry is None:
+            slurry = Slurry(Dp=this_pipe.diameter)
+        slugs = [Slug(length=this_pipe.length, slurry=copy(slurry))]
+        return cls(name=this_pipe.name,
+                   diameter=this_pipe.diameter,
+                   length=this_pipe.length,
+                   total_K=this_pipe.total_K,
+                   elev_change=this_pipe.elev_change,
+                   slugs=slugs,
+                   feed_in=feed_in
+                   )
+
     def feed(self, Q: float) -> (float, Slug):
         """
         Get slurry from upstream, update the slugs, and send slurry and head downstream

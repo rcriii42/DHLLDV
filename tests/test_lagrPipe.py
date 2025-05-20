@@ -44,6 +44,15 @@ class MyTestCase(unittest.TestCase):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
 
+    def test_lagrpipe_from_pipe(self):
+        """Test LagrPipe.from_pipe returns the proper thing"""
+        p = Pipe()
+        lp = LagrPipe.from_pipe(p, feed_in=self.suct_feed.feed)
+        self.assertEqual(p.length, lp.length)
+        total_length = sum(s.length for s in lp.slugs)
+        self.assertAlmostEqual(p.length, total_length)
+
+
     def test_suction_feed(self):
         """Test that the SuctionFeed.feed function returns the right thing"""
         head, slug = self.suct_feed.feed(1.824146925)
