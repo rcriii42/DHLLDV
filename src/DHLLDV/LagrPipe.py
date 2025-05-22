@@ -164,6 +164,9 @@ class LagrPipeline(Pipeline):
     def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None):
         super().__init__(name, pipe_list, slurry)
 
+        self.timecounter = 0  #  Track the number of timesteps so far
+        self.slurry.Dp = self.pipesections[-1].diameter
+        self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
         self.suction_feed = SuctionFeed(copy(self.slurry),
                                         Dp=self.pipesections[0].diameter,
