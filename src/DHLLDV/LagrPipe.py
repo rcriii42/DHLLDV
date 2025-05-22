@@ -195,6 +195,31 @@ class LagrPipeline(Pipeline):
                 print(f'LagrPipeline.__init__: Warning, unknown element type {type(element)} '
                       f'in pipeline at position {i}, not adding')
 
+    def update(self) -> tuple[float, float, Slug]:
+        """Update the pipeline by one second
+        TODO: Allow user-input timestep?
+
+        Advance time
+        Call feed functions
+        calculate acceleration/deceleration
+
+        Returns the new flow, net head, and last slug"""
+        self.timecounter += 1
+        net_head, disch_slug = self.lpipe_list[-1].feed(self.lastflow)
+        hvel = self.pipesections[0].velocity(self.lastflow) ** 2 / (2 * gravity)
+        net_head += self.lpipe_list[0].slugs[0].slurry.rhom * hvel
+        pl_weight = 0
+        for p in self.lpipe_list:
+            if type(p) is LagrPipe:
+                for s in p.slugs:
+                    pl_weight += s.length * s.slurry.rhom
+        acceleration = -1 * net_head / pl_weight    # Note friction losses are positive and pump head is negative
+        acc_pipe = Pipe(diameter=self.pumps[-1].disch_dia)  # A pipe of the last pump discharge diameter for flow calcs
+        vls = acc_pipe.velocity(self.lastflow)
+        self.lastflow = acc_pipe.flow(vls + acceleration)
+
+        return self.lastflow, net_head, disch_slug
+
 
 if __name__ == '__main__':
     from tests.test_Pipe import Ladder_Pump600, Main_Pump500
