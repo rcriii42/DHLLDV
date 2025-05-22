@@ -137,10 +137,6 @@ class LagrPipe(Pipe):
                     last_slug.length -= remain_length
                     remain_length = 0
 
-        for s in self.slugs:
-            im = s.slurry.im(vm)  # Implicitly assume timestep is 1
-            hvel = vm**2 / (2 * gravity)
-            h_in += im * s.length + s.slurry.rhom * (self.total_K * s.length/self.length) * hvel
             for s in self.slugs:
                 im = s.slurry.im(vm)  # Implicitly assume timestep is 1
                 hvel = vm ** 2 / (2 * gravity)
@@ -152,6 +148,7 @@ class LagrPipe(Pipe):
             self.slugs[0].slurry = copy(in_slug.slurry)
             hvel = vm ** 2 / (2 * gravity)
             h_in += in_slug.slurry.rhom * self.total_K * hvel
+        h_in += self.elev_change * extruded_slug.slurry.rhom
 
         return h_in, extruded_slug
 
