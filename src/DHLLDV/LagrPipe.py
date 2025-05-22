@@ -120,27 +120,38 @@ class LagrPipe(Pipe):
         in_slug.slurry.Dp = self.slugs[0].slurry.Dp
         vm = remain_length = self.velocity(Q)  # If the timestep is 1, the velocity is the slug length
 
-        self.slugs.insert(0, in_slug)
-
-        extruded_slug = Slug(0, copy(self.slugs[-1].slurry))
-        while remain_length > 0:
-            last_slug = self.slugs[-1]
-            if last_slug.length <= remain_length:
-                # Add the entire slug to the extruded slug
-                extruded_slug += last_slug
-                remain_length -= last_slug.length
-                self.slugs = self.slugs[:-1]
-            else:
-                # The last slug is too long, split it
-                new_slug = Slug(remain_length, copy(last_slug.slurry))
-                extruded_slug += new_slug
-                last_slug.length -= remain_length
-                remain_length = 0
+        if self.length > 0:
+            self.slugs.insert(0, in_slug)
+            extruded_slug = Slug(0, copy(self.slugs[-1].slurry))
+            while remain_length > 0:
+                last_slug = self.slugs[-1]
+                if last_slug.length <= remain_length:
+                    # Add the entire slug to the extruded slug
+                    extruded_slug = extruded_slug + last_slug
+                    remain_length -= last_slug.length
+                    self.slugs = self.slugs[:-1]
+                else:
+                    # The last slug is too long, split it
+                    new_slug = Slug(remain_length, copy(last_slug.slurry))
+                    extruded_slug = extruded_slug + new_slug
+                    last_slug.length -= remain_length
+                    remain_length = 0
 
         for s in self.slugs:
             im = s.slurry.im(vm)  # Implicitly assume timestep is 1
             hvel = vm**2 / (2 * gravity)
             h_in += im * s.length + s.slurry.rhom * (self.total_K * s.length/self.length) * hvel
+            for s in self.slugs:
+                im = s.slurry.im(vm)  # Implicitly assume timestep is 1
+                hvel = vm ** 2 / (2 * gravity)
+                h_in += im * s.length + s.slurry.rhom * (self.total_K * s.length / self.length) * hvel
+        else:
+            # For zero-length pipe sections just pass along the in_slug, keeping the slurry
+            in_slug.slurry.Dp = self.slugs[0].slurry.Dp
+            extruded_slug = in_slug
+            self.slugs[0].slurry = copy(in_slug.slurry)
+            hvel = vm ** 2 / (2 * gravity)
+            h_in += in_slug.slurry.rhom * self.total_K * hvel
 
         return h_in, extruded_slug
 
