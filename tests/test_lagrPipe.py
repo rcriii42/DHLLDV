@@ -9,7 +9,7 @@ class MyTestCase(unittest.TestCase):
     def setUp(self):
         self.slurry1 = Slurry(Cv=0.2)
         self.slurry2 = Slurry(Cv=0.1)
-        self.suct_feed = SuctionFeed(self.slurry2, suct_elev=1/self.slurry2.rhom)
+        self.suct_feed = SuctionFeed(self.slurry2)
         self.l_pipe = LagrPipe(slugs=[Slug(10.0, self.slurry1)],
                                feed_in=self.suct_feed.feed)
 
@@ -57,7 +57,6 @@ class MyTestCase(unittest.TestCase):
     def test_suction_feed(self):
         """Test that the SuctionFeed.feed function returns the right thing"""
         head, slug = self.suct_feed.feed(1.824146925)
-        self.assertEqual(head, 1)
         self.assertAlmostEqual(slug.length, 4)
         self.assertNotEqual(slug.slurry, self.slurry2)
         self.assertEqual(slug.slurry.rhom, self.slurry2.rhom)
@@ -75,7 +74,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(len(self.l_pipe.slugs), 2)
         self.assertEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
         self.assertEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry1.rhom)
-        self.assertAlmostEqual(h_out, 1 + 1.068679635)
+        self.assertAlmostEqual(h_out, 1.068679635)
 
     def test_feed4_step_2(self):
         """Test the second step if velocity is 4 m/sec"""
@@ -87,7 +86,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
         self.assertEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry2.rhom)
         self.assertEqual(self.l_pipe.slugs[2].slurry.rhom, self.slurry1.rhom)
-        self.assertAlmostEqual(h_out, 1 + 1.004257308)
+        self.assertAlmostEqual(h_out, 1.004257308)
 
     def test_feed5p5_step_2(self):
         """Test the second step if velocity is 5.5 m/sec"""

@@ -48,13 +48,12 @@ class Slug:
 class SuctionFeed:
     """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
 
-    def __init__(self, slurry: Slurry, density: float = None, Dp: float = None, suct_elev: float = 0):
+    def __init__(self, slurry: Slurry, density: float = None, Dp: float = None):
         self.slurry = slurry
         if density is not None:
             self.slurry.rhom = density
         if Dp is not None:
             self.slurry.Dp = Dp
-        self.elev = suct_elev
 
     @property
     def rhom(self):
@@ -79,7 +78,7 @@ class SuctionFeed:
 
     def feed(self, Q: float) -> (float, Slug):
         """Return the suction elevation head and a slug of slurry"""
-        return self.slurry.rhom * self.elev, Slug(Q/self.area, copy(self.slurry))
+        return 0, Slug(Q/self.area, copy(self.slurry))
 
 
 @dataclass
@@ -169,8 +168,7 @@ class LagrPipeline(Pipeline):
         self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
         self.suction_feed = SuctionFeed(copy(self.slurry),
-                                        Dp=self.pipesections[0].diameter,
-                                        suct_elev=self.pipesections[0].elev_change)
+                                        Dp=self.pipesections[0].diameter)
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
@@ -242,3 +240,7 @@ if __name__ == '__main__':
         if type(p) is LagrPipe:
             slugs_length += sum(s.length for s in p.slugs)
     print(slugs_length)
+
+    for i in range(50):
+        q, h, slug = lpipeline.update()
+        print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, {h=:0.3f}, {slug.slurry.rhom=:0.3f}')
