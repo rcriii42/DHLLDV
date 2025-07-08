@@ -22,10 +22,10 @@ def Vsm_max(Dp, d, rhol, rhos, musf=0.4, f=None):
     top = 8.8 * (musf * Rsd/0.66)**0.55 * Dp**0.7 * d_mm**1.75
     bottom = d_mm**2 + 0.11 * Dp**0.7
 
-    if f:
-        alt = (0.018/f)**0.13 * (2 * gravity*Dp*(rhos-rhol))**0.5
     if f is not None:
         alt = (0.018/f)**0.13 * (2 * gravity*Dp*(rhos/rhol-1))**0.5
+        print(f'right: {(0.018/f)**0.13:0.3e}, bottom: {(2 * gravity*Dp*(rhos/rhol-1))**0.5:0.3e}')
+        print(f'{alt:0.2f}, {top / bottom:0.2f}')
         return min(alt, top/bottom)
     else:
         return top/bottom   # Eqn. 6.20-34
