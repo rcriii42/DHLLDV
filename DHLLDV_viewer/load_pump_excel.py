@@ -242,6 +242,7 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
                               length=float(vals[len_col]),
                               total_K=float(vals[k_col]),
                               elev_change=float(vals[dz_col])))
+    print(f'Loaded {pipeline_name}')
     return Pipeline(name=pipeline_name, pipe_list=pipes, slurry=slurry)
 
 
