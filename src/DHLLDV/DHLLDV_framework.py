@@ -42,8 +42,10 @@ def Cvs_Erhg(vls, Dp,  d, epsilon, nu, rhol, rhos, Cvs, get_dict=False):
     else:
         regime = 'SB'
 
-    if Erhg_obj[regime] > Erhg_obj['He']:
-        regime = 'He'
+    if type(Erhg_obj['He']) is complex:  # But why is it complex?
+        pass
+    elif Erhg_obj[regime] > Erhg_obj['He']:
+            regime = 'He'
 
     if Erhg_obj[regime] < Erhg_obj['Ho']:
         regime = 'Ho'
