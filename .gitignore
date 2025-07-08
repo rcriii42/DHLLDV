@@ -4,14 +4,22 @@
 *.pdf
 *py.cover
 .coverage
-06 Dredging Processes -  Hydraulic Transport - Theory New.pdf
+
+/dist
+/build
+/venv
+
 graphs/
-Old_book/
 htmlcov/
+
 .project
 .pydevproject
 .idea/
+
+
+DHLLDV_viewer/static/
+*.lnk
+Old_book/
+06 Dredging Processes -  Hydraulic Transport - Theory New.pdf
 Book1.xls
 The Delft Head Loss & Limit Deposit Velocity Model.pdf
-/dist
-/build
