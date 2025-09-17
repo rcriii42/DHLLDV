@@ -52,12 +52,13 @@ class Slug:
 class SuctionFeed:
     """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
 
-    def __init__(self, slurry: Slurry, density: float = None, Dp: float = None):
+    def __init__(self, slurry: Slurry, density: float = None, Dp: float = None, elevation_change: float = 0):
         self.slurry = slurry
         if density is not None:
             self.slurry.rhom = density
         if Dp is not None:
             self.slurry.Dp = Dp
+        self.elevation_change = elevation_change
 
     @property
     def rhom(self):
@@ -86,7 +87,7 @@ class SuctionFeed:
         """Return the suction elevation head, velocity head, and a slug of slurry"""
         Vls = Q/self.area
         hvel = Vls**2 * self.slurry.rhom / (2 * gravity)
-        return hvel, Slug(Vls, copy(self.slurry))
+        return hvel-self.elevation_change*self.slurry.rhol, Slug(Vls, copy(self.slurry))
 
 
 @dataclass
