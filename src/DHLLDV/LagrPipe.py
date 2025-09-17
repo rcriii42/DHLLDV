@@ -44,6 +44,11 @@ class Slug:
         else:
             raise TypeError
 
+    @property
+    def area(self):
+        """THe area of the slug pipe"""
+        return pi * (self.slurry.Dp / 2) ** 2
+
 
 class SuctionFeed:
     """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
