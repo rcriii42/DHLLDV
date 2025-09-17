@@ -123,7 +123,9 @@ class LagrPipe(Pipe):
         Returns a tuple of the total head requirement to date, and the Slug passed downstream
         """
         h_in, in_slug = self.feed_in(Q)
+        hvel_in = (Q/in_slug.area)**2 * in_slug.slurry.rhom/ (2 * gravity)
         in_slug.slurry.Dp = self.slugs[0].slurry.Dp
+        hvel_new = (Q/in_slug.area)**2 * in_slug.slurry.rhom/ (2 * gravity)
         vm = remain_length = self.velocity(Q)  # If the timestep is 1, the velocity is the slug length
 
         if self.length > 0:
@@ -154,6 +156,7 @@ class LagrPipe(Pipe):
             self.slugs[0].slurry = copy(in_slug.slurry)
             hvel = vm ** 2 / (2 * gravity)
             h_in += in_slug.slurry.rhom * self.total_K * hvel
+        h_in += (hvel_new - hvel_in)
         h_in += self.elev_change * extruded_slug.slurry.rhom
 
         return h_in, extruded_slug
