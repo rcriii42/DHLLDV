@@ -224,22 +224,29 @@ if __name__ == '__main__':
 
     pipe1 = Pipe(diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0)
     slurry = Slurry(fluid='salt')
+    pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+                 pipe1,
+                 Ladder_Pump600,
+                 Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                 Main_Pump500,
+                 Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2,
+                      elev_change=-1.0),
+                 Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0,
+                      elev_change=1.0)]
     lpipeline = LagrPipeline(name="test lagrangian pipeline",
-                                  pipe_list=[Pipe('Entrance', 0.6, 0, 0.5, -4.0),
-                                             pipe1,
-                                             Ladder_Pump600,
-                                             Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
-                                             Main_Pump500,
-                                             Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2,
-                                                  elev_change=-1.0),
-                                             Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0,
-                                                  elev_change=1.0)],
+                                  pipe_list=pipe_list,
                                   slurry=slurry)
     slugs_length = 0
     for p in lpipeline.lpipe_list:
         if type(p) is LagrPipe:
             slugs_length += sum(s.length for s in p.slugs)
     print(slugs_length)
+
+    P = Pipeline('test_pipeline', pipe_list, slurry)
+    flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
+    qop = P.find_operating_point(flow_list)
+    h_losses_slurry, h_losses_fluid, h_pump_slurry, h_pump_fluid = P.calc_system_head(qop)
+    print(f'{qop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, {h_pump_fluid=:0.3f}')
 
     for i in range(50):
         q, h, slug = lpipeline.update()
