@@ -208,6 +208,13 @@ class MyTestCase(unittest.TestCase):
         qop = self.pipeline.find_operating_point(flow_list)
         self.assertAlmostEqual(qop, 1.55425794, places=3)
 
+    def test_head_at_op_point_matches(self):
+        """The pump and slurry head should match at the pipeline operating point"""
+        flow_list = [self.pipeline.pipesections[-1].flow(v) for v in self.pipeline.slurry.vls_list]
+        qop = self.pipeline.find_operating_point(flow_list)
+        Htot_m, Htot_l, Hpumps_l, Hpumps_m = self.pipeline.calc_system_head(qop)
+        self.assertAlmostEqual(Htot_m, Hpumps_m, 12)
+
 
 if __name__ == '__main__':
     unittest.main()
