@@ -9,7 +9,6 @@ from dataclasses import dataclass
 from functools import partial
 from math import pi
 
-import scipy.optimize
 from DHLLDV.DHLLDV_constants import gravity
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
@@ -62,6 +61,7 @@ class SuctionFeed:
 
     @property
     def rhom(self):
+        """"The feed density"""
         return self.slurry.rhom
 
     @rhom.setter
@@ -70,6 +70,7 @@ class SuctionFeed:
 
     @property
     def Dp(self):
+        """The suction diameter (m)"""
         return self.slurry.Dp
 
     @Dp.setter
@@ -123,9 +124,9 @@ class LagrPipe(Pipe):
         Returns a tuple of the total head requirement to date, and the Slug passed downstream
         """
         h_in, in_slug = self.feed_in(Q)
-        hvel_in = (Q/in_slug.area)**2 * in_slug.slurry.rhom/ (2 * gravity)
+        hvel_in = (Q/in_slug.area)**2 * in_slug.slurry.rhom / (2 * gravity)
         in_slug.slurry.Dp = self.slugs[0].slurry.Dp
-        hvel_new = (Q/in_slug.area)**2 * in_slug.slurry.rhom/ (2 * gravity)
+        hvel_new = (Q/in_slug.area)**2 * in_slug.slurry.rhom / (2 * gravity)
         vm = remain_length = self.velocity(Q)  # If the timestep is 1, the velocity is the slug length
 
         if self.length > 0:
@@ -173,7 +174,7 @@ class LagrPipeline(Pipeline):
     def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None):
         super().__init__(name, pipe_list, slurry)
 
-        self.timecounter = 0  #  Track the number of timesteps so far
+        self.timecounter = 0  # Track the number of timesteps so far
         self.slurry.Dp = self.pipesections[-1].diameter
         self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
@@ -257,8 +258,10 @@ if __name__ == '__main__':
     qop = P.find_operating_point(flow_list)
     vop = P.pipesections[-1].velocity(qop)
     h_losses_slurry, h_losses_fluid, h_pump_slurry, h_pump_fluid = P.calc_system_head(qop)
-    print(f'{qop=:0.3f} {vop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, {h_pump_fluid=:0.3f}')
+    print(f'{qop=:0.3f} {vop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, '
+          f'{h_pump_fluid=:0.3f}')
 
     for i in range(9):
         q, h, slug = lpipeline.update()
-        print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, {h=:0.3f}, {slug.slurry.rhom=:0.3f}')
+        print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, {h=:0.3f}, '
+              f'{slug.slurry.rhom=:0.3f}')
