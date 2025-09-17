@@ -42,7 +42,6 @@ class MyTestCase(unittest.TestCase):
         P = Pipeline('test_pipeline', self.pipe_list, self.slurry)
         flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
         qop = P.find_operating_point(flow_list)
-        # h_losses_slurry, h_losses_fluid, h_pump_slurry, h_pump_fluid = P.calc_system_head(qop)
         q, h, slug = self.lpipeline.update()
         self.assertEqual(q, qop)
 
