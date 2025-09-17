@@ -180,7 +180,8 @@ class LagrPipeline(Pipeline):
         self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
         self.suction_feed = SuctionFeed(copy(self.slurry),
-                                        Dp=self.pipesections[0].diameter)
+                                        Dp=self.pipesections[0].diameter,
+                                        elevation_change=self.pipesections[0].elev_change)
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
