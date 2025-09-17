@@ -245,9 +245,10 @@ if __name__ == '__main__':
     P = Pipeline('test_pipeline', pipe_list, slurry)
     flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
     qop = P.find_operating_point(flow_list)
+    vop = P.pipesections[-1].velocity(qop)
     h_losses_slurry, h_losses_fluid, h_pump_slurry, h_pump_fluid = P.calc_system_head(qop)
-    print(f'{qop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, {h_pump_fluid=:0.3f}')
+    print(f'{qop=:0.3f} {vop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, {h_pump_fluid=:0.3f}')
 
-    for i in range(50):
+    for i in range(9):
         q, h, slug = lpipeline.update()
         print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, {h=:0.3f}, {slug.slurry.rhom=:0.3f}')
