@@ -265,7 +265,7 @@ if __name__ == '__main__':
     flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
     qop = P.find_operating_point(flow_list)
     vop = P.pipesections[-1].velocity(qop)
-    h_losses_slurry, h_losses_fluid, h_pump_slurry, h_pump_fluid = P.calc_system_head(qop)
+    h_losses_slurry, h_losses_fluid, h_pump_fluid, h_pump_slurry = P.calc_system_head(qop)
     print(f'{qop=:0.3f} {vop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, '
           f'{h_pump_fluid=:0.3f}')
 
