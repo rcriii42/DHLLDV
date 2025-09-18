@@ -159,7 +159,13 @@ class LagrPipe(Pipe):
             hvel = vm ** 2 / (2 * gravity)
             h_in += in_slug.slurry.rhom * self.total_K * hvel
         h_in += (hvel_new - hvel_in)
-        h_in += self.elev_change * extruded_slug.slurry.rhom
+
+        helev = 0  # elevation head requirement
+        for s in self.slugs:
+            if self.length > 0:
+                helev += s.slurry.rhom * s.length * self.elev_change / self.length
+
+        h_in += helev
 
         return h_in, extruded_slug
 
