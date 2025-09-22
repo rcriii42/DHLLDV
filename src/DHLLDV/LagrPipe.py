@@ -49,7 +49,7 @@ class Slug:
         return pi * (self.slurry.Dp / 2) ** 2
 
 
-class SuctionFeed:
+class FixedDensityFeed:
     """A class that has a simple feed mechanism to provide fixed-density feed to a project"""
 
     def __init__(self, slurry: Slurry, density: float = None, Dp: float = None, elevation_change: float = 0):
@@ -187,9 +187,9 @@ class LagrPipeline(Pipeline):
         self.slurry.Dp = self.pipesections[-1].diameter
         self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
-        self.suction_feed = SuctionFeed(copy(self.slurry),
-                                        Dp=self.pipesections[0].diameter,
-                                        elevation_change=self.pipesections[0].elev_change)
+        self.suction_feed = FixedDensityFeed(copy(self.slurry),
+                                             Dp=self.pipesections[0].diameter,
+                                             elevation_change=self.pipesections[0].elev_change)
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
