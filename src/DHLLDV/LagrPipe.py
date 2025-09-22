@@ -222,6 +222,8 @@ class LagrPipeline(Pipeline):
 
         Returns the new flow, net head, and last slug"""
         self.timecounter += 1
+
+        # net_head is pump_head - required head. If negative the system will decelerate.
         net_head, disch_slug = self.lpipe_list[-1].feed(self.lastflow)
         hvel = self.pipesections[0].velocity(self.lastflow) ** 2 / (2 * gravity)
         net_head += self.lpipe_list[0].slugs[0].slurry.rhom * hvel
