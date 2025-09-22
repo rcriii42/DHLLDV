@@ -84,10 +84,12 @@ class SuctionFeed:
         return pi * (self.Dp/2)**2
 
     def feed(self, Q: float) -> (float, Slug):
-        """Return the suction elevation head, velocity head, and a slug of slurry"""
+        """Return head of 0, and a slug of slurry
+
+        The head is all calculated in the pipe sections"""
         Vls = Q/self.area
         hvel = Vls**2 * self.slurry.rhom / (2 * gravity)
-        return hvel-self.elevation_change*self.slurry.rhol, Slug(Vls, copy(self.slurry))
+        return 0, Slug(Vls, copy(self.slurry))
 
 
 @dataclass
