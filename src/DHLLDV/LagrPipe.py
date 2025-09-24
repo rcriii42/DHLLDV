@@ -48,6 +48,19 @@ class Slug:
         """The density of the slurry"""
         return self.slurry.rhom
 
+    @property
+    def Dp(self):
+        """The pipe diameter"""
+        return self.slurry.Dp
+
+    @Dp.setter
+    def Dp(self, value):
+        """Update the slug length when the Dp changes"""
+        orig_q = self.length * self.area
+        self.slurry.Dp = value
+        self.length = orig_q / self.area
+
+    @property
     def area(self):
         """THe area of the slug pipe"""
         return pi * (self.slurry.Dp / 2) ** 2
