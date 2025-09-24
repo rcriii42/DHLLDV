@@ -63,7 +63,7 @@ class Slug:
     @property
     def area(self):
         """THe area of the slug pipe"""
-        return pi * (self.slurry.Dp / 2) ** 2
+        return pi * (self.Dp / 2) ** 2
 
 
 class FixedDensityFeed:
