@@ -44,6 +44,10 @@ class Slug:
             raise TypeError
 
     @property
+    def rhom(self):
+        """The density of the slurry"""
+        return self.slurry.rhom
+
     def area(self):
         """THe area of the slug pipe"""
         return pi * (self.slurry.Dp / 2) ** 2
