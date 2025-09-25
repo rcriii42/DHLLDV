@@ -202,7 +202,9 @@ class LagrPipe(Pipe):
 
         slugs_length = sum(s.length for s in self.slugs)
         if int(slugs_length * 1000) != int(self.length * 1000):
-            print(f'WARNING {self.name=}: lengths do not add up {slugs_length=:0.3f} {self.length=:0.3f}')
+            diff = slugs_length - self.length
+            print(f'WARNING {self.name=}: lengths do not add up {slugs_length=:0.3f} {self.length=:0.3f} '
+                  f'{diff=:0.3e}')
 
         return [-1 * hvel_w * self.average_rhom(), hloss_out, hpump], extruded_slug
 
