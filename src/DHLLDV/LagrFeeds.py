@@ -48,4 +48,35 @@ class FixedDensityFeed:
 
         return [0.0, 0.0, 0.0], Slug(Vls, copy(self.slurry))
 
-    # class CyclicFeed(FixedDensityFeed):
+class CyclicFeed(FixedDensityFeed):
+    """A feed function with a simple varying density list"""
+
+    def __init__(self, slurry: Slurry, densities: list[float] | None = None, Dp: float = None):
+        self.slurry = slurry
+        if densities is None:
+            self.densities = [self.slurry.rhom]
+        else:
+            self.densities = densities
+        if Dp is not None:
+            self.slurry.Dp = Dp
+        self.index = 0
+
+    @property
+    def rhom(self):
+        """"The feed density at the current index"""
+        return self.densities[self.index].rhom
+
+    @rhom.setter
+    def rhom(self, value):
+        raise AttributeError("Cannot set rhom attribute - update the densities list")
+
+    def feed(self, Q: float) -> ([float, float, float], Slug):
+        """The cyclic feed mechanism"""
+        Vls = Q / self.area
+        new_slurry = copy(self.slurry)
+        new_slurry.rhom = self.densities[self.index]
+        self.index += 1
+        if self.index >= len(self.densities):
+            self.index = 0
+
+        return [0.0, 0.0, 0.0], Slug(Vls, new_slurry)
