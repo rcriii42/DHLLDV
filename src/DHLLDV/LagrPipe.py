@@ -268,7 +268,9 @@ class LagrPipeline(Pipeline):
 
         # net_head is the sum of the heads (losses and velocity head negative)
         # If net_head is negative, the system will decelerate
-        net_head = sum(head_list)
+        _, hloss_out, hpump = head_list
+        hvel_out = -1 * disch_slug.rhom * self.lpipe_list[-1].velocity(self.lastflow)**2 / (2 * gravity)
+        net_head = hvel_out + hloss_out + hpump
         pl_weight = 0
         for p in self.lpipe_list:
             if type(p) is LagrPipe:
@@ -276,11 +278,11 @@ class LagrPipeline(Pipeline):
                     pl_weight += s.length * s.slurry.rhom
         acceleration = net_head / pl_weight
         # Use the last pump discharge diameter for acceleration calcs
-        acc_pipe = Pipe(diameter=self.pumps[-1].disch_dia)
+        acc_pipe = self.lpipe_list[-1]
         vls = acc_pipe.velocity(self.lastflow)
         self.lastflow = acc_pipe.flow(vls + acceleration)
 
-        return self.lastflow, head_list, disch_slug
+        return self.lastflow, [hvel_out, hloss_out, hpump], disch_slug
 
 
 if __name__ == '__main__':
