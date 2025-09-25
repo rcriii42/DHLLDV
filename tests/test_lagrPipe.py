@@ -54,7 +54,7 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(p.length, total_length)
 
 
-    def test_suction_feed(self):
+    def test_FixedDensity_feed(self):
         """Test that the FixedDensityFeed.feed function returns the right thing"""
         head, slug = self.suct_feed.feed(1.824146925)
         self.assertAlmostEqual(slug.length, 4)
