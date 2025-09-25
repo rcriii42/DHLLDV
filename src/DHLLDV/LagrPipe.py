@@ -142,21 +142,24 @@ class LagrPipe(Pipe):
         else:
             return self.slugs[0].rhom
 
-    def feed(self, Q: float) -> (float, Slug):
+    def feed(self, Q: float) -> ([float, float, float], Slug):
         """
         Get slurry from upstream, update the slugs, and send slurry and head downstream
 
         Q is the quantity moved this timestep in m3
 
-        Returns a tuple of the total head requirement to date, and the Slug passed downstream
+        Returns a tuple with a list of the total head to this point (Hvel, Hloss, Hpump), and the Slug passed downstream
         """
         h_in, in_slug = self.feed_in(Q)
-        hvel_in = (Q/in_slug.area)**2 * in_slug.slurry.rhom / (2 * gravity)
-        in_slug.slurry.Dp = self.slugs[0].slurry.Dp
-        hvel_new = (Q/in_slug.area)**2 * in_slug.slurry.rhom / (2 * gravity)
+        in_slug.Dp = self.slugs[0].slurry.Dp  # also updates the length to account for diameter changes
         vm = remain_length = self.velocity(Q)  # If the timestep is 1, the velocity is the slug length
 
-        if self.length > 0:
+        if self.length == 0:
+            # For zero-length pipe sections just pass along the in_slug, keeping the slurry
+            extruded_slug = in_slug
+            self.slugs[0].slurry = copy(in_slug.slurry)
+
+        else:
             self.slugs.insert(0, in_slug)
             extruded_slug = Slug(0, copy(self.slugs[-1].slurry))
             while remain_length > 0:
@@ -173,27 +176,35 @@ class LagrPipe(Pipe):
                     last_slug.length -= remain_length
                     remain_length = 0
 
-            for s in self.slugs:
-                im = s.slurry.im(vm)  # Implicitly assume timestep is 1
-                hvel = vm ** 2 / (2 * gravity)
-                h_in += im * s.length + s.slurry.rhom * (self.total_K * s.length / self.length) * hvel
-        else:
-            # For zero-length pipe sections just pass along the in_slug, keeping the slurry
-            in_slug.slurry.Dp = self.slugs[0].slurry.Dp
-            extruded_slug = in_slug
-            self.slugs[0].slurry = copy(in_slug.slurry)
-            hvel = vm ** 2 / (2 * gravity)
-            h_in += in_slug.slurry.rhom * self.total_K * hvel
-        h_in += (hvel_new - hvel_in)
-
-        helev = 0  # elevation head requirement
+        """Calculate the losses, does three things:
+        
+        Calculates friction and fitting losses and subtract from input losses
+        Calculates the velocity head
+        Calculate the elevation head
+        """
+        hvel_in, hloss_in, hpump = h_in
+        hvel_w = vm ** 2 / (2 * gravity)
+        hloss_out = hloss_in
         for s in self.slugs:
+            im = s.slurry.im(vm)  # Implicitly assume timestep is 1
+            hloss_out -= im * s.length  # Friction losses
             if self.length > 0:
-                helev += s.slurry.rhom * s.length * self.elev_change / self.length
+                hloss_out -= s.slurry.rhom * (self.total_K * s.length / self.length) * hvel_w  # Fitting losses
+            else:
+                hloss_out -= s.slurry.rhom * self.total_K * hvel_w  # Fitting losses
 
-        h_in += helev
+        if self.length > 0:
+            for s in self.slugs:
+                hloss_out -= s.slurry.rhom * s.length * self.elev_change / self.length  # elevation head requirement
+        else:
+            s = self.slugs[0]
+            hloss_out -= s.rhom * self.elev_change  # elevation head requirement
 
-        return h_in, extruded_slug
+        slugs_length = sum(s.length for s in self.slugs)
+        if int(slugs_length * 1000) != int(self.length * 1000):
+            print(f'WARNING {self.name=}: lengths do not add up {slugs_length=:0.3f} {self.length=:0.3f}')
+
+        return [-1 * hvel_w * self.average_rhom(), hloss_out, hpump], extruded_slug
 
 
 class LagrPipeline(Pipeline):
