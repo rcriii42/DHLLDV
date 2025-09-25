@@ -146,7 +146,7 @@ class Pipeline:
     def update_slurries(self):
         """Update the dictionary of slurries by pipe diameter
 
-        If self._slurry.Dp is not in the pipeline, set it to the last pipe diameter"""
+        If self._slurry.Dp is not in the pipeline, set it to the minimum pipe diameter"""
         self.slurries = {}
         count = 0
         for p in self.pipesections:
@@ -156,7 +156,7 @@ class Pipeline:
             elif isinstance(p, Pump):
                 p.slurry = self.slurry
         if self._slurry.Dp not in self.slurries.keys():
-            self._slurry.Dp = self.pipesections[-1].diameter
+            self._slurry.Dp = min(self.slurries.keys())
 
     def calc_system_head(self, Q):
         """Calculate the system head for a pipeline
