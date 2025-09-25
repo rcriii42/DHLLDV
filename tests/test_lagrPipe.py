@@ -62,6 +62,7 @@ class MyTestCase(unittest.TestCase):
         self.assertEqual(slug.slurry.rhom, self.slurry2.rhom)
 
     def test_feed_rhom_out(self):
+        """Test the extruded slug density and length"""
         h_out, slug_out = self.l_pipe.feed(1.824146925)
         self.assertEqual(slug_out.slurry.rhom, 1.34984824)
         self.assertAlmostEqual(slug_out.length, 4)
