@@ -146,7 +146,7 @@ class LagrPipeline(Pipeline):
         self.lpipe_list = []
         self.suction_feed = FixedDensityFeed(copy(self.slurry),
                                              Dp=self.pipesections[0].diameter,
-                                             elevation_change=self.pipesections[0].elev_change)
+                                             )
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
