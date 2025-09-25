@@ -1,0 +1,60 @@
+"""Show the simulation in the browser"""
+
+import base64
+import io
+import sys
+
+import openpyxl
+
+from bokeh.io import curdoc
+from bokeh.layouts import column, row
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
+from bokeh.models.tickers import FixedTicker
+from bokeh.models.widgets import FileInput
+from bokeh.plotting import figure
+
+from DHLLDV import DHLLDV_framework, LagrPipe
+from DHLLDV.LagrPipe import LagrPipeline
+from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
+from DHLLDV.PumpObj import Pump
+from DHLLDV.SlurryObj import Slurry
+
+from ExamplePumps import Ladder_Pump600, Main_Pump500
+
+slurry = Slurry(fluid='salt')
+pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
+             Pipe(name='LP Suction', diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+             Ladder_Pump600,
+             Pipe(name='MP Suction', diameter=0.5, length=25.0, total_K=0.1, elev_change=0.0),
+             Main_Pump500,
+             Pipe(name='MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+             Pipe(name='Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)]
+lpipeline = LagrPipeline(name="test lagrangian pipeline",
+                                  pipe_list=pipe_list,
+                                  slurry=slurry)
+
+source = ColumnDataSource(data=dict(timestep=[], velocity=[], density=[]))
+
+p = figure(height=500, tools="xpan,xwheel_zoom,xbox_zoom,reset",
+           x_axis_type=None, y_axis_location="right")
+p.x_range.follow = "end"
+p.x_range.follow_interval = 100
+p.x_range.range_padding = 0
+
+p.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
+p.line(x='timestep', y='density', alpha=0.8, line_width=2, color='orange', source=source)
+
+
+def update():
+    """Update the simulation"""
+    q, heads, disch_slug = lpipeline.update()
+    new_data = dict(timestep=[lpipeline.timecounter],
+                    velocity=[lpipeline.lpipe_list[-1].velocity(q)],
+                    density=[disch_slug.rhom])
+
+    source.stream(new_data, 100)
+
+curdoc().add_root(p)
+curdoc().add_periodic_callback(update, 50)
+curdoc().title = "Simulation"
