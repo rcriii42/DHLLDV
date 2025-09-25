@@ -39,7 +39,7 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density=[]))
 
 p = figure(height=500, tools="xpan,xwheel_zoom,xbox_zoom,reset",
-           x_axis_type=None, y_axis_location="right")
+           y_axis_location="right")
 p.x_range.follow = "end"
 p.x_range.follow_interval = 100
 p.x_range.range_padding = 0
@@ -53,7 +53,7 @@ def update():
     q, heads, disch_slug = lpipeline.update()
     new_data = dict(timestep=[lpipeline.timecounter],
                     velocity=[lpipeline.lpipe_list[-1].velocity(q)],
-                    density=[disch_slug.rhom])
+                    density=[lpipeline.lpipe_list[0].slugs[0].rhom],)
 
     source.stream(new_data, 100)
 
