@@ -253,7 +253,7 @@ class LagrPipeline(Pipeline):
                 print(f'LagrPipeline.__init__: Warning, unknown element type {type(element)} '
                       f'in pipeline at position {i}, not adding')
 
-    def update(self) -> tuple[float, float, Slug]:
+    def update(self) -> tuple[float, [float, float, float], Slug]:
         """Update the pipeline by one second
         TODO: Allow user-input timestep?
 
@@ -261,24 +261,26 @@ class LagrPipeline(Pipeline):
         Call feed functions
         calculate acceleration/deceleration
 
-        Returns the new flow, net head, and last slug"""
+        Returns the new flow, head tuple (velocity, losses, pump), and last slug"""
         self.timecounter += 1
 
-        # net_head is pump_head - required head. If negative the system will decelerate.
-        net_head, disch_slug = self.lpipe_list[-1].feed(self.lastflow)
-        hvel = self.pipesections[0].velocity(self.lastflow) ** 2 / (2 * gravity)
-        net_head += self.lpipe_list[0].slugs[0].slurry.rhom * hvel
+        head_list, disch_slug = self.lpipe_list[-1].feed(self.lastflow)
+
+        # net_head is the sum of the heads (losses and velocity head negative)
+        # If net_head is negative, the system will decelerate
+        net_head = sum(head_list)
         pl_weight = 0
         for p in self.lpipe_list:
             if type(p) is LagrPipe:
                 for s in p.slugs:
                     pl_weight += s.length * s.slurry.rhom
-        acceleration = -1 * net_head / pl_weight    # Note friction losses are positive and pump head is negative
-        acc_pipe = Pipe(diameter=self.pumps[-1].disch_dia)  # A pipe of the last pump discharge diameter for flow calcs
+        acceleration = net_head / pl_weight
+        # Use the last pump discharge diameter for acceleration calcs
+        acc_pipe = Pipe(diameter=self.pumps[-1].disch_dia)
         vls = acc_pipe.velocity(self.lastflow)
         self.lastflow = acc_pipe.flow(vls + acceleration)
 
-        return self.lastflow, net_head, disch_slug
+        return self.lastflow, head_list, disch_slug
 
 
 if __name__ == '__main__':
