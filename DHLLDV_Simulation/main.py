@@ -8,7 +8,7 @@ import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Slider, RadioButtonGroup
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
@@ -58,6 +58,7 @@ Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 
+rate_slider = Slider(title="framerate", value=1, start=1, end=20, step=1)
 
 def update():
     """Update the simulation"""
@@ -74,6 +75,12 @@ def update():
     source.stream(new_data, 100)
 
 
-curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p))
-curdoc().add_periodic_callback(update, 1000)
+curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, rate_slider))
+periodic_callbacks = [curdoc().add_periodic_callback(update, 1000)]
+
+def update_framerate(attr, old, new):
+    curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
+    periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
+rate_slider.on_change('value', update_framerate)
+
 curdoc().title = "Simulation"
