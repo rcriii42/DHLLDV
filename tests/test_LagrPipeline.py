@@ -54,7 +54,17 @@ class MyTestCase(unittest.TestCase):
         q, h, slug = self.lpipeline.update()
         self.assertAlmostEqual(q, qop, places=4)
 
-    def test_head_matches_pipeline(self):
+    def test_pump_head_matches_pipeline(self):
+        """Check that the newly initiated lagrpipe head matches the source pipeline operating point head"""
+        P = Pipeline('test_pipeline', self.pipe_list, self.slurry)
+        flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
+        qop = P.find_operating_point(flow_list)
+        h_losses_slurry, h_losses_fluid, h_pump_fluid, h_pump_slurry = P.calc_system_head(qop)
+        q, h_list, slug = self.lpipeline.update()
+
+        self.assertAlmostEqual(h_list[2], h_pump_slurry, places=4)
+
+    def test_net_head_matches_pipeline(self):
         """Check that the newly initiated lagrpipe head matches the source pipeline operating point head"""
         P = Pipeline('test_pipeline', self.pipe_list, self.slurry)
         flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
