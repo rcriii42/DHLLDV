@@ -137,16 +137,19 @@ class LagrPipeline(Pipeline):
     Calculates acceleration/deceleration
     """
 
-    def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None):
+    def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None, suct_feed=None):
         super().__init__(name, pipe_list, slurry)
 
         self.timecounter = 0  # Track the number of timesteps so far
         self.slurry.Dp = self.pipesections[-1].diameter
         self.lastflow = self.find_operating_point(self.slurry.vls_list)
         self.lpipe_list = []
-        self.suction_feed = FixedDensityFeed(copy(self.slurry),
-                                             Dp=self.pipesections[0].diameter,
-                                             )
+        if suct_feed is not None:
+            self.suction_feed = suct_feed
+        else:
+            self.suction_feed = FixedDensityFeed(copy(self.slurry),
+                                                 Dp=self.pipesections[0].diameter,
+                                                 )
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
