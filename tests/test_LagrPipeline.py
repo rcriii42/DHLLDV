@@ -72,7 +72,7 @@ class MyTestCase(unittest.TestCase):
         h_losses_slurry, h_losses_fluid, h_pump_fluid, h_pump_slurry = P.calc_system_head(qop)
         q, h_list, slug = self.lpipeline.update()
 
-        self.assertAlmostEqual(sum(h_list), h_losses_slurry - h_pump_slurry, places=4)
+        self.assertAlmostEqual(sum(h_list[1:]), h_losses_slurry - h_pump_slurry, places=4)
 
 
 if __name__ == '__main__':
