@@ -209,7 +209,7 @@ class LagrPipeline(Pipeline):
                 for s in p.slugs:
                     pl_weight += s.length * s.slurry.rhom
         acceleration = net_head / pl_weight
-        print(f'{net_head=:0.3f} {pl_weight=:0.3f} {acceleration=:0.3e}')
+        # print(f'{net_head=:0.3f} {pl_weight=:0.3f} {acceleration=:0.3e}')
         # Use the last pump discharge diameter for acceleration calcs
         acc_pipe = self.lpipe_list[-1]
         vls = acc_pipe.velocity(self.lastflow)
