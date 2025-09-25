@@ -116,7 +116,17 @@ class LagrPipe(Pipe):
     feed_in: Callable[[float], (float, Slug)] | None = None  # The incoming feed function, see definition below
 
     def __post_init__(self):
+        if self.slugs is None:
+            self.slugs = [Slug(1.0, Slurry())]
         self.length = sum(s.length for s in self.slugs)
+
+        #Check slugs are all the same diameter
+        check_diameter = self.slugs[0].Dp
+        for i, s in enumerate(self.slugs[0:]):
+            if s.Dp != check_diameter:
+                print(f'WARNING slug {i+1} in {self.name} diameter of {s.Dp:0.3f} does not match '
+                      f'first slug {check_diameter=:0.3f}, setting to reference')
+                s.Dp = check_diameter
 
     @classmethod
     def from_pipe(cls, this_pipe: Pipe,
