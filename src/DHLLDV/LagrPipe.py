@@ -238,12 +238,13 @@ class LagrPipeline(Pipeline):
                 # add a feed method for the pump
                 element.feed_in = last_feed
 
-                def pump_feed(this_pump: Pump, Q: float):
+                def pump_feed(this_pump: Pump, Q: float) -> ([float, float, float], Slug):
                     """Function handle the feed of a pump object"""
                     h_in, in_slug = this_pump.feed_in(Q)
+                    hvel_in, hloss_in, hpump_in = h_in
                     this_pump.slurry = in_slug.slurry
-                    _, H, _, _ = this_pump.point(Q)
-                    return h_in - H, in_slug
+                    _, h, _, _ = this_pump.point(Q)
+                    return [hvel_in, hloss_in, hpump_in + h], in_slug
 
                 last_feed = partial(pump_feed, element)
                 self.lpipe_list.append(element)
