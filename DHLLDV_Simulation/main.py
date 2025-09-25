@@ -16,6 +16,7 @@ from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework, LagrPipe
 from DHLLDV.LagrPipe import LagrPipeline
+from DHLLDV.LagrFeeds import CyclicFeed
 from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
@@ -31,8 +32,9 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
              Pipe(name='MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
              Pipe(name='Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)]
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
-                                  pipe_list=pipe_list,
-                                  slurry=slurry)
+                         pipe_list=pipe_list,
+                         slurry=slurry,
+                         suct_feed=CyclicFeed(slurry, densities=[1.1, 1.2, 1.3, 1.03], Dp=0.6))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density=[]))
 
