@@ -30,6 +30,22 @@ class MyTestCase(unittest.TestCase):
                 slugs_length += sum(s.length for s in p.slugs)
         self.assertEqual(self.lpipeline.total_length, slugs_length)
 
+    def test_lpipe_sender_length_on_dia_change(self):
+        """Test that slugs lengths for the upstream pipe are correct when pipe diameter is changed"""
+        q, h, slug = self.lpipeline.update()
+        slugs_length = 0
+        for s in self.lpipeline.lpipe_list[1].slugs:
+            slugs_length += s.length
+        self.assertEqual(slugs_length, self.lpipeline.lpipe_list[1].length)
+
+    def test_lpipe_reciever_length_on_dia_change(self):
+        """Test that slugs lengths for the downstream pipe are correct when pipe diameter is changed"""
+        q, h, slug = self.lpipeline.update()
+        slugs_length = 0
+        for s in self.lpipeline.lpipe_list[3].slugs:
+            slugs_length += s.length
+        self.assertEqual(slugs_length, self.lpipeline.lpipe_list[3].length)
+
     def test_flow_matches_pipeline(self):
         """Check that the newly initiated lagrpipe flow matched the source pipeline operating point"""
         P = Pipeline('test_pipeline', self.pipe_list, self.slurry)
