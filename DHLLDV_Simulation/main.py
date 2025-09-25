@@ -47,6 +47,9 @@ p.x_range.range_padding = 0
 p.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
 p.line(x='timestep', y='density', alpha=0.8, line_width=2, color='orange', source=source)
 
+Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
+Sm_display = TextInput(title="Rhom (ton/m3)", value=f"{0.0}", width=95, disabled=True)
+
 
 def update():
     """Update the simulation"""
@@ -55,8 +58,12 @@ def update():
                     velocity=[lpipeline.lpipe_list[-1].velocity(q)],
                     density=[lpipeline.lpipe_list[0].slugs[0].rhom],)
 
+    Vm_display.value = f'{lpipeline.lpipe_list[-1].velocity(q):0.3f}'
+    Sm_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
+
     source.stream(new_data, 100)
 
-curdoc().add_root(p)
-curdoc().add_periodic_callback(update, 50)
+
+curdoc().add_root(column(row(Vm_display, Sm_display), p))
+curdoc().add_periodic_callback(update, 1000)
 curdoc().title = "Simulation"
