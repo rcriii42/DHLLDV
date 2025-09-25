@@ -191,12 +191,13 @@ class LagrPipe(Pipe):
         """Calculate the losses, does three things:
         
         Calculates friction and fitting losses and subtract from input losses
-        Calculates the velocity head
+        Calculates the velocity head, adds change from previous pipe to losses
         Calculate the elevation head
         """
         hvel_in, hloss_in, hpump = h_in
         hvel_w = vm ** 2 / (2 * gravity)
-        hloss_out = hloss_in
+        hvel_change = -1 * hvel_w * in_slug.rhom - hvel_in
+        hloss_out = hloss_in + hvel_change
         for s in self.slugs:
             im = s.slurry.im(vm)  # Implicitly assume timestep is 1
             hloss_out -= im * s.length  # Friction losses
@@ -282,9 +283,8 @@ class LagrPipeline(Pipeline):
 
         # net_head is the sum of the heads (losses and velocity head negative)
         # If net_head is negative, the system will decelerate
-        _, hloss_out, hpump = head_list
-        hvel_out = -1 * disch_slug.rhom * self.lpipe_list[-1].velocity(self.lastflow)**2 / (2 * gravity)
-        net_head = hvel_out + hloss_out + hpump
+        hvel_out, hloss_out, hpump = head_list
+        net_head = hloss_out + hpump
         pl_weight = 0
         for p in self.lpipe_list:
             if type(p) is LagrPipe:
