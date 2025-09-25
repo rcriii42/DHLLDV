@@ -1,6 +1,8 @@
 import unittest
 
-from DHLLDV.LagrPipe import add_slurries, LagrPipe, Slug, FixedDensityFeed
+from DHLLDV.LagrPipe import LagrPipe
+from DHLLDV.LagrSlug import Slug, add_slurries
+from DHLLDV.LagrFeeds import FixedDensityFeed
 from DHLLDV.PipeObj import Pipe
 from DHLLDV.SlurryObj import Slurry
 
