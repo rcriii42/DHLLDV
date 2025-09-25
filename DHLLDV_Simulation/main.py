@@ -23,6 +23,12 @@ from DHLLDV.SlurryObj import Slurry
 
 from ExamplePumps import Ladder_Pump600, Main_Pump500
 
+csd_densities = ([1.03] * 15 +  # coming out of corner
+                 [1.35] * 60 * 2 +  # dig swing
+                 [1.19] * 15 + [1.03] * 15 +  # corner
+                 [1.35/2] * 60 * 2 +  # back swing
+                 [1.35/4]*15)
+
 slurry = Slurry(fluid='salt', Cv=0.001)
 pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
              Pipe(name='LP Suction', diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
@@ -34,7 +40,7 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          pipe_list=pipe_list,
                          slurry=slurry,
-                         suct_feed=CyclicFeed(slurry, densities=[1.1, 1.2, 1.3, 1.03], Dp=0.6))
+                         suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
