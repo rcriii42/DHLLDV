@@ -292,7 +292,7 @@ if __name__ == '__main__':
 
     slurry = Slurry(fluid='salt')
     pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
-                 Pipe(name='LP Suction', diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
+                 Pipe(name='LP Suction', diameter=0.5, length=10.0, total_K=0.1, elev_change=5.0),
                  Ladder_Pump600,
                  Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
                  Main_Pump500,
