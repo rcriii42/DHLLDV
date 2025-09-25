@@ -153,7 +153,7 @@ class LagrPipe(Pipe):
         Returns a tuple with a list of the total head to this point (Hvel, Hloss, Hpump), and the Slug passed downstream
         """
         h_in, in_slug = self.feed_in(Q)
-        in_slug.Dp = self.slugs[0].slurry.Dp  # also updates the length to account for diameter changes
+        in_slug.Dp = self.diameter  # also updates the length to account for diameter changes
         vm = remain_length = self.velocity(Q)  # If the timestep is 1, the velocity is the slug length
 
         if self.length == 0:
