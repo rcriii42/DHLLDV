@@ -315,7 +315,10 @@ if __name__ == '__main__':
     print(f'{qop=:0.3f} {vop=:0.3f} {h_losses_slurry=:0.3f}, {h_losses_fluid=:0.3f} {h_pump_slurry=:0.3f}, '
           f'{h_pump_fluid=:0.3f}')
 
-    for i in range(9):
-        q, h, slug = lpipeline.update()
-        print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, {h=:0.3f}, '
-              f'{slug.slurry.rhom=:0.3f}')
+    for i in range(5):
+        q, h_list, extruded_slug = lpipeline.update()
+        hvel_out, hloss_out, hpump = h_list
+        hlosses = sum(h_list[:2])
+        print(f'{lpipeline.timecounter=}, {q=:0.3f}, vls={lpipeline.pipesections[-1].velocity(q):0.3f}, '
+              f'{hvel_out=:0.3f}, {hloss_out=:0.3f} {hlosses=:0.3f}, {hpump=:0.3f}, '
+              f'{extruded_slug.slurry.rhom=:0.3f}')
