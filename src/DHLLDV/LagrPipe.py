@@ -311,7 +311,7 @@ if __name__ == '__main__':
         if type(p) is LagrPipe:
             slugs_length += sum(s.length for s in p.slugs)
             elev_change += p.elev_change
-    print(f'{slugs_length=:0.3f} {elev_change=:0.3f}')
+    print(f'{lpipeline.total_length=:0.3f} {slugs_length=:0.3f} {elev_change=:0.3f}')
 
     P = Pipeline('test_pipeline', pipe_list, slurry)
     flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
