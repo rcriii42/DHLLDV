@@ -135,6 +135,13 @@ class LagrPipe(Pipe):
                    feed_in=feed_in
                    )
 
+    def average_rhom(self):
+        """Return the average density for all the slugs in this pipe"""
+        if self.length > 0:
+            return sum(s.rhom * s.length for s in self.slugs) / self.length
+        else:
+            return self.slugs[0].rhom
+
     def feed(self, Q: float) -> (float, Slug):
         """
         Get slurry from upstream, update the slugs, and send slurry and head downstream
