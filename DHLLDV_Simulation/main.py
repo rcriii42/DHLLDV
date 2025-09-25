@@ -23,7 +23,7 @@ from DHLLDV.SlurryObj import Slurry
 
 from ExamplePumps import Ladder_Pump600, Main_Pump500
 
-slurry = Slurry(fluid='salt')
+slurry = Slurry(fluid='salt', Cv=0.001)
 pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
              Pipe(name='LP Suction', diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
              Ladder_Pump600,
