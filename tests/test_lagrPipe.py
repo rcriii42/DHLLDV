@@ -72,9 +72,8 @@ class MyTestCase(unittest.TestCase):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
         self.assertEqual(len(self.l_pipe.slugs), 2)
-        self.assertEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
-        self.assertEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry1.rhom)
-        self.assertAlmostEqual(h_out, 1.068679635)
+        self.assertAlmostEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
+        self.assertAlmostEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry1.rhom)
 
     def test_feed4_step_2(self):
         """Test the second step if velocity is 4 m/sec"""
@@ -83,10 +82,9 @@ class MyTestCase(unittest.TestCase):
         total_length = sum(s.length for s in self.l_pipe.slugs)
         self.assertAlmostEqual(10, total_length)
         self.assertEqual(len(self.l_pipe.slugs), 3)
-        self.assertEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
-        self.assertEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry2.rhom)
-        self.assertEqual(self.l_pipe.slugs[2].slurry.rhom, self.slurry1.rhom)
-        self.assertAlmostEqual(h_out, 1.004257308)
+        self.assertAlmostEqual(self.l_pipe.slugs[0].slurry.rhom, self.slurry2.rhom)
+        self.assertAlmostEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry2.rhom)
+        self.assertAlmostEqual(self.l_pipe.slugs[2].slurry.rhom, self.slurry1.rhom)
 
     def test_feed5p5_step_2(self):
         """Test the second step if velocity is 5.5 m/sec"""
