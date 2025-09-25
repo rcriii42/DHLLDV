@@ -304,15 +304,13 @@ if __name__ == '__main__':
     from tests.test_Pipe import Ladder_Pump600, Main_Pump500
 
     slurry = Slurry(fluid='salt')
-    pipe_list = [Pipe('Entrance', 0.6, 0, 0.5, -4.0),
+    pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
                  Pipe(name='LP Suction', diameter=0.6, length=10.0, total_K=0.1, elev_change=5.0),
                  Ladder_Pump600,
-                 Pipe('MP Suction', 0.5, 25.0, 0.1, 0.0),
+                 Pipe(name='MP Suction', diameter=0.5, length=25.0, total_K=0.1, elev_change=0.0),
                  Main_Pump500,
-                 Pipe('MP Discharge', diameter=0.5, length=20.0, total_K=0.2,
-                      elev_change=-1.0),
-                 Pipe('Discharge', diameter=0.5, length=1000.0, total_K=1.0,
-                      elev_change=1.0)]
+                 Pipe(name='MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
+                 Pipe(name='Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)]
     lpipeline = LagrPipeline(name="test lagrangian pipeline",
                                   pipe_list=pipe_list,
                                   slurry=slurry)
