@@ -125,6 +125,8 @@ class LagrPipe(Pipe):
         """Create a LagrPipe from an existing Pipe"""
         if slurry is None:
             slurry = Slurry(Dp=this_pipe.diameter)
+        else:
+            slurry.Dp = this_pipe.diameter
         slugs = [Slug(length=this_pipe.length, slurry=copy(slurry))]
         return cls(name=this_pipe.name,
                    diameter=this_pipe.diameter,
