@@ -34,8 +34,10 @@ class MyTestCase(unittest.TestCase):
         q = 1.82
         heads, out_slug = self.l_pipe.feed(q)
         hvel, hloss, hpump = heads
+        fric_loss = -1 * self.slurry.im(self.pipe.velocity(q)) * self.pipe.length
+        vel_head = -1 * self.slurry.rhom * self.pipe.velocity(q)**2 / (2 * gravity)
         self.assertAlmostEqual(hloss,
-                               -1 * self.slurry.im(self.pipe.velocity(q)) * self.pipe.length
+                               fric_loss + vel_head
                                )
 
     def test_head_losses_with_elev(self):
@@ -45,9 +47,10 @@ class MyTestCase(unittest.TestCase):
         heads, out_slug = self.l_pipe.feed(q)
         hvel, hloss, hpump = heads
         fric_loss = -1 * self.slurry.im(self.pipe.velocity(q)) * self.pipe.length
+        vel_head = -1 * self.slurry.rhom * self.pipe.velocity(q) ** 2 / (2 * gravity)
         elev_loss = -1 * elev_change * self.slurry.rhom
         self.assertAlmostEqual(hloss,
-                               fric_loss + elev_loss,
+                               fric_loss + vel_head + elev_loss,
                                )
 
     def test_head_losses_with_K(self):
@@ -57,9 +60,10 @@ class MyTestCase(unittest.TestCase):
         heads, out_slug = self.l_pipe.feed(q)
         hvel, hloss, hpump = heads
         fric_loss = -1 * self.slurry.im(self.pipe.velocity(q)) * self.pipe.length
+        vel_head = -1 * self.slurry.rhom * self.pipe.velocity(q) ** 2 / (2 * gravity)
         fitting_loss = -1 * k * self.slurry.rhom * self.pipe.velocity(q)**2 / (2 * gravity)
         self.assertAlmostEqual(hloss,
-                               fric_loss + fitting_loss,
+                               fric_loss + vel_head + fitting_loss,
                                )
 
 
