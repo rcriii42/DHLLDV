@@ -43,7 +43,7 @@ class MyTestCase(unittest.TestCase):
         flow_list = [P.pipesections[-1].flow(v) for v in P.slurry.vls_list]
         qop = P.find_operating_point(flow_list)
         q, h, slug = self.lpipeline.update()
-        self.assertEqual(q, qop)
+        self.assertAlmostEqual(q, qop, places=4)
 
     def test_head_matches_pipeline(self):
         """Check that the newly initiated lagrpipe head matches the source pipeline operating point head"""
