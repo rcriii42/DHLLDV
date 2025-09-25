@@ -230,6 +230,9 @@ class LagrPipeline(Pipeline):
             if type(element) is Pipe:
                 self.lpipe_list.append(LagrPipe.from_pipe(this_pipe=element, feed_in=last_feed, slurry=slurry))
                 last_feed = self.lpipe_list[-1].feed
+                if i > 0 and element.elev_change > element.length:
+                    print(f'WARNING Pipe section {element.name} at position {i} length less than elevation change: '
+                          f'{element.length=:0.3f} {element.elev_change=:0.3f}')
 
             elif type(element) is Pump:
                 # add a feed method for the pump
