@@ -102,5 +102,11 @@ def start_button_clicked():
 start_button = Button(label="Start", button_type="success")
 start_button.on_click(start_button_clicked)
 
-curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, row(start_button, rate_slider)))
+# Button to stop the server
+def stop_button_callback():
+    sys.exit()  # Stop the server
+stop_button = Button(label="Stop Server", button_type="success", width=75)
+stop_button.on_click(stop_button_callback)
+
+curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, row(start_button, rate_slider), stop_button))
 curdoc().title = "Simulation"
