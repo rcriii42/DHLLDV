@@ -64,6 +64,9 @@ density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color=
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
+
+num_slugs_display = TextInput(title="Total slugs", value=f'{lpipeline.num_slugs}', disabled=True)
+
 pipeline_info = Div(text=f'{lpipeline}'.replace('\n', '<BR>'),
                     styles={'font-size': '80%', 'color': 'blue'})
 slurry_info = Div(text=f'{slurry}'.replace('\n', '<BR>'),
@@ -76,11 +79,12 @@ def update():
     new_data = dict(timestep=[lpipeline.timecounter],
                     velocity=[lpipeline.lpipe_list[-1].velocity(q)],
                     density_in=[lpipeline.lpipe_list[0].slugs[0].rhom],
-                    density_avg=[lpipeline.average_rhom()],)
+                    density_avg=[lpipeline.average_rhom],)
 
     Vm_display.value = f'{lpipeline.lpipe_list[-1].velocity(q):0.3f}'
     Sm_in_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
-    Sm_avg_display.value = f'{lpipeline.average_rhom():0.3f}'
+    Sm_avg_display.value = f'{lpipeline.average_rhom:0.3f}'
+    num_slugs_display.value = f'{lpipeline.num_slugs}'
 
     print(new_data)
     source.stream(new_data, 100)
@@ -144,6 +148,7 @@ curdoc().add_root(column(file_input,
                          velocity_plot,
                          density_plot,
                          row(start_button, rate_slider), stop_button,
+                         num_slugs_display,
                          row(slurry_info, pipeline_info)
                          )
                   )
