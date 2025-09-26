@@ -37,7 +37,7 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          pipe_list=pipe_list,
                          slurry=slurry,
-                         suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.25, Dp=0.6))
+                         suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.4, Dp=0.6, swing_time=60, corner_time=20))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
