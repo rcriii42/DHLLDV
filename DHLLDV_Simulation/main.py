@@ -44,15 +44,15 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
-p = figure(height=500, tools="xpan,xwheel_zoom,xbox_zoom,reset",
-           y_axis_location="right")
-p.x_range.follow = "end"
-p.x_range.follow_interval = 100
-p.x_range.range_padding = 0
+velocity_plot = figure(height=500, tools="xpan,xwheel_zoom,xbox_zoom,reset",
+                       y_axis_location="right")
+velocity_plot.x_range.follow = "end"
+velocity_plot.x_range.follow_interval = 100
+velocity_plot.x_range.range_padding = 0
 
-p.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
-p.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=source)
-p.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=source)
+velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
+velocity_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=source)
+velocity_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=source)
 
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
@@ -109,4 +109,5 @@ stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
 curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, row(start_button, rate_slider), stop_button))
+                         velocity_plot,
 curdoc().title = "Simulation"
