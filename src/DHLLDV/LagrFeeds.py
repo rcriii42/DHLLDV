@@ -117,27 +117,31 @@ class CSDFeed(FixedDensityFeed):
         if self.index < self.swing_time:
             min_rho = 1.03 + (self.rhom-1.03)/2
             max_rho = (self.rhom + 1.5)/2
-            mode_rho = 3 * self.rhom - min_rho - max_rho
+            mode_rho = max(3 * self.rhom - min_rho - max_rho,
+                           self.rhom)
             new_rhom = triangular(min_rho, max_rho, mode_rho)
         elif self.index < self.swing_time + self.corner_time:
             time_in_corner = self.swing_time + self.corner_time - self.index
             min_rho = 1.03 + (self.rhom - 1.03) / 2
             max_rho = (self.rhom + 1.5) / 2
-            mode_rho = 3 * self.rhom - min_rho - max_rho
+            mode_rho = max(3 * self.rhom - min_rho - max_rho,
+                           self.rhom)
             new_rhom = (triangular(min_rho, max_rho, mode_rho) * time_in_corner +
                         1.03 * (self.corner_time - time_in_corner)) / self.corner_time
         elif self.index < self.swing_time + self.corner_time + self.backswing_time:
-            bs_rhom = self.rhom * self.backswing_ratio
+            bs_rhom = 1.03 + (self.rhom - 1.03) * self.backswing_ratio
             min_rho = 1.03 + (bs_rhom - 1.03) / 2
             max_rho = (bs_rhom + 1.5) / 2
-            mode_rho = 3 * bs_rhom - min_rho - max_rho
+            mode_rho = max(3 * bs_rhom - min_rho - max_rho,
+                           bs_rhom)
             new_rhom = triangular(min_rho, max_rho, mode_rho)
         else:
             time_in_corner = self.swing_time + self.corner_time + self.backswing_time + self.corner_time - self.index
-            bs_rhom = self.rhom * self.backswing_ratio
+            bs_rhom = 1.03 + (self.rhom - 1.03) * self.backswing_ratio
             min_rho = 1.03 + (bs_rhom - 1.03) / 2
             max_rho = (bs_rhom + 1.5) / 2
-            mode_rho = 3 * bs_rhom - min_rho - max_rho
+            mode_rho = max(3 * bs_rhom - min_rho - max_rho,
+                           bs_rhom)
             new_rhom = (triangular(min_rho, max_rho, mode_rho) * (self.corner_time - time_in_corner) +
                         1.03 * time_in_corner) / self.corner_time
 
