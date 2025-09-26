@@ -137,7 +137,8 @@ stop_button.on_click(stop_button_callback)
 curdoc().add_root(column(file_input,
                          row(Vm_display, Sm_in_display, Sm_avg_display),
                          velocity_plot,
-                         slurry_info,
-                         pipeline_info,
-                         row(start_button, rate_slider), stop_button))
+                         row(start_button, rate_slider), stop_button,
+                         row(slurry_info, pipeline_info)
+                         )
+                  )
 curdoc().title = "Simulation"
