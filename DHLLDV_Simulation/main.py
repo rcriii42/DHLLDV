@@ -21,6 +21,8 @@ from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 
+from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
+
 from ExamplePumps import Ladder_Pump600, Main_Pump500
 
 csd_densities = ([1.03] * 15 +  # coming out of corner
@@ -75,6 +77,24 @@ def update():
     source.stream(new_data, 100)
 
 
+def load_xl_data(attr, old, new):
+    global lpipeline
+    global slurry
+    excel = io.BytesIO(base64.b64decode(file_input.value))
+    try:
+        pipeline = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
+        slurry = pipeline.slurry
+        lpipeline = LagrPipeline(pipe_list=pipeline.pipesections, slurry=slurry,
+                                 suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
+        source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
+    except InvalidExcelError as e:
+        print(f'Error loading {file_input.filename}: {e}')
+
+
+file_input = FileInput(accept=".xls, .xlsm, .xlsx")
+file_input.on_change('filename', load_xl_data)
+
+
 periodic_callbacks = []
 rate = 1
 def update_framerate(attr, old, new):
@@ -108,6 +128,8 @@ def stop_button_callback():
 stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
-curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, row(start_button, rate_slider), stop_button))
+curdoc().add_root(column(file_input,
+                         row(Vm_display, Sm_in_display, Sm_avg_display),
                          velocity_plot,
+                         row(start_button, rate_slider), stop_button))
 curdoc().title = "Simulation"
