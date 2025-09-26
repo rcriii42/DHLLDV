@@ -14,8 +14,8 @@ from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
 from bokeh.plotting import figure
 
-from DHLLDV import DHLLDV_framework, LagrPipe
-from DHLLDV.LagrPipe import LagrPipeline
+from DHLLDV import DHLLDV_framework
+from DHLLDV.LagrPipe import LagrPipe, LagrPipeline
 from DHLLDV.LagrFeeds import CyclicFeed
 from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
 from DHLLDV.PumpObj import Pump
@@ -45,6 +45,22 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
+
+def build_snake_source():
+    """Build the source data for the pipeline snake"""
+    snake_x = [0.0]
+    snake_rho = [1.1]
+    for p in lpipeline.lpipe_list:
+        if type(p) is LagrPipe:
+            for s in p.slugs:
+                snake_x.append(snake_x[-1] + s.length)
+                snake_rho.append(s.rhom)
+    return snake_x, snake_rho
+sx, sr = build_snake_source()
+snake_source = ColumnDataSource(data=dict(x=sx, rho=sr))
+snake_plot = figure(height=200, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+                      y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
+snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
 velocity_plot = figure(height=200, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                        y_range=(0.0, 10.0))
@@ -85,6 +101,9 @@ def update():
     Sm_in_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
     Sm_avg_display.value = f'{lpipeline.average_rhom:0.3f}'
     num_slugs_display.value = f'{lpipeline.num_slugs}'
+
+    sx, sr = build_snake_source()
+    snake_source.data = dict(x=sx, rho=sr)
 
     print(new_data)
     source.stream(new_data, 100)
@@ -145,6 +164,7 @@ stop_button.on_click(stop_button_callback)
 
 curdoc().add_root(column(file_input,
                          row(Vm_display, Sm_in_display, Sm_avg_display),
+                         snake_plot,
                          velocity_plot,
                          density_plot,
                          row(start_button, rate_slider), stop_button,
