@@ -113,7 +113,11 @@ class LagrPipe(Pipe):
         hvel_change = -1 * hvel_w * in_slug.rhom - hvel_in
         hloss_out = hloss_in + hvel_change
         for s in self.slugs:
-            im = s.slurry.im(vm)  # Implicitly assume timestep is 1
+            try:
+                im = s.slurry.im(vm)  # Implicitly assume timestep is 1
+            except TypeError as e:
+                print(f'{e.__str__()} \n{s.slurry}')
+                im = 0.0923
             hloss_out -= im * s.length  # Friction losses
             if self.length > 0:
                 hloss_out -= s.slurry.rhom * (self.total_K * s.length / self.length) * hvel_w  # Fitting losses
