@@ -8,7 +8,7 @@ import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Slider, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
@@ -58,7 +58,6 @@ Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 
-rate_slider = Slider(title="framerate", value=1, start=1, end=20, step=1)
 
 def update():
     """Update the simulation"""
@@ -72,15 +71,36 @@ def update():
     Sm_in_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
     Sm_avg_display.value = f'{lpipeline.average_rhom():0.3f}'
 
+    print(new_data)
     source.stream(new_data, 100)
 
 
-curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, rate_slider))
-periodic_callbacks = [curdoc().add_periodic_callback(update, 1000)]
-
+periodic_callbacks = []
+rate = 1
 def update_framerate(attr, old, new):
-    curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
-    periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
+    rate = new
+    print(f'{rate=}')
+    if len(periodic_callbacks) > 0:
+        curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
+        periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
+rate_slider = Slider(title="framerate", value=rate, start=1, end=20, step=1)
 rate_slider.on_change('value', update_framerate)
+print(f'{rate=}')
 
+
+def start_button_clicked():
+    """Start or stop the simulation"""
+    print('Button clicked')
+    if len(periodic_callbacks) > 0:
+        print("Stopping simulation")
+        curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
+        start_button.label = "Start"
+    else:
+        print("Starting simulation")
+        periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - rate) * 50))
+        start_button.label = "Stop"
+start_button = Button(label="Start", button_type="success")
+start_button.on_click(start_button_clicked)
+
+curdoc().add_root(column(row(Vm_display, Sm_in_display, Sm_avg_display), p, row(start_button, rate_slider)))
 curdoc().title = "Simulation"
