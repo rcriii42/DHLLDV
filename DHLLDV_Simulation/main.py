@@ -37,7 +37,8 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          pipe_list=pipe_list,
                          slurry=slurry,
-                         suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.4, Dp=0.6, swing_time=60, corner_time=20))
+                         suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.4, Dp=0.6, swing_time=60, corner_time=20,
+                                           backswing_ratio=0.75))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
@@ -53,18 +54,18 @@ def build_snake_source():
     return snake_x, snake_rho
 sx, sr = build_snake_source()
 snake_source = ColumnDataSource(data=dict(x=sx, rho=sr))
-snake_plot = figure(height=200, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+snake_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                       y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
 snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
-velocity_plot = figure(height=200, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                        y_range=(0.0, 10.0))
 velocity_plot.x_range.follow = "end"
 velocity_plot.x_range.follow_interval = 100
 velocity_plot.x_range.range_padding = 0
 velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
 
-density_plot = figure(height=200, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                       y_range=(1.0, 1.6))
 density_plot.x_range.follow = "end"
 density_plot.x_range.follow_interval = 100
@@ -72,6 +73,7 @@ density_plot.x_range.range_padding = 0
 density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=source)
 density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=source)
 
+time_step_display = TextInput(title="Timestep", value=f"{0}", width=95, disabled=True)
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
@@ -92,6 +94,7 @@ def update():
                     density_in=[lpipeline.lpipe_list[0].slugs[0].rhom],
                     density_avg=[lpipeline.average_rhom],)
 
+    time_step_display.value = f'{lpipeline.timecounter}'
     Vm_display.value = f'{lpipeline.lpipe_list[-1].velocity(q):0.3f}'
     Sm_in_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
     Sm_avg_display.value = f'{lpipeline.average_rhom:0.3f}'
@@ -157,13 +160,13 @@ def stop_button_callback():
 stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
-curdoc().add_root(column(file_input,
-                         row(Vm_display, Sm_in_display, Sm_avg_display),
+curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display),
                          snake_plot,
                          velocity_plot,
                          density_plot,
                          row(start_button, rate_slider), stop_button,
                          num_slugs_display,
+                         file_input,
                          row(slurry_info, pipeline_info)
                          )
                   )
