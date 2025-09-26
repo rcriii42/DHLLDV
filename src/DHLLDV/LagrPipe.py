@@ -55,6 +55,7 @@ class LagrPipe(Pipe):
                    feed_in=feed_in
                    )
 
+    @property
     def average_rhom(self):
         """Return the average density for all the slugs in this pipe"""
         if self.length > 0:
@@ -127,7 +128,7 @@ class LagrPipe(Pipe):
             print(f'WARNING {self.name=}: lengths do not add up {slugs_length=:0.3f} {self.length=:0.3f} '
                   f'{diff=:0.3e}')
 
-        return [-1 * hvel_w * self.average_rhom(), hloss_out, hpump], extruded_slug
+        return [-1 * hvel_w * self.average_rhom, hloss_out, hpump], extruded_slug
 
 
 class LagrPipeline(Pipeline):
@@ -179,12 +180,13 @@ class LagrPipeline(Pipeline):
                 print(f'LagrPipeline.__init__: Warning, unknown element type {type(element)} '
                       f'in pipeline at position {i}, not adding')
 
+    @property
     def average_rhom(self):
         """Calculate the average density in the pipeline"""
         weight_sum = 0
         for p in self.lpipe_list:
             if type(p) is LagrPipe:
-                weight_sum += p.length * p.average_rhom()
+                weight_sum += p.length * p.average_rhom
         return weight_sum / self.total_length
 
     def update(self) -> tuple[float, [float, float, float], Slug]:
