@@ -1,6 +1,7 @@
 """Show the simulation in the browser"""
 
 import base64
+import copy
 import io
 import sys
 
@@ -16,7 +17,7 @@ from bokeh.plotting import figure
 
 from DHLLDV import DHLLDV_framework
 from DHLLDV.LagrPipe import LagrPipe, LagrPipeline
-from DHLLDV.LagrFeeds import CyclicFeed
+from DHLLDV.LagrFeeds import CyclicFeed, CSDFeed
 from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
 from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
@@ -24,12 +25,6 @@ from DHLLDV.SlurryObj import Slurry
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
 
 from ExamplePumps import Ladder_Pump600, Main_Pump500
-
-csd_densities = ([1.03] * 15 +  # coming out of corner
-                 [1.35] * 60 * 2 +  # dig swing
-                 [1.19] * 15 + [1.03] * 15 +  # corner
-                 [1.35/2] * 60 * 2 +  # back swing
-                 [1.35/4]*15)
 
 slurry = Slurry(fluid='salt', Cv=0.001)
 pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
@@ -42,14 +37,14 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          pipe_list=pipe_list,
                          slurry=slurry,
-                         suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
+                         suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.25, Dp=0.6))
 
 source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
 def build_snake_source():
     """Build the source data for the pipeline snake"""
     snake_x = [0.0]
-    snake_rho = [1.1]
+    snake_rho = [1.03]
     for p in lpipeline.lpipe_list:
         if type(p) is LagrPipe:
             for s in p.slugs:
