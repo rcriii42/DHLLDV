@@ -59,6 +59,10 @@ velocity_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
 Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
 Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
+pipeline_info = Div(text=f'{lpipeline}'.replace('\n', '<BR>'),
+                    styles={'font-size': '80%', 'color': 'blue'})
+slurry_info = Div(text=f'{slurry}'.replace('\n', '<BR>'),
+                  styles={'font-size': '80%', 'color': 'blue'})
 
 
 def update():
@@ -87,6 +91,8 @@ def load_xl_data(attr, old, new):
         lpipeline = LagrPipeline(pipe_list=pipeline.pipesections, slurry=slurry,
                                  suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
         source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
+        pipeline_info.text = f'{lpipeline}'.replace('\n', '<BR>')
+        slurry_info.text = f'{slurry}'.replace('\n', '<BR>')
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
 
@@ -131,5 +137,7 @@ stop_button.on_click(stop_button_callback)
 curdoc().add_root(column(file_input,
                          row(Vm_display, Sm_in_display, Sm_avg_display),
                          velocity_plot,
+                         slurry_info,
+                         pipeline_info,
                          row(start_button, rate_slider), stop_button))
 curdoc().title = "Simulation"
