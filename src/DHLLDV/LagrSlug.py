@@ -1,6 +1,6 @@
 """LagrSlug.py - The slug object for the LagrPumps"""
 
-from copy import copy
+from copy import deepcopy
 from dataclasses import dataclass
 from math import pi
 
@@ -16,7 +16,7 @@ def add_slurries(sw1: [Slurry | None, float], sw2: [Slurry | None, float]) -> Sl
     elif sw2[0] is None:
         return sw1[0]
     rho_new = (sw1[0].rhom * sw1[1] + sw2[0].rhom * sw2[1])/(sw1[1] + sw2[1])
-    new_slurry = copy(sw2[0])
+    new_slurry = deepcopy(sw2[0])
     new_slurry.rhom = rho_new
     return new_slurry
 

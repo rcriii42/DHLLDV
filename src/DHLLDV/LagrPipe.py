@@ -4,7 +4,7 @@ Creates a Lagrangian view of the pipeline that tracks 'slugs' of slurry moving d
 """
 
 from collections.abc import Callable
-from copy import copy
+from copy import deepcopy
 from dataclasses import dataclass
 from functools import partial
 from math import pi
@@ -15,6 +15,7 @@ from DHLLDV.SlurryObj import Slurry
 from DHLLDV.PipeObj import Pipe, Pipeline
 from DHLLDV.LagrFeeds import FixedDensityFeed
 from DHLLDV.LagrSlug import Slug
+
 
 @dataclass
 class LagrPipe(Pipe):
@@ -27,7 +28,7 @@ class LagrPipe(Pipe):
             self.slugs = [Slug(1.0, Slurry())]
         self.length = sum(s.length for s in self.slugs)
 
-        #Check slugs are all the same diameter
+        # Check slugs are all the same diameter
         check_diameter = self.slugs[0].Dp
         for i, s in enumerate(self.slugs[0:]):
             if s.Dp != check_diameter:
@@ -44,7 +45,7 @@ class LagrPipe(Pipe):
             slurry = Slurry(Dp=this_pipe.diameter)
         else:
             slurry.Dp = this_pipe.diameter
-        slugs = [Slug(length=this_pipe.length, slurry=copy(slurry))]
+        slugs = [Slug(length=this_pipe.length, slurry=deepcopy(slurry))]
         return cls(name=this_pipe.name,
                    diameter=this_pipe.diameter,
                    length=this_pipe.length,
@@ -76,11 +77,11 @@ class LagrPipe(Pipe):
         if self.length == 0:
             # For zero-length pipe sections just pass along the in_slug, keeping the slurry
             extruded_slug = in_slug
-            self.slugs[0].slurry = copy(in_slug.slurry)
+            self.slugs[0].slurry = deepcopy(in_slug.slurry)
 
         else:
             self.slugs.insert(0, in_slug)
-            extruded_slug = Slug(0, copy(self.slugs[-1].slurry))
+            extruded_slug = Slug(0, deepcopy(self.slugs[-1].slurry))
             while remain_length > 0:
                 last_slug = self.slugs[-1]
                 if last_slug.length <= remain_length:
@@ -90,7 +91,7 @@ class LagrPipe(Pipe):
                     self.slugs = self.slugs[:-1]
                 else:
                     # The last slug is too long, split it
-                    new_slug = Slug(remain_length, copy(last_slug.slurry))
+                    new_slug = Slug(remain_length, deepcopy(last_slug.slurry))
                     extruded_slug = extruded_slug + new_slug
                     last_slug.length -= remain_length
                     remain_length = 0
@@ -147,7 +148,7 @@ class LagrPipeline(Pipeline):
         if suct_feed is not None:
             self.suction_feed = suct_feed
         else:
-            self.suction_feed = FixedDensityFeed(copy(self.slurry),
+            self.suction_feed = FixedDensityFeed(deepcopy(self.slurry),
                                                  Dp=self.pipesections[0].diameter,
                                                  )
         last_feed = self.suction_feed.feed

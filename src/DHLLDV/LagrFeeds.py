@@ -1,6 +1,6 @@
 """LagrFeeds.py - Various feed functions for the LagrPipeline"""
 
-from copy import copy
+from copy import deepcopy
 from math import pi
 
 from DHLLDV.LagrSlug import Slug
@@ -46,7 +46,7 @@ class FixedDensityFeed:
         The head is all calculated in the pipe sections"""
         Vls = Q/self.area
 
-        return [0.0, 0.0, 0.0], Slug(Vls, copy(self.slurry))
+        return [0.0, 0.0, 0.0], Slug(Vls, deepcopy(self.slurry))
 
 class CyclicFeed(FixedDensityFeed):
     """A feed function with a simple varying density list"""
@@ -73,7 +73,7 @@ class CyclicFeed(FixedDensityFeed):
     def feed(self, Q: float) -> ([float, float, float], Slug):
         """The cyclic feed mechanism"""
         Vls = Q / self.area
-        new_slurry = copy(self.slurry)
+        new_slurry = deepcopy(self.slurry)
         new_slurry.rhom = self.densities[self.index]
         self.index += 1
         if self.index >= len(self.densities):
