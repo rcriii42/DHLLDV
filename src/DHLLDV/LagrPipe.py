@@ -63,6 +63,11 @@ class LagrPipe(Pipe):
         else:
             return self.slugs[0].rhom
 
+    @property
+    def num_slugs(self):
+        """Count the slugs in this pipe"""
+        return len(self.slugs)
+
     def feed(self, Q: float) -> ([float, float, float], Slug):
         """
         Get slurry from upstream, update the slugs, and send slurry and head downstream
@@ -188,6 +193,10 @@ class LagrPipeline(Pipeline):
             if type(p) is LagrPipe:
                 weight_sum += p.length * p.average_rhom
         return weight_sum / self.total_length
+
+    @property
+    def num_slugs(self):
+        return sum(p.num_slugs for p in self.lpipe_list if type(p) is LagrPipe)
 
     def update(self) -> tuple[float, [float, float, float], Slug]:
         """Update the pipeline by one second

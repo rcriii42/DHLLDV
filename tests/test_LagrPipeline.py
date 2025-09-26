@@ -30,6 +30,11 @@ class MyTestCase(unittest.TestCase):
                 slugs_length += sum(s.length for s in p.slugs)
         self.assertEqual(self.lpipeline.total_length, slugs_length)
 
+    def test_num_slugs(self):
+        """Test the number of slugs after one timestep"""
+        _ = self.lpipeline.update()
+        self.assertEqual(self.lpipeline.num_slugs, 9)
+
     def test_lpipe_sender_length_on_dia_change(self):
         """Test that slugs lengths for the upstream pipe are correct when pipe diameter is changed"""
         q, h, slug = self.lpipeline.update()

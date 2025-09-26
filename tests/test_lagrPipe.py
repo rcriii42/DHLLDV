@@ -88,6 +88,12 @@ class MyTestCase(unittest.TestCase):
         self.assertAlmostEqual(self.l_pipe.slugs[1].slurry.rhom, self.slurry2.rhom)
         self.assertAlmostEqual(self.l_pipe.slugs[2].slurry.rhom, self.slurry1.rhom)
 
+    def test_feed4_step_2_num_slugs(self):
+        """Test the number of slugs at the second step if velocity is 4 m/sec"""
+        for i in range(2):
+            h_out, slug_out = self.l_pipe.feed(1.824146925)
+        self.assertEqual(self.l_pipe.num_slugs, 3)
+
     def test_feed5p5_step_2(self):
         """Test the second step if velocity is 5.5 m/sec"""
         for i in range(2):
