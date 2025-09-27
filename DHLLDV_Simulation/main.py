@@ -103,7 +103,8 @@ def update():
     sx, sr = build_snake_source()
     snake_source.data = dict(x=sx, rho=sr)
 
-    print(new_data)
+    print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
+          f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
     source.stream(new_data, 100)
 
 
