@@ -132,8 +132,8 @@ class LagrPipe(Pipe):
             hloss_out -= s.rhom * self.elev_change  # elevation head requirement
 
         slugs_length = sum(s.length for s in self.slugs)
-        if int(slugs_length * 1000) != int(self.length * 1000):
-            diff = slugs_length - self.length
+        diff = slugs_length - self.length
+        if int(diff * 10000) > 0:
             print(f'WARNING {self.name=}: lengths do not add up {slugs_length=:0.3f} {self.length=:0.3f} '
                   f'{diff=:0.3e}')
 
