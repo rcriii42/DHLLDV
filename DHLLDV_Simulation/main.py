@@ -40,7 +40,7 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          suct_feed=CSDFeed(copy.deepcopy(slurry), density=1.4, Dp=0.6, swing_time=60, corner_time=20,
                                            backswing_ratio=0.75))
 
-source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
+vd_source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
 def build_snake_source():
     """Build the source data for the pipeline snake"""
@@ -63,15 +63,15 @@ velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_a
 velocity_plot.x_range.follow = "end"
 velocity_plot.x_range.follow_interval = 100
 velocity_plot.x_range.range_padding = 0
-velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=source)
+velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=vd_source)
 
 density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                       y_range=(1.0, 1.6))
 density_plot.x_range.follow = "end"
 density_plot.x_range.follow_interval = 100
 density_plot.x_range.range_padding = 0
-density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=source)
-density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=source)
+density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=vd_source)
+density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=vd_source)
 
 time_step_display = TextInput(title="Timestep", value=f"{0}", width=95, disabled=True)
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
@@ -105,7 +105,7 @@ def update():
 
     print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
           f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
-    source.stream(new_data, 100)
+    vd_source.stream(new_data, 100)
 
 
 def load_xl_data(attr, old, new):
