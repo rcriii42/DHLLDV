@@ -10,7 +10,7 @@ import openpyxl
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
 from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup
-from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
+from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
 from bokeh.plotting import figure
@@ -23,6 +23,10 @@ from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
+from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
+
+unit_convs = unit_conv_SI
+unit_labels = unit_label_SI
 
 from ExamplePumps import Ladder_Pump600, Main_Pump500
 
@@ -34,6 +38,7 @@ pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_cha
              Main_Pump500,
              Pipe(name='MP Discharge', diameter=0.5, length=20.0, total_K=0.2, elev_change=-1.0),
              Pipe(name='Discharge', diameter=0.5, length=1000.0, total_K=1.0, elev_change=1.0)]
+pipeline = Pipeline('test_pipeline', pipe_list, copy.deepcopy(slurry))
 lpipeline = LagrPipeline(name="test lagrangian pipeline",
                          pipe_list=pipe_list,
                          slurry=slurry,
@@ -86,6 +91,102 @@ slurry_info = Div(text=f'{slurry}'.replace('\n', '<BR>'),
                   styles={'font-size': '80%', 'color': 'blue'})
 
 
+def create_HQ_plot():
+    """Create the HQ Plot"""
+    flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
+    head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
+    source = ColumnDataSource(data=dict(Q=convert_list(unit_convs['flow'], flow_list),
+                                        v=convert_list(unit_convs['len'], pipeline.slurry.vls_list),
+                                        im=convert_list(unit_convs['len'], head_lists[0]),
+                                        il=convert_list(unit_convs['len'], head_lists[1]),
+                                        Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
+                                        Hpump_m=convert_list(unit_convs['len'], head_lists[3])))
+    last10_src = ColumnDataSource(data=dict(Q=[], im=[]))
+    last30_src = ColumnDataSource(data=dict(Q=[], im=[]))
+    HQ_hover = HoverTool(tooltips=[('name', "$name"),
+                                   (f"Flow ({unit_labels['flow']})", "@Q{0.00}"),
+                                   (f"Velocity ({unit_labels['vel']})", "@v{0.0}"),
+                                   (f"Slurry Graded Cvt=c ({unit_labels['len']})", "@im{0,0.0}"),
+                                   (f"Fluid ({unit_labels['len']})", "@il{0,0.0}"),
+                                   (f"Pump Head Slurry ({unit_labels['len']})", "@Hpump_m{0,0.0}",),
+                                   (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
+                                   ])
+    plot = figure(height=450, width=595, title="System Head Requirement",
+                     tools="crosshair,pan,reset,save,wheel_zoom",
+                     x_range=[0, flow_list[-1] * unit_convs['flow']], y_range=[0, 100])
+    plot.tools.append(HQ_hover)
+
+    plot.line('Q', 'im', source=source,
+                 color='black',
+                 line_dash='solid',
+                 line_width=3,
+                 line_alpha=0.6,
+                 legend_label=f'Slurry Graded Cvt=c ({unit_labels["len"]})',
+                 name='Slurry graded Sand Cvt=c')
+
+    plot.line('Q', 'il', source=source,
+                 color='blue',
+                 line_dash='solid',
+                 line_width=2,
+                 line_alpha=0.3,
+                 legend_label='Water',
+                 name='Water')
+
+    plot.line('Q', 'Hpump_m', source=source,
+                 color='black',
+                 line_dash='dashed',
+                 line_width=3,
+                 line_alpha=0.6,
+                 legend_label='Pump Slurry',
+                 name='Pump Slurry')
+
+    plot.line('Q', 'Hpump_l', source=source,
+                 color='blue',
+                 line_dash='dashed',
+                 line_width=2,
+                 line_alpha=0.3,
+                 legend_label='Pump Water',
+                 name='Pump Water')
+
+    plot.circle(x='Q', y='im', color='orange', size=4, alpha=1.0, source=last10_src)
+    plot.circle(x='Q', y='im', color='orange', size=2, alpha=0.25, source=last30_src)
+    plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0] * unit_convs['len'],
+                                                   pipeline.slurry.vls_list[-1] * unit_convs['len'])}
+    plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
+    plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
+    plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp * unit_convs["dia"]:0.1f} ' \
+                                  f'{unit_labels["dia"]} pipe)'
+    plot.xaxis[0].formatter = NumeralTickFormatter(format="0.0")
+    plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
+    plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3] * unit_convs['len']
+    plot.axis.major_tick_in = 10
+    plot.axis.minor_tick_in = 7
+    plot.axis.minor_tick_out = 0
+    plot.legend.location = "bottom_left"
+
+    return plot, source, last10_src, last30_src
+HQ_plot, im_source, last10_source, last30_source  = create_HQ_plot()
+
+
+def update_HQ_plot():
+    """Update the HQ plot from the given pipeline"""
+    pipeline.slurry.rhom = lpipeline.suction_feed.rhom
+    pipeline.update_slurries()
+    this_pipe = Pipe(diameter=pipeline.slurry.Dp)
+    flow_list = [this_pipe.flow(v) for v in pipeline.slurry.vls_list]
+    head_lists = list(zip(*[pipeline.calc_system_head(Q) for Q in flow_list]))
+    im_source.data = dict(Q=convert_list(unit_convs['flow'], flow_list),
+                          v=convert_list(unit_convs['len'], pipeline.slurry.vls_list),
+                          im=convert_list(unit_convs['len'], head_lists[0]),
+                          il=convert_list(unit_convs['len'], head_lists[1]),
+                          Hpump_l=convert_list(unit_convs['len'], head_lists[2]),
+                          Hpump_m=convert_list(unit_convs['len'], head_lists[3]))
+    last_hq = dict(Q=[lpipeline.lastflow], im=[lpipeline.last_head_loss * -1])
+    last10_source.stream(last_hq, 1)
+    last30_source.stream(last_hq, 30)
+update_HQ_plot()
+
+
 def update():
     """Update the simulation"""
     q, heads, disch_slug = lpipeline.update()
@@ -102,6 +203,8 @@ def update():
 
     sx, sr = build_snake_source()
     snake_source.data = dict(x=sx, rho=sr)
+
+    update_HQ_plot()
 
     print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
           f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
@@ -162,9 +265,8 @@ stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
 curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display),
-                         snake_plot,
-                         velocity_plot,
-                         density_plot,
+                         row(column(snake_plot, velocity_plot, density_plot),
+                             column(HQ_plot)),
                          row(start_button, rate_slider), stop_button,
                          num_slugs_display,
                          file_input,
