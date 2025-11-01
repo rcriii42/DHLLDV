@@ -72,9 +72,28 @@ class CrossoverGauge:
         self.draw_side_axis('vel')
         self.draw_side_axis('den')
 
-    def update(self):
-        """Update the crossover gauge"""
-        pass
+        self.pointer_data = ColumnDataSource(data=dict(vel_x=[vel_pointer_origin[0], den_pointer_origin[0]],
+                                                       vel_y=[vel_pointer_origin[1], den_pointer_origin[1]],
+                                                       den_x=[den_pointer_origin[0], vel_pointer_origin[0]],
+                                                       den_y=[den_pointer_origin[1], vel_pointer_origin[1]]))
+        self.figure.line(source=self.pointer_data, x='vel_x', y='vel_y', color="red")
+        self.figure.line(source=self.pointer_data, x='den_x', y='den_y', color="red")
+        self.update(vel_max_value/2, 1+(den_max_value-1)/2)
+
+    def update(self, vel, den):
+        """Update the crossover gauge pointers"""
+        # print(f'CrossoverGauge.update: (vel={vel:0.2f}, den={den:0.3f})')
+        pointer_radius = (self.vel_pointer_origin[0] - self.den_pointer_origin[0]) * 1 + (self.tick_len - 1) / 2
+        vel_angle = pi - (vel * self.vel_max_angle / self.vel_max_value) * pi / 180
+        den_angle = ((den - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
+        self.pointer_data.data = dict(vel_x=[self.vel_pointer_origin[0],
+                                             self.vel_pointer_origin[0] + pointer_radius * cos(vel_angle)],
+                                      vel_y=[self.vel_pointer_origin[1],
+                                             self.vel_pointer_origin[1] + pointer_radius * sin(vel_angle)],
+                                      den_x=[self.den_pointer_origin[0],
+                                             self.den_pointer_origin[0] + pointer_radius * cos(den_angle)],
+                                      den_y=[self.den_pointer_origin[1],
+                                             self.den_pointer_origin[1] + pointer_radius * sin(den_angle)])
 
     def draw_side_axis(self, side='vel'):
         """Draw the velocity axis on the left"""
@@ -89,6 +108,9 @@ class CrossoverGauge:
             side_min_tick = self.vel_min_value
             side_tick_gap = 0.5
             side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
+            if side_num_ticks > 10:
+                side_tick_gap = 1.0
+                side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
             side_tick_anchor = 'center_right'
             def delta_tick(tick_val):
                 """Determine the tick angle offset from horiz based on the value"""
@@ -108,9 +130,9 @@ class CrossoverGauge:
                 """Determine the tick angle offset from horiz based on the value"""
                 return (tick_val - 1) * self.den_max_angle / (self.den_max_value - 1) * pi / 180
         # The axis line is an arc centered on the pointer origin and touching the other.
-        print(f'drawing {side} axis'
-              f'{side_axis_radius=} {side_origin_x=} {side_origin_y=} {side_end_angle=}'
-              f' {side_direction=} {side_color=}')
+        # print(f'drawing {side} axis'
+        #       f'{side_axis_radius=} {side_origin_x=} {side_origin_y=} {side_end_angle=}'
+        #       f' {side_direction=} {side_color=}')
         num_segments = 50
         segment_angle = (side_end_angle - side_start_angle)/num_segments
         axis_angles = [side_start_angle + a * segment_angle for a in range(num_segments + 1)]
@@ -127,7 +149,7 @@ class CrossoverGauge:
                        side_origin_x + self.tick_len*side_axis_radius*cos(tick_angle)]
             y_ticks = [side_origin_y + side_axis_radius*sin(tick_angle),
                        side_origin_y + self.tick_len*side_axis_radius*sin(tick_angle)]
-            print(f'{tick_value=:0.2f} {tick_angle=:0.3f} {x_ticks=} {y_ticks=}')
+            # print(f'{tick_value=:0.2f} {tick_angle=:0.3f} {x_ticks=} {y_ticks=}')
             self.figure.line(x=x_ticks,
                              y=y_ticks)
             if side_tick_anchor == "center_right":
@@ -153,7 +175,7 @@ snake_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis
                       y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
 snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
-crossover_gauge = CrossoverGauge()
+crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5)
 
 velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                        y_range=(0.0, 10.0))
@@ -297,6 +319,8 @@ def update():
     snake_source.data = dict(x=sx, rho=sr)
 
     update_HQ_plot()
+    crossover_gauge.update(lpipeline.lpipe_list[-1].velocity(q),
+                           lpipeline.lpipe_list[0].slugs[0].rhom)
 
     print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
           f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
