@@ -3,13 +3,14 @@
 import base64
 import copy
 import io
+from math import pi, sin, cos
 import sys
 
 import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup, Label
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
@@ -47,6 +48,93 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
 
 vd_source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
 
+
+class CrossoverGauge:
+    """A class to simulate a crossover velocity/density gauge with a middle axis indicating production"""
+    def __init__(self,
+                 vel_max_angle=45, vel_max_value=5.5, vel_pointer_origin=(1, 0),
+                 den_max_angle=45, den_max_value=1.3, den_pointer_origin=(-1, 0)) -> None:
+        self.vel_max_angle = vel_max_angle
+        self.vel_min_value = 0.0
+        self.vel_max_value = vel_max_value
+        self.vel_pointer_origin = vel_pointer_origin
+        self.den_max_angle = den_max_angle
+        self.den_min_value = 1.0
+        self.den_max_value = den_max_value
+        self.den_pointer_origin = den_pointer_origin
+
+        print('creating crossover gauge figure')
+        self.figure = figure(height=450,
+                             x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
+                             y_range=(-0.1, (self.vel_pointer_origin[0] - self.den_pointer_origin[0])))
+        self.draw_side_axis('vel')
+        self.draw_side_axis('den')
+
+    def update(self):
+        """Update the crossover gauge"""
+        pass
+
+    def draw_side_axis(self, side='vel'):
+        """Draw the velocity axis on the left"""
+        side_axis_radius = self.vel_pointer_origin[0] - self.den_pointer_origin[0]
+        if side == 'vel':
+            side_origin_x = self.vel_pointer_origin[0]
+            side_origin_y = self.vel_pointer_origin[1]
+            side_start_angle = pi
+            side_end_angle = pi - self.vel_max_angle * pi / 180
+            side_direction = 'clock'
+            side_color = "navy"
+            side_min_tick = self.vel_min_value
+            side_tick_gap = 0.5
+            side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
+            side_tick_anchor = 'center_right'
+            def delta_tick(tick_val):
+                """Determine the tick angle offset from horiz based on the value"""
+                return (-1 * tick_val * self.vel_max_angle / self.vel_max_value) * pi / 180
+        else:
+            side_origin_x = self.den_pointer_origin[0]
+            side_origin_y = self.den_pointer_origin[1]
+            side_start_angle = 0
+            side_end_angle = self.den_max_angle * pi / 180
+            side_direction = 'anticlock'
+            side_color = "navy"
+            side_min_tick = self.den_min_value
+            side_tick_gap = .05
+            side_num_ticks = int((self.den_max_value - self.den_min_value) / side_tick_gap) + 1
+            side_tick_anchor = 'center_left'
+            def delta_tick(tick_val):
+                """Determine the tick angle offset from horiz based on the value"""
+                return (tick_val - 1) * self.den_max_angle / (self.den_max_value - 1) * pi / 180
+        # The axis line is an arc centered on the pointer origin and touching the other.
+        print(f'drawing {side} axis'
+              f'{side_axis_radius=} {side_origin_x=} {side_origin_y=} {side_end_angle=}'
+              f' {side_direction=} {side_color=}')
+        num_segments = 50
+        segment_angle = (side_end_angle - side_start_angle)/num_segments
+        axis_angles = [side_start_angle + a * segment_angle for a in range(num_segments + 1)]
+        axis_x = [side_origin_x + side_axis_radius*cos(a) for a in axis_angles]
+        axis_y = [side_origin_y + side_axis_radius*sin(a) for a in axis_angles]
+        self.figure.line(x=axis_x, y=axis_y)
+
+        # The axis tick marks
+        print(f'{side_num_ticks=} ticks')
+        for i in range(side_num_ticks):
+            tick_value = side_min_tick + i * side_tick_gap
+            tick_angle = side_start_angle + delta_tick(tick_value)
+            x_ticks = [side_origin_x + side_axis_radius*cos(tick_angle),
+                       side_origin_x + 1.05*side_axis_radius*cos(tick_angle)]
+            y_ticks = [side_origin_y + side_axis_radius*sin(tick_angle),
+                       side_origin_y + 1.05*side_axis_radius*sin(tick_angle)]
+            print(f'{tick_value=:0.2f} {tick_angle=:0.3f} {x_ticks=} {y_ticks=}')
+            self.figure.line(x=x_ticks,
+                             y=y_ticks)
+            if side_tick_anchor == "center_right":
+                x_offset = -0.2
+            else:
+                x_offset = 0.0
+            self.figure.add_layout(Label(x=x_ticks[1]+x_offset, y=y_ticks[1], text=f'{tick_value:0.2f}'))
+
+
 def build_snake_source():
     """Build the source data for the pipeline snake"""
     snake_x = [0.0]
@@ -62,6 +150,8 @@ snake_source = ColumnDataSource(data=dict(x=sx, rho=sr))
 snake_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                       y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
 snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
+
+crossover_gauge = CrossoverGauge()
 
 velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                        y_range=(0.0, 10.0))
@@ -265,7 +355,7 @@ stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
 curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display),
-                         row(column(snake_plot, velocity_plot, density_plot),
+                         row(column(crossover_gauge.figure, snake_plot),
                              column(HQ_plot)),
                          row(start_button, rate_slider), stop_button,
                          num_slugs_display,
