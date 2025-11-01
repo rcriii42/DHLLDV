@@ -63,6 +63,8 @@ class CrossoverGauge:
         self.den_max_value = den_max_value
         self.den_pointer_origin = den_pointer_origin
 
+        self.tick_len = 1.05  # Length of the tick relative to the axis radius
+
         print('creating crossover gauge figure')
         self.figure = figure(height=450,
                              x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
@@ -122,9 +124,9 @@ class CrossoverGauge:
             tick_value = side_min_tick + i * side_tick_gap
             tick_angle = side_start_angle + delta_tick(tick_value)
             x_ticks = [side_origin_x + side_axis_radius*cos(tick_angle),
-                       side_origin_x + 1.05*side_axis_radius*cos(tick_angle)]
+                       side_origin_x + self.tick_len*side_axis_radius*cos(tick_angle)]
             y_ticks = [side_origin_y + side_axis_radius*sin(tick_angle),
-                       side_origin_y + 1.05*side_axis_radius*sin(tick_angle)]
+                       side_origin_y + self.tick_len*side_axis_radius*sin(tick_angle)]
             print(f'{tick_value=:0.2f} {tick_angle=:0.3f} {x_ticks=} {y_ticks=}')
             self.figure.line(x=x_ticks,
                              y=y_ticks)
