@@ -73,9 +73,12 @@ class CrossoverGauge:
         self.tick_len = 1.05  # Length of the tick relative to the axis radius
 
         print('creating crossover gauge figure')
-        self.figure = figure(height=450,
+        self.figure = figure(height=375,
                              x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
-                             y_range=(-0.1, (self.vel_pointer_origin[0] - self.den_pointer_origin[0])))
+                             y_range=(-0.1, 0.85 * (self.vel_pointer_origin[0] - self.den_pointer_origin[0])),
+                             tools="", outline_line_color="black")
+        self.figure.xaxis.visible = False
+        self.figure.yaxis.visible = False
         self.draw_side_axis('vel')
         self.draw_side_axis('den')
         self.draw_middle_axis()
@@ -120,14 +123,14 @@ class CrossoverGauge:
             vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
             den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
             prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
-            self.figure.add_layout(Label(x=x_center, y=y_center, text=f'{prod_center*3600:0.0f}'))
+            self.figure.add_layout(Label(x=x_center - 0.08, y=y_center + 0.02, text=f'{prod_center*3600:0.0f}'))
             print(f'draw_middle_axis: {vel_center=:0.2f} {den_center=:0.2f} {prod_center=:0.1e} {prod_center*3600=:0.1f} {angle_center=:0.3f}')
 
             # Now draw points of equal production starting at the maximum density
             x_list = [x_center]
             y_list = [y_center]
             den_min_angle = ((self.rhof - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
-            alpha_d = self.den_max_angle * pi / 180
+            alpha_d = self.den_max_angle * 1.01 * pi / 180
             delta_alpha = (alpha_d - den_min_angle) / 10
             print(f'{den_min_angle=:0.3f} {alpha_d=:0.3f} {delta_alpha=:0.3f}')
             i = 11
@@ -138,7 +141,7 @@ class CrossoverGauge:
                 rhom = 1 + (self.den_max_value - 1) * alpha_d / (self.den_max_angle * pi / 180)
                 if rhom <= self.rhof:
                     # One more point at maximum velocity
-                    vm = self.vel_max_value
+                    vm = self.vel_max_value * 1.01
                     rhom = prod_center * (self.rhoi - self.rhof)/(vm * self.Ap) + self.rhof
                     alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
 
@@ -148,7 +151,7 @@ class CrossoverGauge:
                 vm = prod_center / (Cvi * self.Ap)
                 if vm > self.vel_max_value:
                     # One more point at maximum velocity
-                    vm = self.vel_max_value
+                    vm = self.vel_max_value * 1.01
                     rhom = prod_center * (self.rhoi - self.rhof) / (vm * self.Ap) + self.rhof
                     alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
                     i = 0
