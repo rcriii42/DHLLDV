@@ -80,6 +80,11 @@ class CrossoverGauge:
         self.figure.line(source=self.pointer_data, x='den_x', y='den_y', color="red")
         self.update(vel_max_value/2, 1+(den_max_value-1)/2)
 
+    @property
+    def Ap(self):
+        """Return the area of the pipe in m2"""
+        return pi * (self.Dp / 2)**2
+
     def update(self, vel, den):
         """Update the crossover gauge pointers"""
         # print(f'CrossoverGauge.update: (vel={vel:0.2f}, den={den:0.3f})')
