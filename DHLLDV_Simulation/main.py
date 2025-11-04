@@ -120,6 +120,7 @@ class CrossoverGauge:
             vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
             den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
             prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
+            self.figure.add_layout(Label(x=x_center, y=y_center, text=f'{prod_center*3600:0.0f}'))
             print(f'draw_middle_axis: {vel_center=:0.2f} {den_center=:0.2f} {prod_center=:0.1e} {prod_center*3600=:0.1f} {angle_center=:0.3f}')
 
             # Now draw points of equal production starting at the maximum density
