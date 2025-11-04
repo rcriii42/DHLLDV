@@ -3,7 +3,7 @@
 import base64
 import copy
 import io
-from math import pi, sin, cos
+from math import pi, sin, cos, tan, asin
 import sys
 
 import openpyxl
@@ -53,7 +53,8 @@ class CrossoverGauge:
     """A class to simulate a crossover velocity/density gauge with a middle axis indicating production"""
     def __init__(self,
                  vel_max_angle=45, vel_max_value=5.5, vel_pointer_origin=(1, 0),
-                 den_max_angle=45, den_max_value=1.3, den_pointer_origin=(-1, 0)) -> None:
+                 den_max_angle=45, den_max_value=1.3, den_pointer_origin=(-1, 0),
+                 rhof=1.025, rhos=2.65, rhoi=1.95, pipe_dia=(10/12)*0.3048) -> None:
         self.vel_max_angle = vel_max_angle
         self.vel_min_value = 0.0
         self.vel_max_value = vel_max_value
@@ -63,6 +64,12 @@ class CrossoverGauge:
         self.den_max_value = den_max_value
         self.den_pointer_origin = den_pointer_origin
 
+        self.rhof = rhof
+        self.rhos = rhos
+        self.rhoi = rhoi
+        self.Dp = pipe_dia
+        print(f'{self.Dp=:0.3f} {self.Ap=:0.3f}')
+
         self.tick_len = 1.05  # Length of the tick relative to the axis radius
 
         print('creating crossover gauge figure')
@@ -71,6 +78,7 @@ class CrossoverGauge:
                              y_range=(-0.1, (self.vel_pointer_origin[0] - self.den_pointer_origin[0])))
         self.draw_side_axis('vel')
         self.draw_side_axis('den')
+        self.draw_middle_axis()
 
         self.pointer_data = ColumnDataSource(data=dict(vel_x=[vel_pointer_origin[0], den_pointer_origin[0]],
                                                        vel_y=[vel_pointer_origin[1], den_pointer_origin[1]],
@@ -99,6 +107,72 @@ class CrossoverGauge:
                                              self.den_pointer_origin[0] + pointer_radius * cos(den_angle)],
                                       den_y=[self.den_pointer_origin[1],
                                              self.den_pointer_origin[1] + pointer_radius * sin(den_angle)])
+
+    def draw_middle_axis(self):
+        """Calculate and draw the middle axis"""
+        for i in range(1, 6):
+            x_center = 0
+            y_center = i * 0.2
+            angle_center = asin((y_center - self.vel_pointer_origin[1]) /
+                                ((x_center - self.vel_pointer_origin[0])**2 +
+                                 (y_center - self.vel_pointer_origin[1])**2)**0.5)
+            print(f'{self.vel_max_angle=} {self.den_max_angle=}')
+            vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
+            den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
+            prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
+            print(f'draw_middle_axis: {vel_center=:0.2f} {den_center=:0.2f} {prod_center=:0.1e} {prod_center*3600=:0.1f} {angle_center=:0.3f}')
+
+            # Now draw points of equal production starting at the maximum density
+            x_list = [x_center]
+            y_list = [y_center]
+            den_min_angle = ((self.rhof - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
+            alpha_d = self.den_max_angle * pi / 180
+            delta_alpha = (alpha_d - den_min_angle) / 10
+            print(f'{den_min_angle=:0.3f} {alpha_d=:0.3f} {delta_alpha=:0.3f}')
+            i = 11
+            while True:
+                # Lower density and calculate the velocity that maintains production
+                if i <= 0:
+                    break
+                rhom = 1 + (self.den_max_value - 1) * alpha_d / (self.den_max_angle * pi / 180)
+                if rhom <= self.rhof:
+                    # One more point at maximum velocity
+                    vm = self.vel_max_value
+                    rhom = prod_center * (self.rhoi - self.rhof)/(vm * self.Ap) + self.rhof
+                    alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
+
+                    i = 0   # End the loop after this point
+                i -= 1
+                Cvi = (rhom - self.rhof) / (self.rhoi - self.rhof)
+                vm = prod_center / (Cvi * self.Ap)
+                if vm > self.vel_max_value:
+                    # One more point at maximum velocity
+                    vm = self.vel_max_value
+                    rhom = prod_center * (self.rhoi - self.rhof) / (vm * self.Ap) + self.rhof
+                    alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
+                    i = 0
+
+                # The angles of the velocity and density pointers
+                alpha_v = pi - vm * (self.vel_max_angle * pi / 180) / self.vel_max_value
+                # alpha_d = (rhom - self.rhof) * self.den_max_angle * pi / 180 / (self.den_max_value - self.rhof)
+
+                # The x,y position
+                xc = (self.den_pointer_origin[0] * tan(alpha_d) - self.vel_pointer_origin[0] * tan(alpha_v) +
+                      self.vel_pointer_origin[1] - self.den_pointer_origin[1]) / (tan(alpha_d) - tan(alpha_v))
+                yc = ((xc - self.vel_pointer_origin[0]) * tan(alpha_v) + self.vel_pointer_origin[1])
+                print(f'draw_middle_axis: {vm=:0.2f} {rhom=:0.2f} {alpha_v=:0.3f} {alpha_d=:0.3f} '
+                      f'{xc=:0.3f} {yc=:0.3f}')
+                if rhom > den_center:
+                    x_list.insert(-1, xc)
+                    y_list.insert(-1, yc)
+                elif rhom < den_center:
+                    x_list.append(xc)
+                    y_list.append(yc)
+                else:
+                    pass
+                alpha_d -= delta_alpha
+
+            self.figure.line(x=x_list, y=y_list, color="blue")
 
     def draw_side_axis(self, side='vel'):
         """Draw the velocity axis on the left"""
