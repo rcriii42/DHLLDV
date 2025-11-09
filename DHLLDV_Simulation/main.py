@@ -158,7 +158,6 @@ class CrossoverGauge:
                 xc = (self.den_pointer_origin[0] * tan(alpha_d) - self.vel_pointer_origin[0] * tan(alpha_v) +
                       self.vel_pointer_origin[1] - self.den_pointer_origin[1]) / (tan(alpha_d) - tan(alpha_v))
                 yc = ((xc - self.vel_pointer_origin[0]) * tan(alpha_v) + self.vel_pointer_origin[1])
-                      f'{xc=:0.3f} {yc=:0.3f}')
                 if rhom > den_center:
                     x_list.insert(-1, xc)
                     y_list.insert(-1, yc)
@@ -453,14 +452,13 @@ def stop_button_callback():
 stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
-
-curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
-                         row(column(crossover_gauge.figure, snake_plot),
-                             column(Tabs(tabs=[HQ_panel]))),
-                         row(start_button, rate_slider), stop_button,
-                         num_slugs_display,
-                         file_input,
-                         row(slurry_info, pipeline_info)
-                         )
-                  )
+left_column = column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
+                     column(crossover_gauge.figure, snake_plot))
+right_column = Tabs(tabs=[HQ_panel])
+bottom_column = column(row(start_button, rate_slider),
+                       stop_button,
+                       num_slugs_display,
+                       file_input,
+                       row(slurry_info, pipeline_info))
+curdoc().add_root(column(row(left_column, right_column), bottom_column))
 curdoc().title = "Simulation"
