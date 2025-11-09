@@ -352,6 +352,7 @@ def create_HQ_plot():
 
     return plot, source, last10_src, last30_src
 HQ_plot, im_source, last10_source, last30_source  = create_HQ_plot()
+HQ_panel = TabPanel(child=HQ_plot, title="HQ")
 
 
 def update_HQ_plot():
@@ -455,7 +456,7 @@ stop_button.on_click(stop_button_callback)
 
 curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
                          row(column(crossover_gauge.figure, snake_plot),
-                             column(HQ_plot)),
+                             column(Tabs(tabs=[HQ_panel]))),
                          row(start_button, rate_slider), stop_button,
                          num_slugs_display,
                          file_input,
