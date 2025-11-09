@@ -68,11 +68,9 @@ class CrossoverGauge:
         self.rhos = rhos
         self.rhoi = rhoi
         self.Dp = pipe_dia
-        print(f'{self.Dp=:0.3f} {self.Ap=:0.3f}')
 
         self.tick_len = 1.05  # Length of the tick relative to the axis radius
 
-        print('creating crossover gauge figure')
         self.figure = figure(height=375,
                              x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
                              y_range=(-0.1, 0.85 * (self.vel_pointer_origin[0] - self.den_pointer_origin[0])),
@@ -98,7 +96,6 @@ class CrossoverGauge:
 
     def update(self, vel, den):
         """Update the crossover gauge pointers"""
-        # print(f'CrossoverGauge.update: (vel={vel:0.2f}, den={den:0.3f})')
         pointer_radius = (self.vel_pointer_origin[0] - self.den_pointer_origin[0]) * 1 + (self.tick_len - 1) / 2
         vel_angle = pi - (vel * self.vel_max_angle / self.vel_max_value) * pi / 180
         den_angle = ((den - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
@@ -119,12 +116,10 @@ class CrossoverGauge:
             angle_center = asin((y_center - self.vel_pointer_origin[1]) /
                                 ((x_center - self.vel_pointer_origin[0])**2 +
                                  (y_center - self.vel_pointer_origin[1])**2)**0.5)
-            print(f'{self.vel_max_angle=} {self.den_max_angle=}')
             vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
             den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
             prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
             self.figure.add_layout(Label(x=x_center - 0.08, y=y_center + 0.02, text=f'{prod_center*3600:0.0f}'))
-            print(f'draw_middle_axis: {vel_center=:0.2f} {den_center=:0.2f} {prod_center=:0.1e} {prod_center*3600=:0.1f} {angle_center=:0.3f}')
 
             # Now draw points of equal production starting at the maximum density
             x_list = [x_center]
@@ -132,7 +127,6 @@ class CrossoverGauge:
             den_min_angle = ((self.rhof - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
             alpha_d = self.den_max_angle * 1.01 * pi / 180
             delta_alpha = (alpha_d - den_min_angle) / 10
-            print(f'{den_min_angle=:0.3f} {alpha_d=:0.3f} {delta_alpha=:0.3f}')
             i = 11
             while True:
                 # Lower density and calculate the velocity that maintains production
@@ -164,7 +158,6 @@ class CrossoverGauge:
                 xc = (self.den_pointer_origin[0] * tan(alpha_d) - self.vel_pointer_origin[0] * tan(alpha_v) +
                       self.vel_pointer_origin[1] - self.den_pointer_origin[1]) / (tan(alpha_d) - tan(alpha_v))
                 yc = ((xc - self.vel_pointer_origin[0]) * tan(alpha_v) + self.vel_pointer_origin[1])
-                print(f'draw_middle_axis: {vm=:0.2f} {rhom=:0.2f} {alpha_v=:0.3f} {alpha_d=:0.3f} '
                       f'{xc=:0.3f} {yc=:0.3f}')
                 if rhom > den_center:
                     x_list.insert(-1, xc)
@@ -213,9 +206,6 @@ class CrossoverGauge:
                 """Determine the tick angle offset from horiz based on the value"""
                 return (tick_val - 1) * self.den_max_angle / (self.den_max_value - 1) * pi / 180
         # The axis line is an arc centered on the pointer origin and touching the other.
-        # print(f'drawing {side} axis'
-        #       f'{side_axis_radius=} {side_origin_x=} {side_origin_y=} {side_end_angle=}'
-        #       f' {side_direction=} {side_color=}')
         num_segments = 50
         segment_angle = (side_end_angle - side_start_angle)/num_segments
         axis_angles = [side_start_angle + a * segment_angle for a in range(num_segments + 1)]
@@ -224,7 +214,6 @@ class CrossoverGauge:
         self.figure.line(x=axis_x, y=axis_y)
 
         # The axis tick marks
-        print(f'{side_num_ticks=} ticks')
         for i in range(side_num_ticks):
             tick_value = side_min_tick + i * side_tick_gap
             tick_angle = side_start_angle + delta_tick(tick_value)
@@ -232,7 +221,6 @@ class CrossoverGauge:
                        side_origin_x + self.tick_len*side_axis_radius*cos(tick_angle)]
             y_ticks = [side_origin_y + side_axis_radius*sin(tick_angle),
                        side_origin_y + self.tick_len*side_axis_radius*sin(tick_angle)]
-            # print(f'{tick_value=:0.2f} {tick_angle=:0.3f} {x_ticks=} {y_ticks=}')
             self.figure.line(x=x_ticks,
                              y=y_ticks)
             if side_tick_anchor == "center_right":
@@ -434,18 +422,15 @@ periodic_callbacks = []
 rate = 1
 def update_framerate(attr, old, new):
     rate = new
-    print(f'{rate=}')
     if len(periodic_callbacks) > 0:
         curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
         periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
 rate_slider = Slider(title="framerate", value=rate, start=1, end=20, step=1)
 rate_slider.on_change('value', update_framerate)
-print(f'{rate=}')
 
 
 def start_button_clicked():
     """Start or stop the simulation"""
-    print('Button clicked')
     if len(periodic_callbacks) > 0:
         print("Stopping simulation")
         curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
