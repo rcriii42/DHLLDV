@@ -246,7 +246,7 @@ snake_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis
                       y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
 snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
-crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5)
+crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5, pipe_dia=pipe_list[-1].diameter)
 
 velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
                        y_range=(0.0, 10.0))
