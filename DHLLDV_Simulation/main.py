@@ -265,8 +265,9 @@ density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color=
 
 time_step_display = TextInput(title="Timestep", value=f"{0}", width=95, disabled=True)
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
-Sm_in_display = TextInput(title="Rhom in (ton/m3)", value=f"{0.0}", width=100, disabled=True)
-Sm_avg_display = TextInput(title="Rhom avg (ton/m3)", value=f"{0.0}", width=100, disabled=True)
+Sm_in_display = TextInput(title="Rhom in (t/m3)", value=f"{0.0}", width=100, disabled=True)
+Sm_avg_display = TextInput(title="Rhom avg (t/m3)", value=f"{0.0}", width=100, disabled=True)
+prod_display = TextInput(title="Prod m3/Hr", value=f"{000}", width=100, disabled=True)
 
 num_slugs_display = TextInput(title="Total slugs", value=f'{lpipeline.num_slugs}', disabled=True)
 
@@ -375,15 +376,18 @@ update_HQ_plot()
 def update():
     """Update the simulation"""
     q, heads, disch_slug = lpipeline.update()
+    in_slurry = lpipeline.lpipe_list[0].slugs[0].slurry
     new_data = dict(timestep=[lpipeline.timecounter],
                     velocity=[lpipeline.lpipe_list[-1].velocity(q)],
-                    density_in=[lpipeline.lpipe_list[0].slugs[0].rhom],
+                    density_in=[in_slurry.rhom],
                     density_avg=[lpipeline.average_rhom],)
 
     time_step_display.value = f'{lpipeline.timecounter}'
     Vm_display.value = f'{lpipeline.lpipe_list[-1].velocity(q):0.3f}'
-    Sm_in_display.value = f'{lpipeline.lpipe_list[0].slugs[0].rhom:0.3f}'
+    Sm_in_display.value = f'{in_slurry.rhom:0.3f}'
     Sm_avg_display.value = f'{lpipeline.average_rhom:0.3f}'
+    production = q * in_slurry.Cvi * 3600
+    prod_display.value = f'{production:0.0f}'
     num_slugs_display.value = f'{lpipeline.num_slugs}'
 
     sx, sr = build_snake_source()
@@ -448,7 +452,8 @@ def stop_button_callback():
 stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
-curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display),
+
+curdoc().add_root(column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
                          row(column(crossover_gauge.figure, snake_plot),
                              column(HQ_plot)),
                          row(start_button, rate_slider), stop_button,
