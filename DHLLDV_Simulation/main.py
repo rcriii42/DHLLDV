@@ -267,20 +267,20 @@ snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
 crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5, pipe_dia=pipe_list[-1].diameter)
 
-velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
-                       y_range=(0.0, 10.0))
-velocity_plot.x_range.follow = "end"
-velocity_plot.x_range.follow_interval = 100
-velocity_plot.x_range.range_padding = 0
-velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=vd_source)
-
-density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
-                      y_range=(1.0, 1.6))
-density_plot.x_range.follow = "end"
-density_plot.x_range.follow_interval = 100
-density_plot.x_range.range_padding = 0
-density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=vd_source)
-density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=vd_source)
+# velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+#                        y_range=(0.0, 10.0))
+# velocity_plot.x_range.follow = "end"
+# velocity_plot.x_range.follow_interval = 100
+# velocity_plot.x_range.range_padding = 0
+# velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=vd_source)
+#
+# density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+#                       y_range=(1.0, 1.6))
+# density_plot.x_range.follow = "end"
+# density_plot.x_range.follow_interval = 100
+# density_plot.x_range.range_padding = 0
+# density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=vd_source)
+# density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=vd_source)
 
 time_step_display = TextInput(title="Timestep", value=f"{0}", width=95, disabled=True)
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
