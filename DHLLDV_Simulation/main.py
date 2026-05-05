@@ -415,7 +415,8 @@ def load_xl_data(attr, old, new):
         pipeline = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
         slurry = pipeline.slurry
         lpipeline = LagrPipeline(pipe_list=pipeline.pipesections, slurry=slurry,
-                                 suct_feed=CSDFeed(slurry, density=1.03))
+                                 suct_feed=CSDFeed(slurry, density=1.17),
+                                 start_pipeline_density=1.03)
         source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
         pipeline_info.text = f'{lpipeline}'.replace('\n', '<BR>')
         slurry_info.text = f'{slurry}'.replace('\n', '<BR>')

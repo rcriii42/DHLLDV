@@ -148,7 +148,7 @@ class LagrPipeline(Pipeline):
     Calculates acceleration/deceleration
     """
 
-    def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None, suct_feed=None):
+    def __init__(self, name="LagrPipeline", pipe_list=None, slurry=None, suct_feed=None, start_pipeline_density=None):
         super().__init__(name, pipe_list, slurry)
 
         self.timecounter = 0  # Track the number of timesteps so far
@@ -162,10 +162,13 @@ class LagrPipeline(Pipeline):
             self.suction_feed = FixedDensityFeed(deepcopy(self.slurry),
                                                  Dp=self.pipesections[0].diameter,
                                                  )
+        existing_slurry = deepcopy(self.slurry)
+        if start_pipeline_density is not None:
+            existing_slurry.rhom = start_pipeline_density
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
-                self.lpipe_list.append(LagrPipe.from_pipe(this_pipe=element, feed_in=last_feed, slurry=slurry))
+                self.lpipe_list.append(LagrPipe.from_pipe(this_pipe=element, feed_in=last_feed, slurry=existing_slurry))
                 last_feed = self.lpipe_list[-1].feed
                 if i > 0 and element.elev_change > element.length:
                     print(f'WARNING Pipe section {element.name} at position {i} length less than elevation change: '
