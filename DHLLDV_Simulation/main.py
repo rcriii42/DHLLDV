@@ -258,6 +258,7 @@ def load_xl_data(attr, old, new):
     crossover_gauge.update(lpipeline.lpipe_list[-1].velocity(1.0),  # Use 1 m3/sec for initial update
                            lpipeline.lpipe_list[0].slugs[0].rhom,
                            rhof=slurry.rhol, rhos=slurry.rhos, rhoi=slurry.rhoi, pipe_dia=slurry.Dp)
+    snake_plot.x_range.end = lpipeline.total_length
     update_HQ_plot()
     update_hydraulic_gradeline(hyd_gradeline, hyd_gl_source, lpipeline)
 
