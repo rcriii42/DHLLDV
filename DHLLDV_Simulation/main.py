@@ -3,7 +3,6 @@
 import base64
 import copy
 import io
-from math import pi, sin, cos, tan, asin
 import sys
 
 import openpyxl
@@ -24,6 +23,7 @@ from DHLLDV.PumpObj import Pump
 from DHLLDV.SlurryObj import Slurry
 
 from CrossoverGauge import CrossoverGauge
+from PZ_plot import create_hydraulic_gradeline, update_hydraulic_gradeline
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
 from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
 
@@ -178,6 +178,9 @@ def create_HQ_plot():
 HQ_plot, im_source, last10_source, last30_source = create_HQ_plot()
 HQ_panel = TabPanel(child=HQ_plot, title="HQ")
 
+hyd_gradeline, hyd_gl_source = create_hydraulic_gradeline(lpipeline)
+hyd_gl_panel = TabPanel(child=hyd_gradeline, title="Gradeline")
+
 
 def update_HQ_plot():
     """Update the HQ plot from the given pipeline"""
@@ -256,6 +259,9 @@ def load_xl_data(attr, old, new):
                            lpipeline.lpipe_list[0].slugs[0].rhom,
                            rhof=slurry.rhol, rhos=slurry.rhos, rhoi=slurry.rhoi, pipe_dia=slurry.Dp)
     update_HQ_plot()
+    update_hydraulic_gradeline(hyd_gradeline, hyd_gl_source, lpipeline)
+
+
 
 
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
@@ -304,7 +310,7 @@ stop_button.on_click(stop_button_callback)
 
 left_column = column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
                      column(crossover_gauge.figure, snake_plot))
-right_column = Tabs(tabs=[HQ_panel])
+right_column = Tabs(tabs=[HQ_panel, hyd_gl_panel])
 bottom_column = column(row(start_button, rate_slider),
                        stop_button,
                        num_slugs_display,
