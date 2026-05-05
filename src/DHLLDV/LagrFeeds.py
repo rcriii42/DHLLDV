@@ -66,7 +66,7 @@ class CyclicFeed(FixedDensityFeed):
     @property
     def rhom(self):
         """"The feed density at the current index"""
-        return self.densities[self.index].rhom
+        return self.densities[self.index]
 
     @rhom.setter
     def rhom(self, value):
