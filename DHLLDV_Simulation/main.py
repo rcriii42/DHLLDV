@@ -407,8 +407,8 @@ def update():
 
 
 def load_xl_data(attr, old, new):
-    global lpipeline
     """Load the pipeline from an Excel file"""
+    global lpipeline, pipeline
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
     try:
