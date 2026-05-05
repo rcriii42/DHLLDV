@@ -1,5 +1,4 @@
 """LagrFeeds.py - Various feed functions for the LagrPipeline"""
-import copy
 from copy import deepcopy
 from math import pi
 
@@ -50,6 +49,7 @@ class FixedDensityFeed:
 
         return [0.0, 0.0, 0.0], Slug(Vls, deepcopy(self.slurry))
 
+
 class CyclicFeed(FixedDensityFeed):
     """A feed function with a simple varying density list"""
 
@@ -83,6 +83,7 @@ class CyclicFeed(FixedDensityFeed):
 
         return [0.0, 0.0, 0.0], Slug(Vls, new_slurry)
 
+
 class CSDFeed(FixedDensityFeed):
     """Feed to mimic a CSD
 
@@ -106,6 +107,7 @@ class CSDFeed(FixedDensityFeed):
 
     @property
     def cycle_time(self):
+        """Return the total cycle time"""
         return self.swing_time + self.corner_time + self.backswing_time + self.corner_time
 
     def feed(self, Q: float) -> ([float, float, float], Slug):
