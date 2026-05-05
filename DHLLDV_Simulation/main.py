@@ -26,10 +26,10 @@ from DHLLDV.SlurryObj import Slurry
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
 from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
 
+from ExamplePumps import Ladder_Pump600, Main_Pump500
+
 unit_convs = unit_conv_SI
 unit_labels = unit_label_SI
-
-from ExamplePumps import Ladder_Pump600, Main_Pump500
 
 slurry = Slurry(fluid='salt', Cv=0.001)
 pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
@@ -178,8 +178,6 @@ class CrossoverGauge:
             side_origin_y = self.vel_pointer_origin[1]
             side_start_angle = pi
             side_end_angle = pi - self.vel_max_angle * pi / 180
-            side_direction = 'clock'
-            side_color = "navy"
             side_min_tick = self.vel_min_value
             side_tick_gap = 0.5
             side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
@@ -187,6 +185,7 @@ class CrossoverGauge:
                 side_tick_gap = 1.0
                 side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
             side_tick_anchor = 'center_right'
+
             def delta_tick(tick_val):
                 """Determine the tick angle offset from horiz based on the value"""
                 return (-1 * tick_val * self.vel_max_angle / self.vel_max_value) * pi / 180
@@ -195,12 +194,11 @@ class CrossoverGauge:
             side_origin_y = self.den_pointer_origin[1]
             side_start_angle = 0
             side_end_angle = self.den_max_angle * pi / 180
-            side_direction = 'anticlock'
-            side_color = "navy"
             side_min_tick = self.den_min_value
             side_tick_gap = .05
             side_num_ticks = int((self.den_max_value - self.den_min_value) / side_tick_gap) + 1
             side_tick_anchor = 'center_left'
+
             def delta_tick(tick_val):
                 """Determine the tick angle offset from horiz based on the value"""
                 return (tick_val - 1) * self.den_max_angle / (self.den_max_value - 1) * pi / 180
@@ -239,10 +237,12 @@ def build_snake_source():
                 snake_x.append(snake_x[-1] + s.length)
                 snake_rho.append(s.rhom)
     return snake_x, snake_rho
+
+
 sx, sr = build_snake_source()
 snake_source = ColumnDataSource(data=dict(x=sx, rho=sr))
 snake_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
-                      y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
+                    y_range=(1.0, 1.6), x_range=(0.0, lpipeline.total_length))
 snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
 crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5, pipe_dia=pipe_list[-1].diameter)
@@ -297,50 +297,50 @@ def create_HQ_plot():
                                    (f"Pump Head Water ({unit_labels['len']})", "@Hpump_l{0,0.0}",),
                                    ])
     plot = figure(height=450, width=595, title="System Head Requirement",
-                     tools="crosshair,pan,reset,save,wheel_zoom",
-                     x_range=[0, flow_list[-1] * unit_convs['flow']], y_range=[0, 100])
+                  tools="crosshair,pan,reset,save,wheel_zoom",
+                  x_range=[0, flow_list[-1] * unit_convs['flow']], y_range=[0, 100])
     plot.tools.append(HQ_hover)
 
     plot.line('Q', 'im', source=source,
-                 color='black',
-                 line_dash='solid',
-                 line_width=3,
-                 line_alpha=0.6,
-                 legend_label=f'Slurry Graded Cvt=c ({unit_labels["len"]})',
-                 name='Slurry graded Sand Cvt=c')
+              color='black',
+              line_dash='solid',
+              line_width=3,
+              line_alpha=0.6,
+              legend_label=f'Slurry Graded Cvt=c ({unit_labels["len"]})',
+              name='Slurry graded Sand Cvt=c')
 
     plot.line('Q', 'il', source=source,
-                 color='blue',
-                 line_dash='solid',
-                 line_width=2,
-                 line_alpha=0.3,
-                 legend_label='Water',
-                 name='Water')
+              color='blue',
+              line_dash='solid',
+              line_width=2,
+              line_alpha=0.3,
+              legend_label='Water',
+              name='Water')
 
     plot.line('Q', 'Hpump_m', source=source,
-                 color='black',
-                 line_dash='dashed',
-                 line_width=3,
-                 line_alpha=0.6,
-                 legend_label='Pump Slurry',
-                 name='Pump Slurry')
+              color='black',
+              line_dash='dashed',
+              line_width=3,
+              line_alpha=0.6,
+              legend_label='Pump Slurry',
+              name='Pump Slurry')
 
     plot.line('Q', 'Hpump_l', source=source,
-                 color='blue',
-                 line_dash='dashed',
-                 line_width=2,
-                 line_alpha=0.3,
-                 legend_label='Pump Water',
-                 name='Pump Water')
+              color='blue',
+              line_dash='dashed',
+              line_width=2,
+              line_alpha=0.3,
+              legend_label='Pump Water',
+              name='Pump Water')
 
     plot.circle(x='Q', y='im', color='orange', size=4, alpha=1.0, source=last10_src)
     plot.circle(x='Q', y='im', color='orange', size=2, alpha=0.25, source=last30_src)
     plot.extra_x_ranges = {'vel_range': Range1d(pipeline.slurry.vls_list[0] * unit_convs['len'],
-                                                   pipeline.slurry.vls_list[-1] * unit_convs['len'])}
+                                                pipeline.slurry.vls_list[-1] * unit_convs['len'])}
     plot.add_layout(LinearAxis(x_range_name='vel_range'), 'above')
     plot.xaxis[1].axis_label = f'Flow ({unit_labels["flow"]})'
     plot.xaxis[0].axis_label = f'Velocity ({unit_labels["vel"]} in {pipeline.slurry.Dp * unit_convs["dia"]:0.1f} ' \
-                                  f'{unit_labels["dia"]} pipe)'
+                               f'{unit_labels["dia"]} pipe)'
     plot.xaxis[0].formatter = NumeralTickFormatter(format="0.0")
     plot.yaxis[0].axis_label = f'Head ({unit_labels["len"]})'
     plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3] * unit_convs['len']
@@ -350,7 +350,9 @@ def create_HQ_plot():
     plot.legend.location = "bottom_left"
 
     return plot, source, last10_src, last30_src
-HQ_plot, im_source, last10_source, last30_source  = create_HQ_plot()
+
+
+HQ_plot, im_source, last10_source, last30_source = create_HQ_plot()
 HQ_panel = TabPanel(child=HQ_plot, title="HQ")
 
 
@@ -370,6 +372,8 @@ def update_HQ_plot():
     last_hq = dict(Q=[lpipeline.lastflow], im=[lpipeline.last_head_loss * -1])
     last10_source.stream(last_hq, 1)
     last30_source.stream(last_hq, 30)
+
+
 update_HQ_plot()
 
 
@@ -404,6 +408,7 @@ def update():
 
 def load_xl_data(attr, old, new):
     global lpipeline
+    """Load the pipeline from an Excel file"""
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
     try:
@@ -424,11 +429,15 @@ file_input.on_change('filename', load_xl_data)
 
 periodic_callbacks = []
 rate = 1
+
+
 def update_framerate(attr, old, new):
-    rate = new
+    """Change the framerate of the simulation"""
     if len(periodic_callbacks) > 0:
         curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
         periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
+
+
 rate_slider = Slider(title="framerate", value=rate, start=1, end=20, step=1)
 rate_slider.on_change('value', update_framerate)
 
@@ -443,12 +452,18 @@ def start_button_clicked():
         print("Starting simulation")
         periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - rate) * 50))
         start_button.label = "Stop"
+
+
 start_button = Button(label="Start", button_type="success")
 start_button.on_click(start_button_clicked)
 
+
 # Button to stop the server
 def stop_button_callback():
-    sys.exit()  # Stop the server
+    """Stop the server"""
+    sys.exit()
+
+
 stop_button = Button(label="Stop Server", button_type="success", width=75)
 stop_button.on_click(stop_button_callback)
 
