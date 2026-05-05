@@ -373,6 +373,11 @@ def update_HQ_plot():
     last10_source.stream(last_hq, 1)
     last30_source.stream(last_hq, 30)
 
+    HQ_plot.xaxis[0].axis_label = (f'Velocity ({unit_labels["vel"]} in '
+                                   f'{pipeline.slurry.Dp * unit_convs["dia"]:0.1f} {unit_labels["dia"]} pipe)')
+    HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3] * unit_convs['len']
+    HQ_plot.x_range.end = flow_list[-1] * unit_convs['flow']
+
 
 update_HQ_plot()
 
@@ -422,6 +427,8 @@ def load_xl_data(attr, old, new):
         slurry_info.text = f'{slurry}'.replace('\n', '<BR>')
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
+
+    update_HQ_plot()
 
 
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
