@@ -153,7 +153,8 @@ class LagrPipeline(Pipeline):
 
         self.timecounter = 0  # Track the number of timesteps so far
         self.slurry.Dp = self.pipesections[-1].diameter
-        self.lastflow = self.find_operating_point(self.slurry.vls_list)
+        flow_list = [self.pipesections[-1].flow(v) for v in self.slurry.vls_list]
+        self.lastflow = self.find_operating_point(flow_list)
         self.last_head_loss = 0
         self.lpipe_list = []
         if suct_feed is not None:
@@ -166,7 +167,7 @@ class LagrPipeline(Pipeline):
         if start_pipeline_density is not None:
             existing_slurry.rhom = start_pipeline_density
             self.slurry = existing_slurry
-            self.lastflow = self.find_operating_point(self.slurry.vls_list)
+            self.lastflow = self.find_operating_point(flow_list)
             self.slurry = slurry
 
         last_feed = self.suction_feed.feed
