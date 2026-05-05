@@ -17,6 +17,7 @@ class FixedDensityFeed:
             self.slurry.rhom = density
         if Dp is not None:
             self.slurry.Dp = Dp
+        self.status = f'Feeding {density:0.3f} ton/m3'
 
     @property
     def rhom(self):
@@ -62,6 +63,7 @@ class CyclicFeed(FixedDensityFeed):
         if Dp is not None:
             self.slurry.Dp = Dp
         self.index = 0
+        self.status = f'CyclicFeed'
 
     @property
     def rhom(self):
@@ -80,6 +82,7 @@ class CyclicFeed(FixedDensityFeed):
         self.index += 1
         if self.index >= len(self.densities):
             self.index = 0
+        self.status = f'Feeding {new_slurry.rhom:0.3f} ton/m3'
 
         return [0.0, 0.0, 0.0], Slug(Vls, new_slurry)
 
@@ -122,6 +125,7 @@ class CSDFeed(FixedDensityFeed):
             mode_rho = max(3 * self.rhom - min_rho - max_rho,
                            self.rhom)
             new_rhom = triangular(min_rho, max_rho, mode_rho)
+            self.status = f'Swing target: {self.rhom:0.3f} ton/m3'
         elif self.index < self.swing_time + self.corner_time:
             time_in_corner = self.swing_time + self.corner_time - self.index
             min_rho = 1.03 + (self.rhom - 1.03) / 2
@@ -130,6 +134,7 @@ class CSDFeed(FixedDensityFeed):
                            self.rhom)
             new_rhom = (triangular(min_rho, max_rho, mode_rho) * time_in_corner +
                         1.03 * (self.corner_time - time_in_corner)) / self.corner_time
+            self.status = f'Corner target: {mode_rho:0.3f} ton/m3'
         elif self.index < self.swing_time + self.corner_time + self.backswing_time:
             bs_rhom = 1.03 + (self.rhom - 1.03) * self.backswing_ratio
             min_rho = 1.03 + (bs_rhom - 1.03) / 2
@@ -137,6 +142,7 @@ class CSDFeed(FixedDensityFeed):
             mode_rho = max(3 * bs_rhom - min_rho - max_rho,
                            bs_rhom)
             new_rhom = triangular(min_rho, max_rho, mode_rho)
+            self.status = f'Backswing target: {bs_rhom:0.3f} ton/m3'
         else:
             time_in_corner = self.swing_time + self.corner_time + self.backswing_time + self.corner_time - self.index
             bs_rhom = 1.03 + (self.rhom - 1.03) * self.backswing_ratio
@@ -146,6 +152,7 @@ class CSDFeed(FixedDensityFeed):
                            bs_rhom)
             new_rhom = (triangular(min_rho, max_rho, mode_rho) * (self.corner_time - time_in_corner) +
                         1.03 * time_in_corner) / self.corner_time
+            self.status = f'Corner target: {mode_rho:0.3f} ton/m3'
 
         Vls = Q / self.area
         new_slurry = deepcopy(self.slurry)

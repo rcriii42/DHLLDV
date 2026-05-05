@@ -427,7 +427,8 @@ def update():
                            lpipeline.lpipe_list[0].slugs[0].rhom)
 
     print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
-          f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
+          f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}, '
+          f'Status: {lpipeline.suction_feed.status}')
     vd_source.stream(new_data, 100)
 
 
