@@ -79,6 +79,7 @@ class CrossoverGauge:
         self.figure.yaxis.visible = False
         self.draw_side_axis('vel')
         self.draw_side_axis('den')
+        self.middle_axis_labels = []
         self.draw_middle_axis()
 
         self.pointer_data = ColumnDataSource(data=dict(vel_x=[vel_pointer_origin[0], den_pointer_origin[0]],
@@ -94,8 +95,9 @@ class CrossoverGauge:
         """Return the area of the pipe in m2"""
         return pi * (self.Dp / 2)**2
 
-    def update(self, vel, den):
-        """Update the crossover gauge pointers"""
+    def update(self, vel, den,
+               rhof=None, rhos=None, rhoi=None, pipe_dia=None):
+        """Update the crossover gauge"""
         pointer_radius = (self.vel_pointer_origin[0] - self.den_pointer_origin[0]) * 1 + (self.tick_len - 1) / 2
         vel_angle = pi - (vel * self.vel_max_angle / self.vel_max_value) * pi / 180
         den_angle = ((den - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
@@ -108,6 +110,22 @@ class CrossoverGauge:
                                       den_y=[self.den_pointer_origin[1],
                                              self.den_pointer_origin[1] + pointer_radius * sin(den_angle)])
 
+        if any([rhof, rhos, rhoi, pipe_dia]):  # Update the middle axis scale
+            self.rhof = rhof
+            self.rhos = rhos
+            self.rhoi = rhoi
+            self.Dp = pipe_dia
+            for i in range(1, 6):
+                x_center = 0
+                y_center = i * 0.2
+                angle_center = asin((y_center - self.vel_pointer_origin[1]) /
+                                    ((x_center - self.vel_pointer_origin[0]) ** 2 +
+                                     (y_center - self.vel_pointer_origin[1]) ** 2) ** 0.5)
+                vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
+                den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
+                prod_center = vel_center * self.Ap * ((den_center - self.rhof) / (self.rhoi - self.rhof))
+                self.middle_axis_labels[i-1].text = f'{prod_center*3600:0.0f}'
+
     def draw_middle_axis(self):
         """Calculate and draw the middle axis"""
         for i in range(1, 6):
@@ -119,7 +137,9 @@ class CrossoverGauge:
             vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
             den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
             prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
-            self.figure.add_layout(Label(x=x_center - 0.08, y=y_center + 0.02, text=f'{prod_center*3600:0.0f}'))
+            lbl = Label(x=x_center - 0.08, y=y_center + 0.02, text=f'{prod_center*3600:0.0f}')
+            self.figure.add_layout(lbl)
+            self.middle_axis_labels.append(lbl)
 
             # Now draw points of equal production starting at the maximum density
             x_list = [x_center]
@@ -428,6 +448,9 @@ def load_xl_data(attr, old, new):
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
 
+    crossover_gauge.update(lpipeline.lpipe_list[-1].velocity(1.0),  # Use 1 m3/sec for initial update
+                           lpipeline.lpipe_list[0].slugs[0].rhom,
+                           rhof=slurry.rhol, rhos=slurry.rhos, rhoi=slurry.rhoi, pipe_dia=slurry.Dp)
     update_HQ_plot()
 
 
