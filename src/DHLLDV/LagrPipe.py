@@ -165,6 +165,10 @@ class LagrPipeline(Pipeline):
         existing_slurry = deepcopy(self.slurry)
         if start_pipeline_density is not None:
             existing_slurry.rhom = start_pipeline_density
+            self.slurry = existing_slurry
+            self.lastflow = self.find_operating_point(self.slurry.vls_list)
+            self.slurry = slurry
+
         last_feed = self.suction_feed.feed
         for i, element in enumerate(self.pipesections):
             if type(element) is Pipe:
