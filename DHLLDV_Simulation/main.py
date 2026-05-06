@@ -9,17 +9,15 @@ import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup, Label
-from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
-from bokeh.models.tickers import FixedTicker
+from bokeh.models import ColumnDataSource, TextInput, Slider, Button
+from bokeh.models import Div, TabPanel, Tabs, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
 from bokeh.models.widgets import FileInput
 from bokeh.plotting import figure
 
-from DHLLDV import DHLLDV_framework
+
 from DHLLDV.LagrPipe import LagrPipe, LagrPipeline
-from DHLLDV.LagrFeeds import CyclicFeed, CSDFeed
-from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
-from DHLLDV.PumpObj import Pump
+from DHLLDV.LagrFeeds import CSDFeed
+from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.SlurryObj import Slurry
 
 from CrossoverGauge import CrossoverGauge
@@ -262,8 +260,6 @@ def load_xl_data(attr, old, new):
     snake_plot.x_range.end = lpipeline.total_length
     update_HQ_plot()
     update_hydraulic_gradeline(hyd_gradeline, hyd_gl_source, lpipeline)
-
-
 
 
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
