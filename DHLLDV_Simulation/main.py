@@ -179,7 +179,8 @@ HQ_plot, im_source, last10_source, last30_source = create_HQ_plot()
 HQ_panel = TabPanel(child=HQ_plot, title="HQ")
 
 hyd_gradeline, hyd_gl_source = create_hydraulic_gradeline(lpipeline)
-hyd_gl_panel = TabPanel(child=hyd_gradeline, title="Gradeline")
+hyd_gl_panel = TabPanel(child=column([hyd_gradeline, snake_plot]),
+                        title="Gradeline")
 
 
 def update_HQ_plot():
