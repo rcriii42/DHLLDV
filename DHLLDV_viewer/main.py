@@ -8,6 +8,7 @@ Added by R. Ramsdell 19 August, 2021
 import base64
 import io
 import sys
+from zipfile import BadZipfile
 
 import openpyxl
 
@@ -86,10 +87,8 @@ def update_source_data():
     global file_input
     if file_input.filename:
         file_input.remove_on_change('filename', upload_xl_data)
-        del top_row.children[2]  # This deletes the file_input
-        file_input = FileInput(accept=".xls, .xlsm, .xlsx")
+        file_input.clear()
         file_input.on_change('filename', upload_xl_data)
-        top_row.children.insert(2, file_input)
 
 
 ################
@@ -566,6 +565,13 @@ def upload_xl_data(attr, old, new):
         pipeline_dropdown.menu = [(s, s) for s in SystemTab.setups.keys()]
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
+    except BadZipfile as e:
+        if not file_input.filename:
+            pass
+        else:
+            print(e)
+            print(f'Error loading {file_input.filename}')
+
     update_source_data()
 
 
@@ -575,6 +581,7 @@ file_input.on_change('filename', upload_xl_data)
 
 # Button to save to Excel
 def save_button_callback():
+    """Save the pipeline to Excel"""
     store_to_excel(pipeline)
 
 
