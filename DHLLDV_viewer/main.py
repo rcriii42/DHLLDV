@@ -14,7 +14,7 @@ import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Scatter
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
@@ -253,7 +253,8 @@ GSD_plot.line('dia', 'p', source=GSD_source,
               # legend_label='Grain Size Distribution',
               name='GSD')
 
-GSD_plot.circle_dot('dia', 'p', source=GSD_source, name='GSD')
+glyph = Scatter(x="dia", y="p", marker="circle", fill_color='blue', line_color='blue')
+GSD_plot.add_glyph(GSD_source, glyph)
 GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
 
 GSD_plot.yaxis[0].axis_label = '% passing'
