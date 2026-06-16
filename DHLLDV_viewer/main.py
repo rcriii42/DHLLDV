@@ -11,6 +11,7 @@ import sys
 from zipfile import BadZipfile
 
 import openpyxl
+from bokeh.core.property.descriptors import UnsetValueError
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
@@ -85,10 +86,13 @@ def update_source_data():
 
     # Reset the file input
     global file_input
-    if file_input.filename:
-        file_input.remove_on_change('filename', upload_xl_data)
-        file_input.clear()
-        file_input.on_change('filename', upload_xl_data)
+    try:
+        if file_input.filename:
+            file_input.remove_on_change('filename', upload_xl_data)
+            file_input.clear()
+            file_input.on_change('filename', upload_xl_data)
+    except UnsetValueError:
+        pass
 
 
 ################
