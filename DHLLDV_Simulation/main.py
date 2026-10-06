@@ -229,6 +229,36 @@ class CrossoverGauge:
             self.figure.add_layout(Label(x=x_ticks[1]+x_offset, y=y_ticks[1], text=f'{tick_value:0.2f}'))
 
 
+class PumpGauges:
+    """A class to manage the gauges for pump objects:
+    Speed (RPM)
+    Power (kW)
+    Pressure in
+    Pressure out"""
+
+    def __init__(self, pump: Pump,
+                 max_values: None | list[float | None] = None,
+                 min_values: None | list[float | None] = None) -> None:
+        self.pump = pump
+        if max_values is None:
+            self.max_values = [pump.max_driver_speed/pump.gear_ratio,
+                               pump.avail_power,
+                               3000,
+                               3500]
+            self.min_values = [0, 0, -100, 0]
+        self.source = ColumnDataSource(data=dict(gauges=['Speed (RPM)', 'Power (kW)', 'Pressure in', 'Pressure out'],
+                                                 y=[50,50,50,50]))
+        self.gauges = figure(height=50)
+        self.row = row(self.gauges, sizing_mode='stretch_both')
+
+
+pump_controls = []
+for p in lpipeline.lpipe_list:
+    if type(p) is Pump:
+        pump_controls.append(PumpGauges(p).row)
+pump_tab = TabPanel(child=column(pump_controls, sizing_mode='stretch_both'), title='Pumps')
+
+
 def build_snake_source():
     """Build the source data for the pipeline snake"""
     snake_x = [0.0]
