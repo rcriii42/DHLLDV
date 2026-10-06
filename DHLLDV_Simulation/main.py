@@ -3,33 +3,32 @@
 import base64
 import copy
 import io
-from math import pi, sin, cos, tan, asin
 import sys
 
 import openpyxl
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Slider, Button, RadioButtonGroup, Label
-from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
-from bokeh.models.tickers import FixedTicker
+from bokeh.models import ColumnDataSource, TextInput, Slider, Button
+from bokeh.models import Div, TabPanel, Tabs, HoverTool, Range1d, LinearAxis, NumeralTickFormatter
 from bokeh.models.widgets import FileInput
 from bokeh.plotting import figure
 
-from DHLLDV import DHLLDV_framework
+
 from DHLLDV.LagrPipe import LagrPipe, LagrPipeline
-from DHLLDV.LagrFeeds import CyclicFeed, CSDFeed
-from DHLLDV.PipeObj import Pipeline, Pipe, OperatingPointError
-from DHLLDV.PumpObj import Pump
+from DHLLDV.LagrFeeds import CSDFeed
+from DHLLDV.PipeObj import Pipeline, Pipe
 from DHLLDV.SlurryObj import Slurry
 
+from CrossoverGauge import CrossoverGauge
+from PZ_plot import create_hydraulic_gradeline, update_hydraulic_gradeline
 from load_pump_excel import load_pipeline_from_workbook, InvalidExcelError
 from unit_conv import unit_conv_US, unit_label_US, unit_conv_SI, unit_label_SI, convert_list
 
+from ExamplePumps import Ladder_Pump600, Main_Pump500
+
 unit_convs = unit_conv_SI
 unit_labels = unit_label_SI
-
-from ExamplePumps import Ladder_Pump600, Main_Pump500
 
 slurry = Slurry(fluid='salt', Cv=0.001)
 pipe_list = [Pipe(name='Entrance', diameter=0.6, length=0, total_K=0.5, elev_change=-4.0),
@@ -47,218 +46,6 @@ lpipeline = LagrPipeline(name="test lagrangian pipeline",
                                            backswing_ratio=0.75))
 
 vd_source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
-
-
-class CrossoverGauge:
-    """A class to simulate a crossover velocity/density gauge with a middle axis indicating production"""
-    def __init__(self,
-                 vel_max_angle=45, vel_max_value=5.5, vel_pointer_origin=(1, 0),
-                 den_max_angle=45, den_max_value=1.3, den_pointer_origin=(-1, 0),
-                 rhof=1.025, rhos=2.65, rhoi=1.95, pipe_dia=(10/12)*0.3048) -> None:
-        self.vel_max_angle = vel_max_angle
-        self.vel_min_value = 0.0
-        self.vel_max_value = vel_max_value
-        self.vel_pointer_origin = vel_pointer_origin
-        self.den_max_angle = den_max_angle
-        self.den_min_value = 1.0
-        self.den_max_value = den_max_value
-        self.den_pointer_origin = den_pointer_origin
-
-        self.rhof = rhof
-        self.rhos = rhos
-        self.rhoi = rhoi
-        self.Dp = pipe_dia
-
-        self.tick_len = 1.05  # Length of the tick relative to the axis radius
-
-        self.figure = figure(height=300,
-                             x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
-                             y_range=(-0.1, 0.85 * (self.vel_pointer_origin[0] - self.den_pointer_origin[0])),
-                             tools="", outline_line_color="black")
-        self.figure.xaxis.visible = False
-        self.figure.yaxis.visible = False
-        self.draw_side_axis('vel')
-        self.draw_side_axis('den')
-        self.draw_middle_axis()
-
-        self.pointer_data = ColumnDataSource(data=dict(vel_x=[vel_pointer_origin[0], den_pointer_origin[0]],
-                                                       vel_y=[vel_pointer_origin[1], den_pointer_origin[1]],
-                                                       den_x=[den_pointer_origin[0], vel_pointer_origin[0]],
-                                                       den_y=[den_pointer_origin[1], vel_pointer_origin[1]]))
-        self.figure.line(source=self.pointer_data, x='vel_x', y='vel_y', color="red")
-        self.figure.line(source=self.pointer_data, x='den_x', y='den_y', color="red")
-        self.update(vel_max_value/2, 1+(den_max_value-1)/2)
-
-    @property
-    def Ap(self):
-        """Return the area of the pipe in m2"""
-        return pi * (self.Dp / 2)**2
-
-    def update(self, vel, den):
-        """Update the crossover gauge pointers"""
-        pointer_radius = (self.vel_pointer_origin[0] - self.den_pointer_origin[0]) * 1 + (self.tick_len - 1) / 2
-        vel_angle = pi - (vel * self.vel_max_angle / self.vel_max_value) * pi / 180
-        den_angle = ((den - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
-        self.pointer_data.data = dict(vel_x=[self.vel_pointer_origin[0],
-                                             self.vel_pointer_origin[0] + pointer_radius * cos(vel_angle)],
-                                      vel_y=[self.vel_pointer_origin[1],
-                                             self.vel_pointer_origin[1] + pointer_radius * sin(vel_angle)],
-                                      den_x=[self.den_pointer_origin[0],
-                                             self.den_pointer_origin[0] + pointer_radius * cos(den_angle)],
-                                      den_y=[self.den_pointer_origin[1],
-                                             self.den_pointer_origin[1] + pointer_radius * sin(den_angle)])
-
-    def draw_middle_axis(self):
-        """Calculate and draw the middle axis"""
-        for i in range(1, 6):
-            x_center = 0
-            y_center = i * 0.2
-            angle_center = asin((y_center - self.vel_pointer_origin[1]) /
-                                ((x_center - self.vel_pointer_origin[0])**2 +
-                                 (y_center - self.vel_pointer_origin[1])**2)**0.5)
-            vel_center = angle_center * self.vel_max_value / (self.vel_max_angle * pi / 180)
-            den_center = angle_center * (self.den_max_value - 1) / (self.den_max_angle * pi / 180) + 1
-            prod_center = vel_center * self.Ap * ((den_center - self.rhof)/(self.rhoi - self.rhof))
-            self.figure.add_layout(Label(x=x_center - 0.08, y=y_center + 0.02, text=f'{prod_center*3600:0.0f}'))
-
-            # Now draw points of equal production starting at the maximum density
-            x_list = [x_center]
-            y_list = [y_center]
-            den_min_angle = ((self.rhof - 1) * self.den_max_angle / (self.den_max_value - 1)) * pi / 180
-            alpha_d = self.den_max_angle * 1.01 * pi / 180
-            delta_alpha = (alpha_d - den_min_angle) / 10
-            i = 11
-            while True:
-                # Lower density and calculate the velocity that maintains production
-                if i <= 0:
-                    break
-                rhom = 1 + (self.den_max_value - 1) * alpha_d / (self.den_max_angle * pi / 180)
-                if rhom <= self.rhof:
-                    # One more point at maximum velocity
-                    vm = self.vel_max_value * 1.01
-                    rhom = prod_center * (self.rhoi - self.rhof)/(vm * self.Ap) + self.rhof
-                    alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
-
-                    i = 0   # End the loop after this point
-                i -= 1
-                Cvi = (rhom - self.rhof) / (self.rhoi - self.rhof)
-                vm = prod_center / (Cvi * self.Ap)
-                if vm > self.vel_max_value:
-                    # One more point at maximum velocity
-                    vm = self.vel_max_value * 1.01
-                    rhom = prod_center * (self.rhoi - self.rhof) / (vm * self.Ap) + self.rhof
-                    alpha_d = (rhom - 1) * (self.den_max_angle * pi / 180) / (self.den_max_value - 1)
-                    i = 0
-
-                # The angles of the velocity and density pointers
-                alpha_v = pi - vm * (self.vel_max_angle * pi / 180) / self.vel_max_value
-                # alpha_d = (rhom - self.rhof) * self.den_max_angle * pi / 180 / (self.den_max_value - self.rhof)
-
-                # The x,y position
-                xc = (self.den_pointer_origin[0] * tan(alpha_d) - self.vel_pointer_origin[0] * tan(alpha_v) +
-                      self.vel_pointer_origin[1] - self.den_pointer_origin[1]) / (tan(alpha_d) - tan(alpha_v))
-                yc = ((xc - self.vel_pointer_origin[0]) * tan(alpha_v) + self.vel_pointer_origin[1])
-                if rhom > den_center:
-                    x_list.insert(-1, xc)
-                    y_list.insert(-1, yc)
-                elif rhom < den_center:
-                    x_list.append(xc)
-                    y_list.append(yc)
-                else:
-                    pass
-                alpha_d -= delta_alpha
-
-            self.figure.line(x=x_list, y=y_list, color="blue")
-
-    def draw_side_axis(self, side='vel'):
-        """Draw the velocity axis on the left"""
-        side_axis_radius = self.vel_pointer_origin[0] - self.den_pointer_origin[0]
-        if side == 'vel':
-            side_origin_x = self.vel_pointer_origin[0]
-            side_origin_y = self.vel_pointer_origin[1]
-            side_start_angle = pi
-            side_end_angle = pi - self.vel_max_angle * pi / 180
-            side_direction = 'clock'
-            side_color = "navy"
-            side_min_tick = self.vel_min_value
-            side_tick_gap = 0.5
-            side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
-            if side_num_ticks > 10:
-                side_tick_gap = 1.0
-                side_num_ticks = int((self.vel_max_value - self.vel_min_value) / side_tick_gap) + 1
-            side_tick_anchor = 'center_right'
-
-            def delta_tick(tick_val):
-                """Determine the tick angle offset from horiz based on the value"""
-                return (-1 * tick_val * self.vel_max_angle / self.vel_max_value) * pi / 180
-        else:
-            side_origin_x = self.den_pointer_origin[0]
-            side_origin_y = self.den_pointer_origin[1]
-            side_start_angle = 0
-            side_end_angle = self.den_max_angle * pi / 180
-            side_direction = 'anticlock'
-            side_color = "navy"
-            side_min_tick = self.den_min_value
-            side_tick_gap = .05
-            side_num_ticks = int((self.den_max_value - self.den_min_value) / side_tick_gap) + 1
-            side_tick_anchor = 'center_left'
-
-            def delta_tick(tick_val):
-                """Determine the tick angle offset from horiz based on the value"""
-                return (tick_val - 1) * self.den_max_angle / (self.den_max_value - 1) * pi / 180
-        # The axis line is an arc centered on the pointer origin and touching the other.
-        num_segments = 50
-        segment_angle = (side_end_angle - side_start_angle)/num_segments
-        axis_angles = [side_start_angle + a * segment_angle for a in range(num_segments + 1)]
-        axis_x = [side_origin_x + side_axis_radius*cos(a) for a in axis_angles]
-        axis_y = [side_origin_y + side_axis_radius*sin(a) for a in axis_angles]
-        self.figure.line(x=axis_x, y=axis_y)
-
-        # The axis tick marks
-        for i in range(side_num_ticks):
-            tick_value = side_min_tick + i * side_tick_gap
-            tick_angle = side_start_angle + delta_tick(tick_value)
-            x_ticks = [side_origin_x + side_axis_radius*cos(tick_angle),
-                       side_origin_x + self.tick_len*side_axis_radius*cos(tick_angle)]
-            y_ticks = [side_origin_y + side_axis_radius*sin(tick_angle),
-                       side_origin_y + self.tick_len*side_axis_radius*sin(tick_angle)]
-            self.figure.line(x=x_ticks,
-                             y=y_ticks)
-            if side_tick_anchor == "center_right":
-                x_offset = -0.2
-            else:
-                x_offset = 0.0
-            self.figure.add_layout(Label(x=x_ticks[1]+x_offset, y=y_ticks[1], text=f'{tick_value:0.2f}'))
-
-
-class PumpGauges:
-    """A class to manage the gauges for pump objects:
-    Speed (RPM)
-    Power (kW)
-    Pressure in
-    Pressure out"""
-
-    def __init__(self, pump: Pump,
-                 max_values: None | list[float | None] = None,
-                 min_values: None | list[float | None] = None) -> None:
-        self.pump = pump
-        if max_values is None:
-            self.max_values = [pump.max_driver_speed/pump.gear_ratio,
-                               pump.avail_power,
-                               3000,
-                               3500]
-            self.min_values = [0, 0, -100, 0]
-        self.source = ColumnDataSource(data=dict(gauges=['Speed (RPM)', 'Power (kW)', 'Pressure in', 'Pressure out'],
-                                                 y=[50, 50, 50, 50]))
-        self.gauges = figure(height=50)
-        self.row = row(self.gauges, sizing_mode='stretch_both')
-
-
-pump_controls = []
-for p in lpipeline.lpipe_list:
-    if type(p) is Pump:
-        pump_controls.append(PumpGauges(p).row)
-pump_tab = TabPanel(child=column(pump_controls, sizing_mode='stretch_both'), title='Pumps')
 
 
 def build_snake_source():
@@ -281,20 +68,20 @@ snake_plot.step(x='x', y='rho', mode='before', source=snake_source)
 
 crossover_gauge = CrossoverGauge(vel_max_value=9.0, den_max_value=1.5, pipe_dia=pipe_list[-1].diameter)
 
-velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
-                       y_range=(0.0, 10.0))
-velocity_plot.x_range.follow = "end"
-velocity_plot.x_range.follow_interval = 100
-velocity_plot.x_range.range_padding = 0
-velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=vd_source)
-
-density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
-                      y_range=(1.0, 1.6))
-density_plot.x_range.follow = "end"
-density_plot.x_range.follow_interval = 100
-density_plot.x_range.range_padding = 0
-density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=vd_source)
-density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=vd_source)
+# velocity_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+#                        y_range=(0.0, 10.0))
+# velocity_plot.x_range.follow = "end"
+# velocity_plot.x_range.follow_interval = 100
+# velocity_plot.x_range.range_padding = 0
+# velocity_plot.line(x='timestep', y='velocity', alpha=0.2, line_width=3, color='navy', source=vd_source)
+#
+# density_plot = figure(height=150, tools="xpan,xwheel_zoom,xbox_zoom,reset", y_axis_location="right",
+#                       y_range=(1.0, 1.6))
+# density_plot.x_range.follow = "end"
+# density_plot.x_range.follow_interval = 100
+# density_plot.x_range.range_padding = 0
+# density_plot.line(x='timestep', y='density_in', alpha=0.8, line_width=2, color='orange', source=vd_source)
+# density_plot.line(x='timestep', y='density_avg', alpha=0.8, line_width=2, color='red', source=vd_source)
 
 time_step_display = TextInput(title="Timestep", value=f"{0}", width=95, disabled=True)
 Vm_display = TextInput(title="Vm (m/s)", value=f"{0.0}", width=95, disabled=True)
@@ -389,6 +176,10 @@ def create_HQ_plot():
 HQ_plot, im_source, last10_source, last30_source = create_HQ_plot()
 HQ_panel = TabPanel(child=HQ_plot, title="HQ")
 
+hyd_gradeline, hyd_gl_source = create_hydraulic_gradeline(lpipeline)
+hyd_gl_panel = TabPanel(child=column([hyd_gradeline, snake_plot]),
+                        title="Gradeline")
+
 
 def update_HQ_plot():
     """Update the HQ plot from the given pipeline"""
@@ -406,6 +197,11 @@ def update_HQ_plot():
     last_hq = dict(Q=[lpipeline.lastflow], im=[lpipeline.last_head_loss * -1])
     last10_source.stream(last_hq, 1)
     last30_source.stream(last_hq, 30)
+
+    HQ_plot.xaxis[0].axis_label = (f'Velocity ({unit_labels["vel"]} in '
+                                   f'{pipeline.slurry.Dp * unit_convs["dia"]:0.1f} {unit_labels["dia"]} pipe)')
+    HQ_plot.y_range.end = 2 * pipeline.calc_system_head(0.1)[3] * unit_convs['len']
+    HQ_plot.x_range.end = flow_list[-1] * unit_convs['flow']
 
 
 update_HQ_plot()
@@ -436,25 +232,34 @@ def update():
                            lpipeline.lpipe_list[0].slugs[0].rhom)
 
     print(f'Timestep {new_data["timestep"][-1]}: Velocity: {new_data["velocity"][-1]:0.2f}, '
-          f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}')
+          f'Incoming Density: {new_data["density_in"][-1]:0.3f}, Pipeline Density: {new_data["density_avg"][-1]:0.3f}, '
+          f'Status: {lpipeline.suction_feed.status}')
     vd_source.stream(new_data, 100)
 
 
 def load_xl_data(attr, old, new):
-    """Load pipeline data from Excel file"""
-    global lpipeline
+    """Load the pipeline from an Excel file"""
+    global lpipeline, pipeline
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
     try:
         pipeline = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
         slurry = pipeline.slurry
         lpipeline = LagrPipeline(pipe_list=pipeline.pipesections, slurry=slurry,
-                                 suct_feed=CyclicFeed(slurry, densities=csd_densities, Dp=0.6))
+                                 suct_feed=CSDFeed(slurry, density=1.17),
+                                 start_pipeline_density=1.03)
         source = ColumnDataSource(data=dict(timestep=[], velocity=[], density_in=[], density_avg=[]))
         pipeline_info.text = f'{lpipeline}'.replace('\n', '<BR>')
         slurry_info.text = f'{slurry}'.replace('\n', '<BR>')
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
+
+    crossover_gauge.update(lpipeline.lpipe_list[-1].velocity(1.0),  # Use 1 m3/sec for initial update
+                           lpipeline.lpipe_list[0].slugs[0].rhom,
+                           rhof=slurry.rhol, rhos=slurry.rhos, rhoi=slurry.rhoi, pipe_dia=slurry.Dp)
+    snake_plot.x_range.end = lpipeline.total_length
+    update_HQ_plot()
+    update_hydraulic_gradeline(hyd_gradeline, hyd_gl_source, lpipeline)
 
 
 file_input = FileInput(accept=".xls, .xlsm, .xlsx")
@@ -466,8 +271,7 @@ rate = 1
 
 
 def update_framerate(attr, old, new):
-    """Change the speed of the simulation on user request"""
-    rate = new
+    """Change the framerate of the simulation"""
     if len(periodic_callbacks) > 0:
         curdoc().remove_periodic_callback(periodic_callbacks.pop(0))
         periodic_callbacks.append(curdoc().add_periodic_callback(update, (21 - new)*50))
@@ -495,9 +299,7 @@ start_button.on_click(start_button_clicked)
 
 # Button to stop the server
 def stop_button_callback():
-    """Stop the server
-
-    Browser window stays open"""
+    """Stop the server"""
     sys.exit()
 
 
@@ -506,7 +308,7 @@ stop_button.on_click(stop_button_callback)
 
 left_column = column(row(time_step_display, Vm_display, Sm_in_display, Sm_avg_display, prod_display),
                      column(crossover_gauge.figure, snake_plot))
-right_column = Tabs(tabs=[HQ_panel, pump_tab])
+right_column = Tabs(tabs=[HQ_panel, hyd_gl_panel])
 bottom_column = column(row(start_button, rate_slider),
                        stop_button,
                        num_slugs_display,
