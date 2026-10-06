@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         """Test loading the pipeline and pump objects correctly"""
         fname = "tests/Example_excel_input.xlsx"
         wb = openpyxl.load_workbook(filename=fname, data_only=True)
-        pipeline = load_pump_excel.load_pipeline_from_workbook(wb)
+        pipeline, du = load_pump_excel.load_pipeline_from_workbook(wb)
         self.assertEqual('UWP 34x34x60 @ 300RPM', pipeline.pumps[0].name)
         self.assertEqual('0.864x0.864x2.134m Pump at 315 RPM', pipeline.pumps[1].name)
         self.assertEqual('Entrance', pipeline.pipesections[0].name)
@@ -25,7 +25,7 @@ class MyTestCase(unittest.TestCase):
         """Test that the loaded pipeline calculations are correct"""
         fname = "tests/Example_excel_input.xlsx"
         wb = openpyxl.load_workbook(filename=fname, data_only=True)
-        pipeline = load_pump_excel.load_pipeline_from_workbook(wb)
+        pipeline, du = load_pump_excel.load_pipeline_from_workbook(wb)
 
         flow_list = [pipeline.pipesections[-1].flow(v) for v in pipeline.slurry.vls_list]
         self.assertAlmostEqual(3.4017658516096114, pipeline.find_operating_point(flow_list))

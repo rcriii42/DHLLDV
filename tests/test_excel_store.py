@@ -17,10 +17,10 @@ class MyTestCase(unittest.TestCase):
         self.input_fname = "tests/Example_excel_input.xlsx"
         self.output_fname = None  # This is a placeholder for the real name, which will be created by the store_to_excel
         self.input_wb = openpyxl.load_workbook(filename=self.input_fname, data_only=True)
-        self.in_pipeline = load_pump_excel.load_pipeline_from_workbook(self.input_wb)
+        self.in_pipeline, du = load_pump_excel.load_pipeline_from_workbook(self.input_wb)
         self.output_fname = store_pump_excel.store_to_excel(self.in_pipeline, path='tests')
         self.output_wb = openpyxl.load_workbook(filename=self.output_fname, data_only=True)
-        self.out_pipeline = load_pump_excel.load_pipeline_from_workbook(self.output_wb)
+        self.out_pipeline, du = load_pump_excel.load_pipeline_from_workbook(self.output_wb)
 
     def tearDown(self):
         """Delete the newly-created output file"""

@@ -310,9 +310,9 @@ if __name__ == "__main__":
     from DHLLDV_viewer.load_pump_excel import load_pipeline_from_workbook
     in_fname = "static/pipelines/Example_input.xlsx"
     wb = openpyxl.load_workbook(filename=in_fname, data_only=True)
-    PL = load_pipeline_from_workbook(wb)
+    PL, du = load_pipeline_from_workbook(wb)
     PL.name = f'Example Stored Pipeline: {datetime.datetime.now().strftime("%Y-%m-%d_%H%M%S")}'
     new_PL_xl_name = store_to_excel(PL, requireds=excel_requireds)
 
     new_wb = openpyxl.load_workbook(filename=new_PL_xl_name, data_only=True)
-    new_PL = load_pipeline_from_workbook(new_wb)
+    new_PL, new_du = load_pipeline_from_workbook(new_wb)

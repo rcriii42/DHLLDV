@@ -359,7 +359,7 @@ if __name__ == "__main__":
         if 'pipeline' in ws_name.lower():
             input_type = 'pipeline'
             pipeline_name = get_range_value(wb, sheet_id, 'name')
-            pipeline = load_pipeline_from_workbook(wb)
+            pipeline, du = load_pipeline_from_workbook(wb)
 
     try:
         import sys
