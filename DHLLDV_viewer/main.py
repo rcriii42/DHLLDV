@@ -578,7 +578,7 @@ file_input.on_change('filename', upload_xl_data)
 
 # Button to save to Excel
 def save_button_callback():
-    store_to_excel(pipeline)
+    store_to_excel(pipeline, display_units=unit_picker.label[:2])
 
 
 save_button = Button(label="Save to Excel", button_type="success")

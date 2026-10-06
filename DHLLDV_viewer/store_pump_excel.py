@@ -253,13 +253,14 @@ def write_pipesections_to_excel(wb: openpyxl.workbook, pipesections: list[Pipe, 
 
 
 def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dict or None = None,
-                   path: str or None = None) -> str:
+                   path: str or None = None, display_units: str or None = 'SI') -> str:
     """Store the pipeline to a new Excel file
 
     pipeline: The pipeline to store
     fname: The name of the file to store. If None, the filename will be a version of the pipeline name with a timestamp
     requireds: A dict with the layout of the file. If None, use excel_requireds defined above
     path: The folder path (relative to .) for saving
+    display_units: The units to use in the UI display
 
     returns the new filename
     """
@@ -293,7 +294,9 @@ def store_to_excel(pipeline: Pipeline, fname: str or None = None, requireds: dic
             ws = wb.create_sheet(sheet_name)
             ws[f'A1'] = 'Name:'
             create_and_fill_named_range(wb, sheet_name, 'name', f'B1', pipeline.name)
-            write_pipesections_to_excel(wb, pipeline.pipesections, 3)
+            ws[f'A2'] = 'Display Units:'
+            create_and_fill_named_range(wb, sheet_name, 'display_units', f'B2', display_units)
+            write_pipesections_to_excel(wb, pipeline.pipesections, 4)
         else:
             pass
     wb.save(fname)
