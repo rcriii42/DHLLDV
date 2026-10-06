@@ -71,7 +71,7 @@ class CrossoverGauge:
 
         self.tick_len = 1.05  # Length of the tick relative to the axis radius
 
-        self.figure = figure(height=375,
+        self.figure = figure(height=300,
                              x_range=(den_pointer_origin[0]*1.5, vel_pointer_origin[0]*1.5),
                              y_range=(-0.1, 0.85 * (self.vel_pointer_origin[0] - self.den_pointer_origin[0])),
                              tools="", outline_line_color="black")
