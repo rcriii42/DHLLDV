@@ -7,6 +7,8 @@ The spreadsheet should have sheets with the following properties:
 - Sheets without 'pipeline', 'pump, 'driver', or 'slurry' in the name are ignored
 - One worksheet named 'Pipeline'
     - Has a named range Pipeline!name
+    - Has a named range Pipeline!display_units with value "SI" or "US", sets the units to display on loading the file,
+    does _not_ affect input units
     - Has a named range Pipeline!pipe_table with a header row and the following columns:
         - Pipe Name: The name of the pipesection or pump
             - If this is a pipesection, any valid string not containing the word 'pump'
@@ -194,11 +196,22 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
     slurry = False
     pump_sheets = {}
     driver_sheets = {}
+    display_units = None
 
     for ws_name in wb.sheetnames:
         sheet_id = wb.sheetnames.index(ws_name)  # The id / index of a worksheet
         if 'pipeline' in ws_name.lower():
             pipeline_name = get_range_value(wb, sheet_id, 'name')
+            try:
+                display_units = get_range_value(wb, sheet_id, 'display_units')
+            except KeyError:
+                print('Display_units not defined, not reset')
+            try:
+                assert display_units in ['SI', 'US']
+            except AssertionError:
+                print(f'Display_units "{display_units}" not recognized, not reset')
+                display_units = None
+
             pipesheet_id = sheet_id
         elif 'pump' in ws_name.lower():
             pump_sheets[ws_name.lower().removesuffix('pump')] = sheet_id
@@ -243,7 +256,7 @@ def load_pipeline_from_workbook(wb: openpyxl.Workbook):
                               total_K=float(vals[k_col]),
                               elev_change=float(vals[dz_col])))
     print(f'Loaded {pipeline_name}')
-    return Pipeline(name=pipeline_name, pipe_list=pipes, slurry=slurry)
+    return Pipeline(name=pipeline_name, pipe_list=pipes, slurry=slurry), display_units
 
 
 def load_slurry_from_workbook(wb: openpyxl.workbook, sheet_id: int):

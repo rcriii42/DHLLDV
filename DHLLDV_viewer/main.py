@@ -559,11 +559,14 @@ def upload_xl_data(attr, old, new):
     global slurry
     excel = io.BytesIO(base64.b64decode(file_input.value))
     try:
-        pipeline = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
+        pipeline, disp_units = load_pipeline_from_workbook(openpyxl.load_workbook(filename=excel, data_only=True))
         slurry = pipeline.slurry
         pipeline_dropdown.label = "Pipeline: " + pipeline.name
         SystemTab.setups[pipeline.name] = pipeline
         pipeline_dropdown.menu = [(s, s) for s in SystemTab.setups.keys()]
+        if disp_units is not None:
+            unit_picker.label = disp_units + " Units"
+            SystemTab.select_units(disp_units)
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
     update_source_data()
@@ -606,6 +609,6 @@ doc.on_session_destroyed(cleanup_session)
 
 
 doc.add_root(column(top_row,
-                         tabbed_panels))
+                    tabbed_panels))
 
 doc.title = "Visualizing DHLLDV"
