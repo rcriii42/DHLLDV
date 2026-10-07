@@ -8,12 +8,14 @@ Added by R. Ramsdell 19 August, 2021
 import base64
 import io
 import sys
+from zipfile import BadZipfile
 
 import openpyxl
+from bokeh.core.property.descriptors import UnsetValueError
 
 from bokeh.io import curdoc
 from bokeh.layouts import column, row
-from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup
+from bokeh.models import ColumnDataSource, TextInput, Button, RadioButtonGroup, Scatter
 from bokeh.models import Spacer, Div, TabPanel, Tabs, Dropdown
 from bokeh.models.tickers import FixedTicker
 from bokeh.models.widgets import FileInput
@@ -84,12 +86,13 @@ def update_source_data():
 
     # Reset the file input
     global file_input
-    if file_input.filename:
-        file_input.remove_on_change('filename', upload_xl_data)
-        del top_row.children[2]  # This deletes the file_input
-        file_input = FileInput(accept=".xls, .xlsm, .xlsx")
-        file_input.on_change('filename', upload_xl_data)
-        top_row.children.insert(2, file_input)
+    try:
+        if file_input.filename:
+            file_input.remove_on_change('filename', upload_xl_data)
+            file_input.clear()
+            file_input.on_change('filename', upload_xl_data)
+    except UnsetValueError:
+        pass
 
 
 ################
@@ -254,7 +257,8 @@ GSD_plot.line('dia', 'p', source=GSD_source,
               # legend_label='Grain Size Distribution',
               name='GSD')
 
-GSD_plot.circle_dot('dia', 'p', source=GSD_source, name='GSD')
+glyph = Scatter(x="dia", y="p", marker="circle", fill_color='blue', line_color='blue')
+GSD_plot.add_glyph(GSD_source, glyph)
 GSD_plot.xaxis[0].axis_label = 'Grain Size (mm)'
 
 GSD_plot.yaxis[0].axis_label = '% passing'
@@ -569,6 +573,13 @@ def upload_xl_data(attr, old, new):
             SystemTab.select_units(disp_units)
     except InvalidExcelError as e:
         print(f'Error loading {file_input.filename}: {e}')
+    except BadZipfile as e:
+        if not file_input.filename:
+            pass
+        else:
+            print(e)
+            print(f'Error loading {file_input.filename}')
+
     update_source_data()
 
 
@@ -578,7 +589,8 @@ file_input.on_change('filename', upload_xl_data)
 
 # Button to save to Excel
 def save_button_callback():
-    store_to_excel(pipeline, display_units=unit_picker.label[:2])
+    """Save the pipeline to Excel"""
+    store_to_excel(pipeline)
 
 
 save_button = Button(label="Save to Excel", button_type="success")
